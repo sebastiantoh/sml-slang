@@ -1,0 +1,40 @@
+{
+  "name": "sml-slang",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "description": "SML sub-language implementation",
+  "scripts": {
+    "antlr4ts": "antlr4ts -visitor src/lang/Sml.g4",
+    "build": "yarn tsc --build --force",
+    "ci": "yarn format:ci && yarn eslint",
+    "compile": "yarn tsc",
+    "eslint": "eslint --ext \".ts,.tsx\" src",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:ci": "prettier --list-different \"src/**/*.{ts,tsx}\"",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebastiantoh/sml-slang.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sebastiantoh/sml-slang/issues"
+  },
+  "homepage": "https://github.com/sebastiantoh/sml-slang#readme",
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^4.4.1",
+    "@typescript-eslint/parser": "^4.4.1",
+    "antlr4ts-cli": "^0.5.0-alpha.4",
+    "eslint": "^7.11.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "husky": "^8.0.1",
+    "prettier": "^2.1.2",
+    "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "antlr4ts": "^0.5.0-alpha.4"
+  }
+}
