@@ -14,7 +14,14 @@ const builtin_infix_operators = {
   mod: (a: any, b: any) => ((a % b) + b) % b,
   '*': (a: any, b: any) => a * b,
   '+': (a: any, b: any) => a + b,
-  '-': (a: any, b: any) => a - b
+  '-': (a: any, b: any) => a - b,
+  '^': (a: any, b: any) => a.concat(b),
+  '=': (a: any, b: any) => a === b,
+  '<>': (a: any, b: any) => a !== b,
+  '<': (a: any, b: any) => a < b,
+  '>': (a: any, b: any) => a > b,
+  '<=': (a: any, b: any) => a <= b,
+  '>=': (a: any, b: any) => a >= b
 }
 
 const evaluators: { [nodeType: string]: Evaluator } = {

@@ -40,6 +40,15 @@ MOD: 'mod';
 STAR: '*';
 PLUS: '+';
 MINUS: '-';
+CARET: '^';
+CONS: '::';
+AT: '@';
+EQ: '=';
+NEQ: '<>';
+LT: '<';
+GT: '>';
+LTE: '<=';
+GTE: '>=';
 
 ID
     : LETTER (LETTER | DIGIT | '\'' | '_' )*
@@ -57,9 +66,11 @@ con
     ;
 
 exp
-    : con                                             # Constant
+    : con                                                             # Constant
     // Precedence levels can be found on Page 98 of https://smlfamily.github.io/sml90-defn.pdf
-    | op1=exp id=(SLASH | DIV | MOD | STAR) op2=exp   # InfixApplication
-    | op1=exp id=(PLUS | MINUS) op2=exp               # InfixApplication
-    | op1=exp id=ID op2=exp                           # InfixApplication
+    | op1=exp id=(SLASH | DIV | MOD | STAR) op2=exp                   # InfixApplication
+    | op1=exp id=(PLUS | MINUS | CARET) op2=exp                       # InfixApplication
+    | <assoc=right> op1=exp id=(CONS | AT) op2=exp                    # InfixApplication
+    | op1=exp id=(EQ | NEQ | LT | GT | LTE | GTE) op2=exp             # InfixApplication
+    | op1=exp id=ID op2=exp                                           # InfixApplication
     ;
