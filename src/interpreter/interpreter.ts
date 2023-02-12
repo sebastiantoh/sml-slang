@@ -4,7 +4,6 @@ import { Context } from '../types'
 // TODO: replace any with some Value class or something
 type Evaluator = (node: Node, context: Context) => any
 
-// TODO: handle precedence of diff infix operators
 // Full list of builtins along with precedence can be found on
 // Page 98 of https://smlfamily.github.io/sml90-defn.pdf
 const builtin_infix_operators = {

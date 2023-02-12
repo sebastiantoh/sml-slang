@@ -26,8 +26,6 @@ test('Infix Applications: negInt mod negInt', () =>
   expect(parse_and_evaluate(`~5 mod ~2`)).toBe(-1))
 test('Infix Applications: int + int', () => expect(parse_and_evaluate(`1 + 2`)).toBe(3))
 test('Infix Applications: int - int', () => expect(parse_and_evaluate(`1 - 2`)).toBe(-1))
-// TODO: fix this test case. idk how why prec doesn't work with antlr
-// test("Infix Applications: precendence of builtin operators", () =>
-//   expect(parse_and_evaluate(`2 + 6 * 3 div 2 - 10 div 2`)).toBe(6)
-// )
+test('Infix Applications: precendence of builtin operators', () =>
+  expect(parse_and_evaluate(`2 + 6 * 3 div 2 - 10 div 2`)).toBe(6))
 // TODO: add more test cases for other builtin stuff

@@ -34,18 +34,18 @@ fragment SAFECODEPOINT: ~ ["\\\u0000-\u001F];
 // reference: https://stackoverflow.com/questions/66902057/antlr-how-to-accept-double-quotes-inside-double-quoted-string-while-parsing
 fragment ASCII: ESC | SAFECODEPOINT;
 
-ID
-    : LETTER (LETTER | DIGIT | '\'' | '_' )*
-    | ( '!' | '%' | '&' | '$' | '#' | '+' | '-' | '/' | ':' |
-        '<' | '=' | '>' | '?' | '@' | '\\' | '~' | '`' | '^' | '|' | '*' )+
-    ;
-
 SLASH: '/';
 DIV: 'div';
 MOD: 'mod';
 STAR: '*';
 PLUS: '+';
 MINUS: '-';
+
+ID
+    : LETTER (LETTER | DIGIT | '\'' | '_' )*
+    | ( '!' | '%' | '&' | '$' | '#' | '+' | '-' | '/' | ':' |
+        '<' | '=' | '>' | '?' | '@' | '\\' | '~' | '`' | '^' | '|' | '*' )+
+    ;
 
 /** Productions */
 
