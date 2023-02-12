@@ -40,6 +40,13 @@ ID
         '<' | '=' | '>' | '?' | '@' | '\\' | '~' | '`' | '^' | '|' | '*' )+
     ;
 
+SLASH: '/';
+DIV: 'div';
+MOD: 'mod';
+STAR: '*';
+PLUS: '+';
+MINUS: '-';
+
 /** Productions */
 
 con
@@ -50,6 +57,9 @@ con
     ;
 
 exp
-    : con                                      # Constant
-    | op1=exp id=ID op2=exp                  # InfixApplication
+    : con                                             # Constant
+    // Precedence levels can be found on Page 98 of https://smlfamily.github.io/sml90-defn.pdf
+    | op1=exp id=(SLASH | DIV | MOD | STAR) op2=exp   # InfixApplication
+    | op1=exp id=(PLUS | MINUS) op2=exp               # InfixApplication
+    | op1=exp id=ID op2=exp                           # InfixApplication
     ;

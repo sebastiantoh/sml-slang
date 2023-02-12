@@ -34,6 +34,12 @@ export class SmlParser extends Parser {
 	public static readonly CHAR = 4;
 	public static readonly STRING = 5;
 	public static readonly ID = 6;
+	public static readonly SLASH = 7;
+	public static readonly DIV = 8;
+	public static readonly MOD = 9;
+	public static readonly STAR = 10;
+	public static readonly PLUS = 11;
+	public static readonly MINUS = 12;
 	public static readonly RULE_con = 0;
 	public static readonly RULE_exp = 1;
 	// tslint:disable:no-trailing-whitespace
@@ -42,9 +48,12 @@ export class SmlParser extends Parser {
 	];
 
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
+		"'/'", "'div'", "'mod'", "'*'", "'+'", "'-'",
 	];
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
-		undefined, "WHITESPACE", "INT", "FLOAT", "CHAR", "STRING", "ID",
+		undefined, "WHITESPACE", "INT", "FLOAT", "CHAR", "STRING", "ID", "SLASH", 
+		"DIV", "MOD", "STAR", "PLUS", "MINUS",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(SmlParser._LITERAL_NAMES, SmlParser._SYMBOLIC_NAMES, []);
 
@@ -145,6 +154,7 @@ export class SmlParser extends Parser {
 		let _prevctx: ExpContext = _localctx;
 		let _startState: number = 2;
 		this.enterRecursionRule(_localctx, 2, SmlParser.RULE_exp, _p);
+		let _la: number;
 		try {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
@@ -158,9 +168,9 @@ export class SmlParser extends Parser {
 			this.con();
 			}
 			this._ctx._stop = this._input.tryLT(-1);
-			this.state = 18;
+			this.state = 24;
 			this._errHandler.sync(this);
-			_alt = this.interpreter.adaptivePredict(this._input, 1, this._ctx);
+			_alt = this.interpreter.adaptivePredict(this._input, 2, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
 				if (_alt === 1) {
 					if (this._parseListeners != null) {
@@ -168,24 +178,84 @@ export class SmlParser extends Parser {
 					}
 					_prevctx = _localctx;
 					{
-					{
-					_localctx = new InfixApplicationContext(new ExpContext(_parentctx, _parentState));
-					(_localctx as InfixApplicationContext)._op1 = _prevctx;
-					this.pushNewRecursionContext(_localctx, _startState, SmlParser.RULE_exp);
-					this.state = 13;
-					if (!(this.precpred(this._ctx, 1))) {
-						throw this.createFailedPredicateException("this.precpred(this._ctx, 1)");
-					}
-					this.state = 14;
-					(_localctx as InfixApplicationContext)._id = this.match(SmlParser.ID);
-					this.state = 15;
-					(_localctx as InfixApplicationContext)._op2 = this.exp(2);
+					this.state = 22;
+					this._errHandler.sync(this);
+					switch ( this.interpreter.adaptivePredict(this._input, 1, this._ctx) ) {
+					case 1:
+						{
+						_localctx = new InfixApplicationContext(new ExpContext(_parentctx, _parentState));
+						(_localctx as InfixApplicationContext)._op1 = _prevctx;
+						this.pushNewRecursionContext(_localctx, _startState, SmlParser.RULE_exp);
+						this.state = 13;
+						if (!(this.precpred(this._ctx, 3))) {
+							throw this.createFailedPredicateException("this.precpred(this._ctx, 3)");
+						}
+						this.state = 14;
+						(_localctx as InfixApplicationContext)._id = this._input.LT(1);
+						_la = this._input.LA(1);
+						if (!((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << SmlParser.SLASH) | (1 << SmlParser.DIV) | (1 << SmlParser.MOD) | (1 << SmlParser.STAR))) !== 0))) {
+							(_localctx as InfixApplicationContext)._id = this._errHandler.recoverInline(this);
+						} else {
+							if (this._input.LA(1) === Token.EOF) {
+								this.matchedEOF = true;
+							}
+
+							this._errHandler.reportMatch(this);
+							this.consume();
+						}
+						this.state = 15;
+						(_localctx as InfixApplicationContext)._op2 = this.exp(4);
+						}
+						break;
+
+					case 2:
+						{
+						_localctx = new InfixApplicationContext(new ExpContext(_parentctx, _parentState));
+						(_localctx as InfixApplicationContext)._op1 = _prevctx;
+						this.pushNewRecursionContext(_localctx, _startState, SmlParser.RULE_exp);
+						this.state = 16;
+						if (!(this.precpred(this._ctx, 2))) {
+							throw this.createFailedPredicateException("this.precpred(this._ctx, 2)");
+						}
+						this.state = 17;
+						(_localctx as InfixApplicationContext)._id = this._input.LT(1);
+						_la = this._input.LA(1);
+						if (!(_la === SmlParser.PLUS || _la === SmlParser.MINUS)) {
+							(_localctx as InfixApplicationContext)._id = this._errHandler.recoverInline(this);
+						} else {
+							if (this._input.LA(1) === Token.EOF) {
+								this.matchedEOF = true;
+							}
+
+							this._errHandler.reportMatch(this);
+							this.consume();
+						}
+						this.state = 18;
+						(_localctx as InfixApplicationContext)._op2 = this.exp(3);
+						}
+						break;
+
+					case 3:
+						{
+						_localctx = new InfixApplicationContext(new ExpContext(_parentctx, _parentState));
+						(_localctx as InfixApplicationContext)._op1 = _prevctx;
+						this.pushNewRecursionContext(_localctx, _startState, SmlParser.RULE_exp);
+						this.state = 19;
+						if (!(this.precpred(this._ctx, 1))) {
+							throw this.createFailedPredicateException("this.precpred(this._ctx, 1)");
+						}
+						this.state = 20;
+						(_localctx as InfixApplicationContext)._id = this.match(SmlParser.ID);
+						this.state = 21;
+						(_localctx as InfixApplicationContext)._op2 = this.exp(2);
+						}
+						break;
 					}
 					}
 				}
-				this.state = 20;
+				this.state = 26;
 				this._errHandler.sync(this);
-				_alt = this.interpreter.adaptivePredict(this._input, 1, this._ctx);
+				_alt = this.interpreter.adaptivePredict(this._input, 2, this._ctx);
 			}
 			}
 		}
@@ -214,24 +284,33 @@ export class SmlParser extends Parser {
 	private exp_sempred(_localctx: ExpContext, predIndex: number): boolean {
 		switch (predIndex) {
 		case 0:
+			return this.precpred(this._ctx, 3);
+
+		case 1:
+			return this.precpred(this._ctx, 2);
+
+		case 2:
 			return this.precpred(this._ctx, 1);
 		}
 		return true;
 	}
 
 	public static readonly _serializedATN: string =
-		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03\b\x18\x04\x02" +
+		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03\x0E\x1E\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x03\x02\x03\x02\x03\x02\x03\x02\x05\x02\v\n\x02\x03" +
-		"\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x07\x03\x13\n\x03\f\x03\x0E" +
-		"\x03\x16\v\x03\x03\x03\x02\x02\x03\x04\x04\x02\x02\x04\x02\x02\x02\x02" +
-		"\x19\x02\n\x03\x02\x02\x02\x04\f\x03\x02\x02\x02\x06\v\x07\x04\x02\x02" +
+		"\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03" +
+		"\x03\x03\x03\x03\x03\x07\x03\x19\n\x03\f\x03\x0E\x03\x1C\v\x03\x03\x03" +
+		"\x02\x02\x03\x04\x04\x02\x02\x04\x02\x02\x04\x03\x02\t\f\x03\x02\r\x0E" +
+		"\x02!\x02\n\x03\x02\x02\x02\x04\f\x03\x02\x02\x02\x06\v\x07\x04\x02\x02" +
 		"\x07\v\x07\x05\x02\x02\b\v\x07\x06\x02\x02\t\v\x07\x07\x02\x02\n\x06\x03" +
 		"\x02\x02\x02\n\x07\x03\x02\x02\x02\n\b\x03\x02\x02\x02\n\t\x03\x02\x02" +
 		"\x02\v\x03\x03\x02\x02\x02\f\r\b\x03\x01\x02\r\x0E\x05\x02\x02\x02\x0E" +
-		"\x14\x03\x02\x02\x02\x0F\x10\f\x03\x02\x02\x10\x11\x07\b\x02\x02\x11\x13" +
-		"\x05\x04\x03\x04\x12\x0F\x03\x02\x02\x02\x13\x16\x03\x02\x02\x02\x14\x12" +
-		"\x03\x02\x02\x02\x14\x15\x03\x02\x02\x02\x15\x05\x03\x02\x02\x02\x16\x14" +
-		"\x03\x02\x02\x02\x04\n\x14";
+		"\x1A\x03\x02\x02\x02\x0F\x10\f\x05\x02\x02\x10\x11\t\x02\x02\x02\x11\x19" +
+		"\x05\x04\x03\x06\x12\x13\f\x04\x02\x02\x13\x14\t\x03\x02\x02\x14\x19\x05" +
+		"\x04\x03\x05\x15\x16\f\x03\x02\x02\x16\x17\x07\b\x02\x02\x17\x19\x05\x04" +
+		"\x03\x04\x18\x0F\x03\x02\x02\x02\x18\x12\x03\x02\x02\x02\x18\x15\x03\x02" +
+		"\x02\x02\x19\x1C\x03\x02\x02\x02\x1A\x18\x03\x02\x02\x02\x1A\x1B\x03\x02" +
+		"\x02\x02\x1B\x05\x03\x02\x02\x02\x1C\x1A\x03\x02\x02\x02\x05\n\x18\x1A";
 	public static __ATN: ATN;
 	public static get _ATN(): ATN {
 		if (!SmlParser.__ATN) {
@@ -415,7 +494,13 @@ export class InfixApplicationContext extends ExpContext {
 			return this.getRuleContext(i, ExpContext);
 		}
 	}
-	public ID(): TerminalNode { return this.getToken(SmlParser.ID, 0); }
+	public SLASH(): TerminalNode | undefined { return this.tryGetToken(SmlParser.SLASH, 0); }
+	public DIV(): TerminalNode | undefined { return this.tryGetToken(SmlParser.DIV, 0); }
+	public MOD(): TerminalNode | undefined { return this.tryGetToken(SmlParser.MOD, 0); }
+	public STAR(): TerminalNode | undefined { return this.tryGetToken(SmlParser.STAR, 0); }
+	public PLUS(): TerminalNode | undefined { return this.tryGetToken(SmlParser.PLUS, 0); }
+	public MINUS(): TerminalNode | undefined { return this.tryGetToken(SmlParser.MINUS, 0); }
+	public ID(): TerminalNode | undefined { return this.tryGetToken(SmlParser.ID, 0); }
 	constructor(ctx: ExpContext) {
 		super(ctx.parent, ctx.invokingState);
 		this.copyFrom(ctx);

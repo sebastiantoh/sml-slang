@@ -8,8 +8,14 @@ type Evaluator = (node: Node, context: Context) => any
 // Full list of builtins along with precedence can be found on
 // Page 98 of https://smlfamily.github.io/sml90-defn.pdf
 const builtin_infix_operators = {
+  // TODO: handle div by 0?
+  '/': (a: any, b: any) => a / b,
+  // TODO: handle div by 0?
+  div: (a: any, b: any) => Math.floor(a / b),
+  mod: (a: any, b: any) => ((a % b) + b) % b,
+  '*': (a: any, b: any) => a * b,
   '+': (a: any, b: any) => a + b,
-  div: (a: any, b: any) => Math.floor(a / b)
+  '-': (a: any, b: any) => a - b
 }
 
 const evaluators: { [nodeType: string]: Evaluator } = {

@@ -17,7 +17,17 @@ test('Constants: Character constant', () => expect(parse_and_evaluate(`#"a"`)).t
 test('Constants: String constant', () => expect(parse_and_evaluate(`"abc"`)).toBe('abc'))
 
 // Infix Applications
-test('Infix Applications: constant + constant', () => expect(parse_and_evaluate(`1 + 2`)).toBe(3))
-test('Infix Applications: constant div constant', () =>
-  expect(parse_and_evaluate(`5 div 2`)).toBe(2))
+test('Infix Applications: float / float', () => expect(parse_and_evaluate(`1.0 / 2.0`)).toBe(0.5))
+test('Infix Applications: int div int', () => expect(parse_and_evaluate(`5 div 2`)).toBe(2))
+test('Infix Applications: posInt mod posInt', () => expect(parse_and_evaluate(`5 mod 2`)).toBe(1))
+test('Infix Applications: posInt mod negInt', () => expect(parse_and_evaluate(`5 mod ~2`)).toBe(-1))
+test('Infix Applications: negInt mod posInt', () => expect(parse_and_evaluate(`~5 mod 2`)).toBe(1))
+test('Infix Applications: negInt mod negInt', () =>
+  expect(parse_and_evaluate(`~5 mod ~2`)).toBe(-1))
+test('Infix Applications: int + int', () => expect(parse_and_evaluate(`1 + 2`)).toBe(3))
+test('Infix Applications: int - int', () => expect(parse_and_evaluate(`1 - 2`)).toBe(-1))
+// TODO: fix this test case. idk how why prec doesn't work with antlr
+// test("Infix Applications: precendence of builtin operators", () =>
+//   expect(parse_and_evaluate(`2 + 6 * 3 div 2 - 10 div 2`)).toBe(6)
+// )
 // TODO: add more test cases for other builtin stuff
