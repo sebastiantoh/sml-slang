@@ -6,7 +6,7 @@ type Evaluator = (node: Node, context: Context) => any
 
 // Full list of builtins along with precedence can be found on
 // Page 98 of https://smlfamily.github.io/sml90-defn.pdf
-const builtin_infix_operators = {
+const builtinInfixOperators = {
   // TODO: handle div by 0?
   '/': (a: any, b: any) => a / b,
   // TODO: handle div by 0?
@@ -31,7 +31,7 @@ const evaluators: { [nodeType: string]: Evaluator } = {
   InfixApplication: function* (node: InfixApplication, context: Context) {
     // TODO: should first lookup context first, before looking up builtin operators
     // Or we can add builtin operators to context.
-    const operator = builtin_infix_operators[node.id]
+    const operator = builtinInfixOperators[node.id]
     const op1 = yield* evaluate(node.operand1, context)
     const op2 = yield* evaluate(node.operand2, context)
     return operator(op1, op2)
