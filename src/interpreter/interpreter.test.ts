@@ -18,5 +18,6 @@ test('Constants: String constant', () => expect(parse_and_evaluate(`"abc"`)).toB
 
 // Infix Applications
 test('Infix Applications: constant + constant', () => expect(parse_and_evaluate(`1 + 2`)).toBe(3))
+test('Infix Applications: constant div constant', () =>
+  expect(parse_and_evaluate(`5 div 2`)).toBe(2))
 // TODO: add more test cases for other builtin stuff
-// test('Infix Applications: constant div constant', () => expect(parse_and_evaluate(`6 div 2`)).toBe('3'))
