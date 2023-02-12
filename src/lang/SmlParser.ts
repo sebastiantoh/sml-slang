@@ -33,6 +33,7 @@ export class SmlParser extends Parser {
 	public static readonly FLOAT = 3;
 	public static readonly CHAR = 4;
 	public static readonly STRING = 5;
+	public static readonly ID = 6;
 	public static readonly RULE_con = 0;
 	public static readonly RULE_exp = 1;
 	// tslint:disable:no-trailing-whitespace
@@ -43,7 +44,7 @@ export class SmlParser extends Parser {
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
 	];
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
-		undefined, "WHITESPACE", "INT", "FLOAT", "CHAR", "STRING",
+		undefined, "WHITESPACE", "INT", "FLOAT", "CHAR", "STRING", "ID",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(SmlParser._LITERAL_NAMES, SmlParser._SYMBOLIC_NAMES, []);
 
@@ -129,16 +130,63 @@ export class SmlParser extends Parser {
 		}
 		return _localctx;
 	}
+
+	public exp(): ExpContext;
+	public exp(_p: number): ExpContext;
 	// @RuleVersion(0)
-	public exp(): ExpContext {
-		let _localctx: ExpContext = new ExpContext(this._ctx, this.state);
-		this.enterRule(_localctx, 2, SmlParser.RULE_exp);
+	public exp(_p?: number): ExpContext {
+		if (_p === undefined) {
+			_p = 0;
+		}
+
+		let _parentctx: ParserRuleContext = this._ctx;
+		let _parentState: number = this.state;
+		let _localctx: ExpContext = new ExpContext(this._ctx, _parentState);
+		let _prevctx: ExpContext = _localctx;
+		let _startState: number = 2;
+		this.enterRecursionRule(_localctx, 2, SmlParser.RULE_exp, _p);
 		try {
-			_localctx = new ConstantContext(_localctx);
+			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 10;
+			{
+			_localctx = new ConstantContext(_localctx);
+			this._ctx = _localctx;
+			_prevctx = _localctx;
+
+			this.state = 11;
 			this.con();
+			}
+			this._ctx._stop = this._input.tryLT(-1);
+			this.state = 18;
+			this._errHandler.sync(this);
+			_alt = this.interpreter.adaptivePredict(this._input, 1, this._ctx);
+			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
+				if (_alt === 1) {
+					if (this._parseListeners != null) {
+						this.triggerExitRuleEvent();
+					}
+					_prevctx = _localctx;
+					{
+					{
+					_localctx = new InfixApplicationContext(new ExpContext(_parentctx, _parentState));
+					(_localctx as InfixApplicationContext)._op1 = _prevctx;
+					this.pushNewRecursionContext(_localctx, _startState, SmlParser.RULE_exp);
+					this.state = 13;
+					if (!(this.precpred(this._ctx, 1))) {
+						throw this.createFailedPredicateException("this.precpred(this._ctx, 1)");
+					}
+					this.state = 14;
+					(_localctx as InfixApplicationContext)._id = this.match(SmlParser.ID);
+					this.state = 15;
+					(_localctx as InfixApplicationContext)._op2 = this.exp(2);
+					}
+					}
+				}
+				this.state = 20;
+				this._errHandler.sync(this);
+				_alt = this.interpreter.adaptivePredict(this._input, 1, this._ctx);
+			}
 			}
 		}
 		catch (re) {
@@ -151,19 +199,39 @@ export class SmlParser extends Parser {
 			}
 		}
 		finally {
-			this.exitRule();
+			this.unrollRecursionContexts(_parentctx);
 		}
 		return _localctx;
 	}
 
+	public sempred(_localctx: RuleContext, ruleIndex: number, predIndex: number): boolean {
+		switch (ruleIndex) {
+		case 1:
+			return this.exp_sempred(_localctx as ExpContext, predIndex);
+		}
+		return true;
+	}
+	private exp_sempred(_localctx: ExpContext, predIndex: number): boolean {
+		switch (predIndex) {
+		case 0:
+			return this.precpred(this._ctx, 1);
+		}
+		return true;
+	}
+
 	public static readonly _serializedATN: string =
-		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03\x07\x0F\x04\x02" +
+		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03\b\x18\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x03\x02\x03\x02\x03\x02\x03\x02\x05\x02\v\n\x02\x03" +
-		"\x03\x03\x03\x03\x03\x02\x02\x02\x04\x02\x02\x04\x02\x02\x02\x02\x0F\x02" +
-		"\n\x03\x02\x02\x02\x04\f\x03\x02\x02\x02\x06\v\x07\x04\x02\x02\x07\v\x07" +
-		"\x05\x02\x02\b\v\x07\x06\x02\x02\t\v\x07\x07\x02\x02\n\x06\x03\x02\x02" +
-		"\x02\n\x07\x03\x02\x02\x02\n\b\x03\x02\x02\x02\n\t\x03\x02\x02\x02\v\x03" +
-		"\x03\x02\x02\x02\f\r\x05\x02\x02\x02\r\x05\x03\x02\x02\x02\x03\n";
+		"\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03\x07\x03\x13\n\x03\f\x03\x0E" +
+		"\x03\x16\v\x03\x03\x03\x02\x02\x03\x04\x04\x02\x02\x04\x02\x02\x02\x02" +
+		"\x19\x02\n\x03\x02\x02\x02\x04\f\x03\x02\x02\x02\x06\v\x07\x04\x02\x02" +
+		"\x07\v\x07\x05\x02\x02\b\v\x07\x06\x02\x02\t\v\x07\x07\x02\x02\n\x06\x03" +
+		"\x02\x02\x02\n\x07\x03\x02\x02\x02\n\b\x03\x02\x02\x02\n\t\x03\x02\x02" +
+		"\x02\v\x03\x03\x02\x02\x02\f\r\b\x03\x01\x02\r\x0E\x05\x02\x02\x02\x0E" +
+		"\x14\x03\x02\x02\x02\x0F\x10\f\x03\x02\x02\x10\x11\x07\b\x02\x02\x11\x13" +
+		"\x05\x04\x03\x04\x12\x0F\x03\x02\x02\x02\x13\x16\x03\x02\x02\x02\x14\x12" +
+		"\x03\x02\x02\x02\x14\x15\x03\x02\x02\x02\x15\x05\x03\x02\x02\x02\x16\x14" +
+		"\x03\x02\x02\x02\x04\n\x14";
 	public static __ATN: ATN;
 	public static get _ATN(): ATN {
 		if (!SmlParser.__ATN) {
@@ -329,6 +397,45 @@ export class ConstantContext extends ExpContext {
 	public accept<Result>(visitor: SmlVisitor<Result>): Result {
 		if (visitor.visitConstant) {
 			return visitor.visitConstant(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+export class InfixApplicationContext extends ExpContext {
+	public _op1!: ExpContext;
+	public _id!: Token;
+	public _op2!: ExpContext;
+	public exp(): ExpContext[];
+	public exp(i: number): ExpContext;
+	public exp(i?: number): ExpContext | ExpContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(ExpContext);
+		} else {
+			return this.getRuleContext(i, ExpContext);
+		}
+	}
+	public ID(): TerminalNode { return this.getToken(SmlParser.ID, 0); }
+	constructor(ctx: ExpContext) {
+		super(ctx.parent, ctx.invokingState);
+		this.copyFrom(ctx);
+	}
+	// @Override
+	public enterRule(listener: SmlListener): void {
+		if (listener.enterInfixApplication) {
+			listener.enterInfixApplication(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: SmlListener): void {
+		if (listener.exitInfixApplication) {
+			listener.exitInfixApplication(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: SmlVisitor<Result>): Result {
+		if (visitor.visitInfixApplication) {
+			return visitor.visitInfixApplication(this);
 		} else {
 			return visitor.visitChildren(this);
 		}

@@ -11,12 +11,13 @@ import {
   ConstantContext,
   ExpContext,
   FloatingPointContext,
+  InfixApplicationContext,
   IntegerContext,
   SmlParser,
   StringContext
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
-import { Constant, Expression, Node } from './ast'
+import { Constant, Expression, InfixApplication, Node } from './ast'
 
 const SML_NEGATIVE_SIGN = '~'
 
@@ -52,8 +53,16 @@ class NodeGenerator implements SmlVisitor<Node> {
     }
   }
 
-  visitConstant(ctx: ConstantContext): Expression {
-    return this.visit(ctx.con()) as Expression
+  visitConstant(ctx: ConstantContext): Constant {
+    return this.visit(ctx.con()) as Constant
+  }
+  visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
+    return {
+      type: 'InfixApplication',
+      operand1: this.visit(ctx._op1) as Expression,
+      operand2: this.visit(ctx._op2) as Expression,
+      id: ctx._id.text!
+    }
   }
 
   visit(tree: ParseTree): Node {

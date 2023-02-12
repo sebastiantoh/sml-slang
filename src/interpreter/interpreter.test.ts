@@ -15,3 +15,8 @@ test('Constants: Positive float constant', () => expect(parse_and_evaluate('2.1'
 test('Constants: Negative float constant', () => expect(parse_and_evaluate('~2.1')).toBe(-2.1))
 test('Constants: Character constant', () => expect(parse_and_evaluate(`#"a"`)).toBe('a'))
 test('Constants: String constant', () => expect(parse_and_evaluate(`"abc"`)).toBe('abc'))
+
+// Infix Applications
+test('Infix Applications: constant + constant', () => expect(parse_and_evaluate(`1 + 2`)).toBe(3))
+// TODO: add more test cases for other builtin stuff
+// test('Infix Applications: constant div constant', () => expect(parse_and_evaluate(`6 div 2`)).toBe('3'))

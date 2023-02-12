@@ -23,9 +23,16 @@ export interface ValueDeclaration extends BaseNode {
   valbind: any
 }
 
-export type Expression = Constant
+export type Expression = Constant | InfixApplication
 
 export interface Constant extends BaseNode {
   type: 'Constant'
   val: Primitive
+}
+
+export interface InfixApplication extends BaseNode {
+  type: 'InfixApplication'
+  operand1: Expression
+  operand2: Expression
+  id: string
 }
