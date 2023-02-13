@@ -24,8 +24,7 @@ test('Infix Applications: int div int', () => expect(parseAndEvaluate(`5 div 2`)
 test('Infix Applications: posInt mod posInt', () => expect(parseAndEvaluate(`5 mod 2`)).toBe(1))
 test('Infix Applications: posInt mod negInt', () => expect(parseAndEvaluate(`5 mod ~2`)).toBe(-1))
 test('Infix Applications: negInt mod posInt', () => expect(parseAndEvaluate(`~5 mod 2`)).toBe(1))
-test('Infix Applications: negInt mod negInt', () =>
-  expect(parseAndEvaluate(`~5 mod ~2`)).toBe(-1))
+test('Infix Applications: negInt mod negInt', () => expect(parseAndEvaluate(`~5 mod ~2`)).toBe(-1))
 
 test('Infix Applications: int + int', () => expect(parseAndEvaluate(`1 + 2`)).toBe(3))
 
@@ -36,10 +35,8 @@ test('Infix Applications: string ^ string', () =>
 
 test('Infix Applications: int1 = int1', () => expect(parseAndEvaluate(`1 = 1`)).toBe(true))
 test('Infix Applications: int1 = int2', () => expect(parseAndEvaluate(`1 = 2`)).toBe(false))
-test('Infix Applications: char1 = char1', () =>
-  expect(parseAndEvaluate(`#"a" = #"a"`)).toBe(true))
-test('Infix Applications: char1 = char2', () =>
-  expect(parseAndEvaluate(`#"a" = #"b"`)).toBe(false))
+test('Infix Applications: char1 = char1', () => expect(parseAndEvaluate(`#"a" = #"a"`)).toBe(true))
+test('Infix Applications: char1 = char2', () => expect(parseAndEvaluate(`#"a" = #"b"`)).toBe(false))
 test('Infix Applications: string1 = string1', () =>
   expect(parseAndEvaluate(`"ab" = "ab"`)).toBe(true))
 test('Infix Applications: string1 = string2', () =>
@@ -58,10 +55,8 @@ test('Infix Applications: string1 <> string2', () =>
 
 test('Infix Applications: int1 < int1', () => expect(parseAndEvaluate(`1 < 1`)).toBe(false))
 test('Infix Applications: int1 < int2', () => expect(parseAndEvaluate(`1 < 2`)).toBe(true))
-test('Infix Applications: char1 < char1', () =>
-  expect(parseAndEvaluate(`#"a" < #"a"`)).toBe(false))
-test('Infix Applications: char1 < char2', () =>
-  expect(parseAndEvaluate(`#"a" < #"b"`)).toBe(true))
+test('Infix Applications: char1 < char1', () => expect(parseAndEvaluate(`#"a" < #"a"`)).toBe(false))
+test('Infix Applications: char1 < char2', () => expect(parseAndEvaluate(`#"a" < #"b"`)).toBe(true))
 test('Infix Applications: string1 < string1', () =>
   expect(parseAndEvaluate(`"ab" < "ab"`)).toBe(false))
 test('Infix Applications: string1 < string2', () =>
@@ -69,10 +64,8 @@ test('Infix Applications: string1 < string2', () =>
 
 test('Infix Applications: int1 > int1', () => expect(parseAndEvaluate(`1 > 1`)).toBe(false))
 test('Infix Applications: int1 > int2', () => expect(parseAndEvaluate(`1 > 2`)).toBe(false))
-test('Infix Applications: char1 > char1', () =>
-  expect(parseAndEvaluate(`#"a" > #"a"`)).toBe(false))
-test('Infix Applications: char1 > char2', () =>
-  expect(parseAndEvaluate(`#"a" > #"b"`)).toBe(false))
+test('Infix Applications: char1 > char1', () => expect(parseAndEvaluate(`#"a" > #"a"`)).toBe(false))
+test('Infix Applications: char1 > char2', () => expect(parseAndEvaluate(`#"a" > #"b"`)).toBe(false))
 test('Infix Applications: string1 > string1', () =>
   expect(parseAndEvaluate(`"ab" > "ab"`)).toBe(false))
 test('Infix Applications: string1 > string2', () =>
