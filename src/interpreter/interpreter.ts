@@ -1,44 +1,206 @@
-import { Constant, InfixApplication, Node } from '../parser/ast'
-import { Context } from '../types'
+import { Context } from '../context'
+import {
+  CharConstant,
+  FloatConstant,
+  InfixApplication,
+  IntConstant,
+  Node,
+  StringConstant
+} from '../parser/ast'
+import * as Sml from '../sml'
 
-// TODO: replace any with some Value class or something
-type Evaluator = (node: Node, context: Context) => any
+type Evaluator = (node: Node, context: Context) => Sml.Value
 
 // Full list of builtins along with precedence can be found on
 // Page 98 of https://smlfamily.github.io/sml90-defn.pdf
 const builtinInfixOperators = {
-  // TODO: handle div by 0?
-  '/': (a: any, b: any) => a / b,
-  // TODO: handle div by 0?
-  div: (a: any, b: any) => Math.floor(a / b),
-  mod: (a: any, b: any) => ((a % b) + b) % b,
-  '*': (a: any, b: any) => a * b,
-  '+': (a: any, b: any) => a + b,
-  '-': (a: any, b: any) => a - b,
-  '^': (a: any, b: any) => a.concat(b),
-  '=': (a: any, b: any) => a === b,
-  '<>': (a: any, b: any) => a !== b,
-  '<': (a: any, b: any) => a < b,
-  '>': (a: any, b: any) => a > b,
-  '<=': (a: any, b: any) => a <= b,
-  '>=': (a: any, b: any) => a >= b
+  '/': (a: Sml.Value, b: Sml.Value) => {
+    if (a.type === 'real' && b.type === 'real') {
+      return {
+        type: 'real',
+        // TODO: handle div by 0?
+        js_val: a.js_val / b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  div: (a: Sml.Value, b: Sml.Value) => {
+    if (a.type === 'int' && b.type === 'int') {
+      return {
+        type: 'int',
+        // TODO: handle div by 0?
+        js_val: Math.floor(a.js_val / b.js_val)
+      }
+    }
+    throw new Error('invalid types')
+  },
+  mod: (a: Sml.Value, b: Sml.Value) => {
+    if (a.type === 'int' && b.type === 'int') {
+      return {
+        type: 'int',
+        js_val: ((a.js_val % b.js_val) + b.js_val) % b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '*': (a: Sml.Value, b: Sml.Value) => {
+    if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
+      return {
+        type: a.type,
+        js_val: a.js_val * b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '+': (a: Sml.Value, b: Sml.Value) => {
+    if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
+      return {
+        type: a.type,
+        js_val: a.js_val + b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '-': (a: Sml.Value, b: Sml.Value) => {
+    if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
+      return {
+        type: a.type,
+        js_val: a.js_val - b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '^': (a: Sml.Value, b: Sml.Value) => {
+    if (a.type === 'string' && b.type === 'string') {
+      return {
+        type: 'string',
+        js_val: a.js_val.concat(b.js_val)
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '=': (a: Sml.Value, b: Sml.Value) => {
+    if (
+      (a.type === 'int' && b.type === 'int') ||
+      (a.type === 'real' && b.type === 'real') ||
+      (a.type === 'string' && b.type === 'string') ||
+      (a.type === 'char' && b.type === 'char')
+    ) {
+      return {
+        type: 'bool',
+        js_val: a.js_val === b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '<>': (a: Sml.Value, b: Sml.Value) => {
+    if (
+      (a.type === 'int' && b.type === 'int') ||
+      (a.type === 'real' && b.type === 'real') ||
+      (a.type === 'string' && b.type === 'string') ||
+      (a.type === 'char' && b.type === 'char')
+    ) {
+      return {
+        type: 'bool',
+        js_val: a.js_val !== b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '<': (a: Sml.Value, b: Sml.Value) => {
+    if (
+      (a.type === 'int' && b.type === 'int') ||
+      (a.type === 'real' && b.type === 'real') ||
+      (a.type === 'string' && b.type === 'string') ||
+      (a.type === 'char' && b.type === 'char')
+    ) {
+      return {
+        type: 'bool',
+        js_val: a.js_val < b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '>': (a: Sml.Value, b: Sml.Value) => {
+    if (
+      (a.type === 'int' && b.type === 'int') ||
+      (a.type === 'real' && b.type === 'real') ||
+      (a.type === 'string' && b.type === 'string') ||
+      (a.type === 'char' && b.type === 'char')
+    ) {
+      return {
+        type: 'bool',
+        js_val: a.js_val > b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '<=': (a: Sml.Value, b: Sml.Value) => {
+    if (
+      (a.type === 'int' && b.type === 'int') ||
+      (a.type === 'real' && b.type === 'real') ||
+      (a.type === 'string' && b.type === 'string') ||
+      (a.type === 'char' && b.type === 'char')
+    ) {
+      return {
+        type: 'bool',
+        js_val: a.js_val <= b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  },
+  '>=': (a: Sml.Value, b: Sml.Value) => {
+    if (
+      (a.type === 'int' && b.type === 'int') ||
+      (a.type === 'real' && b.type === 'real') ||
+      (a.type === 'string' && b.type === 'string') ||
+      (a.type === 'char' && b.type === 'char')
+    ) {
+      return {
+        type: 'bool',
+        js_val: a.js_val >= b.js_val
+      }
+    }
+    throw new Error('invalid types')
+  }
 }
 
 const evaluators: { [nodeType: string]: Evaluator } = {
-  Constant: function* (node: Constant, _context: Context) {
-    return node.val
+  IntConstant: function (node: IntConstant, _context: Context) {
+    return {
+      type: 'int',
+      js_val: node.val
+    }
   },
-  InfixApplication: function* (node: InfixApplication, context: Context) {
+  FloatConstant: function (node: FloatConstant, _context: Context) {
+    return {
+      type: 'real',
+      js_val: node.val
+    }
+  },
+  CharConstant: function (node: CharConstant, _context: Context) {
+    return {
+      type: 'char',
+      js_val: node.val
+    }
+  },
+  StringConstant: function (node: StringConstant, _context: Context) {
+    return {
+      type: 'string',
+      js_val: node.val
+    }
+  },
+  InfixApplication: function (node: InfixApplication, context: Context) {
     // TODO: should first lookup context first, before looking up builtin operators
     // Or we can add builtin operators to context.
     const operator = builtinInfixOperators[node.id]
-    const op1 = yield* evaluate(node.operand1, context)
-    const op2 = yield* evaluate(node.operand2, context)
+    const op1 = evaluate(node.operand1, context)
+    const op2 = evaluate(node.operand2, context)
     return operator(op1, op2)
   }
 }
 
-export function* evaluate(node: Node, context: Context) {
-  const result = yield* evaluators[node.type](node, context)
+export function evaluate(node: Node, context: Context): Sml.Value {
+  const result = evaluators[node.type](node, context)
   return result
 }

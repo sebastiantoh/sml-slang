@@ -1,8 +1,5 @@
 export type Node = Declaration | Expression | Program | Statement
 
-// TODO: grammar online doesn't seem to include booleans?
-export type Primitive = number | string | boolean
-
 interface BaseNode {
   type: string
 }
@@ -25,9 +22,25 @@ export interface ValueDeclaration extends BaseNode {
 
 export type Expression = Constant | InfixApplication
 
-export interface Constant extends BaseNode {
-  type: 'Constant'
-  val: Primitive
+/**
+ * Constants
+ */
+export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant
+export interface IntConstant extends BaseNode {
+  type: 'IntConstant'
+  val: number
+}
+export interface FloatConstant extends BaseNode {
+  type: 'FloatConstant'
+  val: number
+}
+export interface StringConstant extends BaseNode {
+  type: 'StringConstant'
+  val: string
+}
+export interface CharConstant extends BaseNode {
+  type: 'CharConstant'
+  val: string
 }
 
 export interface InfixApplication extends BaseNode {
