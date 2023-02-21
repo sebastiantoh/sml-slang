@@ -43,7 +43,8 @@
   "jest": {
     "preset": "ts-jest",
     "modulePathIgnorePatterns": [
-      "./src/__tests__/utils.ts"
+      "./src/__tests__/utils.ts",
+      "./dist"
     ]
   }
 }
