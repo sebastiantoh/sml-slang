@@ -1,12 +1,4 @@
-import { Context } from '../context'
-import {
-  CharConstant,
-  FloatConstant,
-  InfixApplication,
-  IntConstant,
-  Node,
-  StringConstant
-} from '../parser/ast'
+import { Node } from '../parser/ast'
 import * as Sml from '../sml'
 import { Instruction } from './instructions'
 
@@ -219,6 +211,9 @@ const exec_microcode = (cmd: Microcode) => {
       // Or we can add builtin operators to context.
       S.push(builtinBinOperators[cmd.id](fst, snd))
       break
+
+    default:
+      throw new Error(`unknown microcode: ${cmd.tag}`)
   }
 }
 

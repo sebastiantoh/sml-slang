@@ -1,30 +1,14 @@
-export type Node = Declaration | Expression | Program | Statement
+export type Node = Expression | Declaration | Program
 
 interface BaseNode {
   tag: string
 }
 
-export interface Program extends BaseNode {
-  tag: 'Program'
-  body: Array<Statement>
-}
-
-export type Statement = Declaration
-
-type Declaration = ValueDeclaration
-
-export interface ValueDeclaration extends BaseNode {
-  tag: 'Declaration'
-  // TODO: replace anys with proper type
-  sym: any
-  valbind: any
-}
-
+/**
+ * Expressions
+ */
 export type Expression = Constant | InfixApplication
 
-/**
- * Constants
- */
 export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant
 export interface IntConstant extends BaseNode {
   tag: 'IntConstant'
@@ -48,4 +32,27 @@ export interface InfixApplication extends BaseNode {
   operand1: Expression
   operand2: Expression
   id: string
+}
+
+/**
+ * Declarations
+ */
+type Declaration = ValueDeclaration | FunctionDeclaration
+
+export interface ValueDeclaration extends BaseNode {
+  tag: 'ValueDeclaration'
+  valbind: any // TODO: replace this with proper type
+}
+
+export interface FunctionDeclaration extends BaseNode {
+  tag: 'FunctionDeclaration'
+  funbind: any // TODO: replace this with proper type
+}
+
+/**
+ * Program
+ */
+export interface Program extends BaseNode {
+  tag: 'Program'
+  body: Array<Declaration>
 }
