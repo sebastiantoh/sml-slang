@@ -8,12 +8,16 @@ import {
   StringConstant
 } from '../parser/ast'
 import * as Sml from '../sml'
+import { Instruction } from './instructions'
 
-type Evaluator = (node: Node, context: Context) => Sml.Value
+type Microcode = Node | Instruction
+let A: Array<Microcode> = []
+let S: Array<Sml.Value> = []
+let E = undefined
 
 // Full list of builtins along with precedence can be found on
 // Page 98 of https://smlfamily.github.io/sml90-defn.pdf
-const builtinInfixOperators = {
+const builtinBinOperators = {
   '/': (a: Sml.Value, b: Sml.Value) => {
     if (a.type === 'real' && b.type === 'real') {
       return {
@@ -165,42 +169,78 @@ const builtinInfixOperators = {
   }
 }
 
-const evaluators: { [nodeType: string]: Evaluator } = {
-  IntConstant: function (node: IntConstant, _context: Context) {
-    return {
-      type: 'int',
-      js_val: node.val
-    }
-  },
-  FloatConstant: function (node: FloatConstant, _context: Context) {
-    return {
-      type: 'real',
-      js_val: node.val
-    }
-  },
-  CharConstant: function (node: CharConstant, _context: Context) {
-    return {
-      type: 'char',
-      js_val: node.val
-    }
-  },
-  StringConstant: function (node: StringConstant, _context: Context) {
-    return {
-      type: 'string',
-      js_val: node.val
-    }
-  },
-  InfixApplication: function (node: InfixApplication, context: Context) {
-    // TODO: should first lookup context first, before looking up builtin operators
-    // Or we can add builtin operators to context.
-    const operator = builtinInfixOperators[node.id]
-    const op1 = evaluate(node.operand1, context)
-    const op2 = evaluate(node.operand2, context)
-    return operator(op1, op2)
+const exec_microcode = (cmd: Microcode) => {
+  switch (cmd.tag) {
+    /**
+     * Node Tags
+     */
+    case 'IntConstant':
+      S.push({
+        type: 'int',
+        js_val: cmd.val
+      })
+      break
+    case 'FloatConstant':
+      S.push({
+        type: 'real',
+        js_val: cmd.val
+      })
+      break
+    case 'CharConstant':
+      S.push({
+        type: 'char',
+        js_val: cmd.val
+      })
+      break
+    case 'StringConstant':
+      S.push({
+        type: 'string',
+        js_val: cmd.val
+      })
+      break
+    case 'InfixApplication':
+      A.push(
+        {
+          tag: 'BinOpI',
+          id: cmd.id
+        },
+        cmd.operand2,
+        cmd.operand1
+      )
+      break
+
+    /**
+     * Instruction Tags
+     */
+    case 'BinOpI':
+      const snd = S.pop()
+      const fst = S.pop()
+      // TODO: should first lookup context first, before looking up builtin operators
+      // Or we can add builtin operators to context.
+      S.push(builtinBinOperators[cmd.id](fst, snd))
+      break
   }
 }
 
-export function evaluate(node: Node, context: Context): Sml.Value {
-  const result = evaluators[node.type](node, context)
-  return result
+export function evaluate(node: Node): Sml.Value {
+  A = [node]
+  S = []
+  // TODO: init env
+  E = undefined
+
+  const step_limit = 1000000
+  let i = 0
+  while (i < step_limit) {
+    if (A.length === 0) break
+    const cmd = A.pop()!
+    exec_microcode(cmd)
+    i++
+  }
+  if (i === step_limit) {
+    throw new Error(`step limit ${step_limit} exceeded`)
+  }
+  if (S.length != 1) {
+    throw new Error(`internal error: stash must be singleton but is: ${S}`)
+  }
+  return S[0]
 }

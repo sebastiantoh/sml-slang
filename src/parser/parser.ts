@@ -33,7 +33,7 @@ class NodeGenerator implements SmlVisitor<Node> {
     const isNeg = ctx.text.startsWith('~')
     const val = isNeg ? parseInt(ctx.text.slice(1)) * -1 : parseInt(ctx.text)
     return {
-      type: 'IntConstant',
+      tag: 'IntConstant',
       val: val
     }
   }
@@ -41,20 +41,20 @@ class NodeGenerator implements SmlVisitor<Node> {
     const isNeg = ctx.text.startsWith('~')
     const val = isNeg ? parseFloat(ctx.text.slice(1)) * -1 : parseFloat(ctx.text)
     return {
-      type: 'FloatConstant',
+      tag: 'FloatConstant',
       val: val
     }
   }
   visitCharacter(ctx: CharacterContext): CharConstant {
     return {
-      type: 'CharConstant',
+      tag: 'CharConstant',
       // remove leading hash and double quote, and also trailing double quotes
       val: ctx.text.slice(2, ctx.text.length - 1)
     }
   }
   visitString(ctx: StringContext): StringConstant {
     return {
-      type: 'StringConstant',
+      tag: 'StringConstant',
       // remove leading and trailing double quotes
       val: ctx.text.slice(1, ctx.text.length - 1)
     }
@@ -65,7 +65,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
     return {
-      type: 'InfixApplication',
+      tag: 'InfixApplication',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
       id: ctx._id.text!

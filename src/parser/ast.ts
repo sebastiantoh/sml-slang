@@ -1,11 +1,11 @@
 export type Node = Declaration | Expression | Program | Statement
 
 interface BaseNode {
-  type: string
+  tag: string
 }
 
 export interface Program extends BaseNode {
-  type: 'Program'
+  tag: 'Program'
   body: Array<Statement>
 }
 
@@ -14,7 +14,7 @@ export type Statement = Declaration
 type Declaration = ValueDeclaration
 
 export interface ValueDeclaration extends BaseNode {
-  type: 'Declaration'
+  tag: 'Declaration'
   // TODO: replace anys with proper type
   sym: any
   valbind: any
@@ -27,24 +27,24 @@ export type Expression = Constant | InfixApplication
  */
 export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant
 export interface IntConstant extends BaseNode {
-  type: 'IntConstant'
+  tag: 'IntConstant'
   val: number
 }
 export interface FloatConstant extends BaseNode {
-  type: 'FloatConstant'
+  tag: 'FloatConstant'
   val: number
 }
 export interface StringConstant extends BaseNode {
-  type: 'StringConstant'
+  tag: 'StringConstant'
   val: string
 }
 export interface CharConstant extends BaseNode {
-  type: 'CharConstant'
+  tag: 'CharConstant'
   val: string
 }
 
 export interface InfixApplication extends BaseNode {
-  type: 'InfixApplication'
+  tag: 'InfixApplication'
   operand1: Expression
   operand2: Expression
   id: string

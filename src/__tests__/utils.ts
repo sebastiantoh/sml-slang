@@ -4,7 +4,6 @@ import * as Sml from '../sml'
 
 export const parseAndEvaluate = (src: string) => {
   const node = parse(src)
-  // pass in a dummy context
-  const res = evaluate(node, { a: null })
+  const res = evaluate(node)
   return Sml.valueToString(res)
 }
