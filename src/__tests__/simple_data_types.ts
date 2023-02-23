@@ -42,6 +42,10 @@ test('integers: int1 >= int2', () => expect(parseAndEvaluate(`1 >= 2`)).toBe('fa
 
 test('integers: precendence of builtin operators', () =>
   expect(parseAndEvaluate(`2 + 6 * 3 div 2 - 10 div 2`)).toBe('6'))
+test('integers: precendence of builtin operators with non-nested parentheses', () =>
+  expect(parseAndEvaluate(`(2 + 6) * 3`)).toBe('24'))
+test('integers: precendence of builtin operators with nested parentheses', () =>
+  expect(parseAndEvaluate(`(((2 + 6) * 3) div 2) - (10 div 2)`)).toBe('7'))
 
 /**
  * Strings

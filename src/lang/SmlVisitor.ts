@@ -9,6 +9,7 @@ import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
+import { ParenthesesContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
 
@@ -68,6 +69,14 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitInfixApplication?: (ctx: InfixApplicationContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `Parentheses`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitParentheses?: (ctx: ParenthesesContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SmlParser.con`.

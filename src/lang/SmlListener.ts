@@ -9,6 +9,7 @@ import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
+import { ParenthesesContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
 
@@ -95,6 +96,19 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitInfixApplication?: (ctx: InfixApplicationContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `Parentheses`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	enterParentheses?: (ctx: ParenthesesContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Parentheses`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	exitParentheses?: (ctx: ParenthesesContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SmlParser.con`.

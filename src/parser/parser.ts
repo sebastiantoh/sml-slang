@@ -13,6 +13,7 @@ import {
   FloatingPointContext,
   InfixApplicationContext,
   IntegerContext,
+  ParenthesesContext,
   SmlParser,
   StringContext
 } from '../lang/SmlParser'
@@ -70,6 +71,9 @@ class NodeGenerator implements SmlVisitor<Node> {
       operand2: this.visit(ctx._op2) as Expression,
       id: ctx._id.text!
     }
+  }
+  visitParentheses(ctx: ParenthesesContext): Expression {
+    return this.visit(ctx.exp()) as Expression
   }
 
   visit(tree: ParseTree): Node {
