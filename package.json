@@ -41,6 +41,10 @@
     "antlr4ts": "^0.5.0-alpha.4"
   },
   "jest": {
-    "preset": "ts-jest"
+    "preset": "ts-jest",
+    "modulePathIgnorePatterns": [
+      "./src/__tests__/utils.ts",
+      "./dist"
+    ]
   }
 }

@@ -13,41 +13,49 @@ import {
   FloatingPointContext,
   InfixApplicationContext,
   IntegerContext,
+  ParenthesesContext,
   SmlParser,
   StringContext
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
-import { Constant, Expression, InfixApplication, Node } from './ast'
-
-const SML_NEGATIVE_SIGN = '~'
+import {
+  CharConstant,
+  Constant,
+  Expression,
+  FloatConstant,
+  InfixApplication,
+  IntConstant,
+  Node,
+  StringConstant
+} from './ast'
 
 class NodeGenerator implements SmlVisitor<Node> {
-  visitInteger(ctx: IntegerContext): Constant {
-    const isNeg = ctx.text.startsWith(SML_NEGATIVE_SIGN)
+  visitInteger(ctx: IntegerContext): IntConstant {
+    const isNeg = ctx.text.startsWith('~')
     const val = isNeg ? parseInt(ctx.text.slice(1)) * -1 : parseInt(ctx.text)
     return {
-      type: 'Constant',
+      tag: 'IntConstant',
       val: val
     }
   }
-  visitFloatingPoint(ctx: FloatingPointContext): Constant {
-    const isNeg = ctx.text.startsWith(SML_NEGATIVE_SIGN)
+  visitFloatingPoint(ctx: FloatingPointContext): FloatConstant {
+    const isNeg = ctx.text.startsWith('~')
     const val = isNeg ? parseFloat(ctx.text.slice(1)) * -1 : parseFloat(ctx.text)
     return {
-      type: 'Constant',
+      tag: 'FloatConstant',
       val: val
     }
   }
-  visitCharacter(ctx: CharacterContext): Constant {
+  visitCharacter(ctx: CharacterContext): CharConstant {
     return {
-      type: 'Constant',
+      tag: 'CharConstant',
       // remove leading hash and double quote, and also trailing double quotes
       val: ctx.text.slice(2, ctx.text.length - 1)
     }
   }
-  visitString(ctx: StringContext): Constant {
+  visitString(ctx: StringContext): StringConstant {
     return {
-      type: 'Constant',
+      tag: 'StringConstant',
       // remove leading and trailing double quotes
       val: ctx.text.slice(1, ctx.text.length - 1)
     }
@@ -58,11 +66,14 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
     return {
-      type: 'InfixApplication',
+      tag: 'InfixApplication',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
       id: ctx._id.text!
     }
+  }
+  visitParentheses(ctx: ParenthesesContext): Expression {
+    return this.visit(ctx.exp()) as Expression
   }
 
   visit(tree: ParseTree): Node {

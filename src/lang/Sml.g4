@@ -34,6 +34,9 @@ fragment SAFECODEPOINT: ~ ["\\\u0000-\u001F];
 // reference: https://stackoverflow.com/questions/66902057/antlr-how-to-accept-double-quotes-inside-double-quoted-string-while-parsing
 fragment ASCII: ESC | SAFECODEPOINT;
 
+LPAREN: '(';
+RPAREN: ')';
+
 SLASH: '/';
 DIV: 'div';
 MOD: 'mod';
@@ -73,4 +76,5 @@ exp
     | <assoc=right> op1=exp id=(CONS | AT) op2=exp                    # InfixApplication
     | op1=exp id=(EQ | NEQ | LT | GT | LTE | GTE) op2=exp             # InfixApplication
     | op1=exp id=ID op2=exp                                           # InfixApplication
+    | LPAREN exp RPAREN                                               # Parentheses
     ;
