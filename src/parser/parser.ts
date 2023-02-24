@@ -14,8 +14,12 @@ import {
   InfixApplicationContext,
   IntegerContext,
   ParenthesesContext,
+  PatConstantContext,
+  PatVariableContext,
   SmlParser,
-  StringContext
+  StringContext,
+  ValbindContext,
+  ValueDeclContext
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
@@ -26,10 +30,17 @@ import {
   InfixApplication,
   IntConstant,
   Node,
-  StringConstant
+  Pattern,
+  StringConstant,
+  Valbind,
+  ValueDeclaration,
+  Variable
 } from './ast'
 
 class NodeGenerator implements SmlVisitor<Node> {
+  /**
+   * Constants
+   */
   visitInteger(ctx: IntegerContext): IntConstant {
     const isNeg = ctx.text.startsWith('~')
     const val = isNeg ? parseInt(ctx.text.slice(1)) * -1 : parseInt(ctx.text)
@@ -61,6 +72,9 @@ class NodeGenerator implements SmlVisitor<Node> {
     }
   }
 
+  /**
+   * Expressions
+   */
   visitConstant(ctx: ConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
   }
@@ -74,6 +88,41 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitParentheses(ctx: ParenthesesContext): Expression {
     return this.visit(ctx.exp()) as Expression
+  }
+
+  /**
+   * Patterns
+   */
+  visitPatConstant(ctx: PatConstantContext): Constant {
+    return this.visit(ctx.con()) as Constant
+  }
+  visitPatVariable(ctx: PatVariableContext): Variable {
+    return {
+      tag: 'Variable',
+      id: ctx._id.text!
+    }
+  }
+
+  /**
+   * Declarations
+   */
+  visitValueDecl(ctx: ValueDeclContext): ValueDeclaration {
+    return {
+      tag: 'ValueDeclaration',
+      valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
+    }
+  }
+
+  /**
+   * Valbind
+   */
+  visitValbind(ctx: ValbindContext): Valbind {
+    return {
+      tag: 'Valbind',
+      is_rec: ctx.REC() !== undefined,
+      pat: this.visit(ctx.pat()) as Pattern,
+      exp: this.visit(ctx.exp()) as Expression
+    }
   }
 
   visit(tree: ParseTree): Node {
