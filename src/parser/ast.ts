@@ -47,7 +47,7 @@ export interface Variable extends BaseNode {
 /**
  * Declarations
  */
-type Declaration = ValueDeclaration | FunctionDeclaration
+export type Declaration = ValueDeclaration | FunctionDeclaration
 
 export interface ValueDeclaration extends BaseNode {
   tag: 'ValueDeclaration'

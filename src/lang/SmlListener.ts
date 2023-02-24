@@ -18,6 +18,7 @@ import { ExpContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
+import { ProgContext } from "./SmlParser";
 
 
 /**
@@ -209,5 +210,16 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitValbind?: (ctx: ValbindContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.prog`.
+	 * @param ctx the parse tree
+	 */
+	enterProg?: (ctx: ProgContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.prog`.
+	 * @param ctx the parse tree
+	 */
+	exitProg?: (ctx: ProgContext) => void;
 }
 

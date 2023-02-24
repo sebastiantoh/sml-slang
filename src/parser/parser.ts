@@ -1,5 +1,5 @@
 /* tslint:disable:max-classes-per-file */
-import { CharStreams, CommonTokenStream } from 'antlr4ts'
+import { CharStreams, CommonTokenStream, ParserRuleContext } from 'antlr4ts'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
@@ -9,6 +9,7 @@ import { SmlLexer } from '../lang/SmlLexer'
 import {
   CharacterContext,
   ConstantContext,
+  DecContext,
   ExpContext,
   FloatingPointContext,
   InfixApplicationContext,
@@ -16,6 +17,7 @@ import {
   ParenthesesContext,
   PatConstantContext,
   PatVariableContext,
+  ProgContext,
   SmlParser,
   StringContext,
   ValbindContext,
@@ -25,12 +27,14 @@ import { SmlVisitor } from '../lang/SmlVisitor'
 import {
   CharConstant,
   Constant,
+  Declaration,
   Expression,
   FloatConstant,
   InfixApplication,
   IntConstant,
   Node,
   Pattern,
+  Program,
   StringConstant,
   Valbind,
   ValueDeclaration,
@@ -125,6 +129,16 @@ class NodeGenerator implements SmlVisitor<Node> {
     }
   }
 
+  /**
+   * Program
+   */
+  visitProg(ctx: ProgContext): Program {
+    return {
+      tag: 'Program',
+      body: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration)
+    }
+  }
+
   visit(tree: ParseTree): Node {
     return tree.accept(this)
   }
@@ -139,20 +153,22 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
 }
 
-// TODO: replace exp with entire program
-function convertSource(exp: ExpContext): Node {
-  const generator = new NodeGenerator()
-  return generator.visit(exp)
-}
-
-export function parse(source: string): Node {
+function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Node {
   const inputStream = CharStreams.fromString(source)
   const lexer = new SmlLexer(inputStream)
   const tokenStream = new CommonTokenStream(lexer)
   const parser = new SmlParser(tokenStream)
   parser.buildParseTree = true
 
-  // TODO: replace exp with prog once prog has been added to grammar
-  const tree = parser.exp()
-  return convertSource(tree)
+  const tree = f(parser)
+  const generator = new NodeGenerator()
+  return generator.visit(tree)
+}
+
+export function parseProg(source: string): Node {
+  return parse(source, (parser: SmlParser) => parser.prog())
+}
+
+export function parseExp(source: string): Node {
+  return parse(source, (parser: SmlParser) => parser.exp())
 }

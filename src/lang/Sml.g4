@@ -91,3 +91,5 @@ dec
     ;
 
 valbind: REC? pat EQ exp;
+
+prog: dec+;

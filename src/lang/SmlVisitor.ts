@@ -18,6 +18,7 @@ import { ExpContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
+import { ProgContext } from "./SmlParser";
 
 
 /**
@@ -142,5 +143,12 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitValbind?: (ctx: ValbindContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SmlParser.prog`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitProg?: (ctx: ProgContext) => Result;
 }
 
