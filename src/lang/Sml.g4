@@ -36,6 +36,8 @@ fragment ASCII: ESC | SAFECODEPOINT;
 
 LPAREN: '(';
 RPAREN: ')';
+REC: 'rec';
+AND: 'and';
 
 SLASH: '/';
 DIV: 'div';
@@ -78,3 +80,16 @@ exp
     | op1=exp id=ID op2=exp                                           # InfixApplication
     | LPAREN exp RPAREN                                               # Parentheses
     ;
+
+pat
+    : con                                                             # PatConstant
+    | id=ID                                                           # PatVariable
+    ;
+
+dec
+    : 'val' valbind (AND valbind)*                                    # ValueDecl
+    ;
+
+valbind: REC? pat EQ exp;
+
+prog: dec+;

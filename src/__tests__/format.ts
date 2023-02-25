@@ -1,12 +1,12 @@
-import { parseAndEvaluate } from './utils'
+import { parseAndEvaluateExp } from './utils'
 
-test('no whitespace between tokens', () => expect(parseAndEvaluate('2+3')).toBe('5'))
+test('no whitespace between tokens', () => expect(parseAndEvaluateExp('2+3')).toBe('5'))
 
-test('multiple spaces between tokens', () => expect(parseAndEvaluate('2    + 3')).toBe('5'))
+test('multiple spaces between tokens', () => expect(parseAndEvaluateExp('2    + 3')).toBe('5'))
 
 test('new line between tokens', () =>
   expect(
-    parseAndEvaluate(`2
+    parseAndEvaluateExp(`2
 +
 3`)
   ).toBe('5'))

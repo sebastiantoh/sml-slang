@@ -3,15 +3,22 @@
 
 import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
+import { PatConstantContext } from "./SmlParser";
+import { PatVariableContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
 import { FloatingPointContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
+import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
+import { PatContext } from "./SmlParser";
+import { DecContext } from "./SmlParser";
+import { ValbindContext } from "./SmlParser";
+import { ProgContext } from "./SmlParser";
 
 
 /**
@@ -22,6 +29,22 @@ import { ExpContext } from "./SmlParser";
  * operations with no return type.
  */
 export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
+	/**
+	 * Visit a parse tree produced by the `PatConstant`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPatConstant?: (ctx: PatConstantContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `PatVariable`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPatVariable?: (ctx: PatVariableContext) => Result;
+
 	/**
 	 * Visit a parse tree produced by the `Integer`
 	 * labeled alternative in `SmlParser.con`.
@@ -53,6 +76,14 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitString?: (ctx: StringContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `ValueDecl`
+	 * labeled alternative in `SmlParser.dec`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitValueDecl?: (ctx: ValueDeclContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `Constant`
@@ -91,5 +122,33 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitExp?: (ctx: ExpContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPat?: (ctx: PatContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SmlParser.dec`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitDec?: (ctx: DecContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SmlParser.valbind`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitValbind?: (ctx: ValbindContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SmlParser.prog`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitProg?: (ctx: ProgContext) => Result;
 }
 

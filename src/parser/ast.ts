@@ -1,4 +1,4 @@
-export type Node = Expression | Declaration | Program
+export type Node = Expression | Pattern | Declaration | Valbind | Program
 
 interface BaseNode {
   tag: string
@@ -35,13 +35,23 @@ export interface InfixApplication extends BaseNode {
 }
 
 /**
+ * Patterns
+ */
+export type Pattern = Constant | Variable
+
+export interface Variable extends BaseNode {
+  tag: 'Variable'
+  id: string
+}
+
+/**
  * Declarations
  */
-type Declaration = ValueDeclaration | FunctionDeclaration
+export type Declaration = ValueDeclaration | FunctionDeclaration
 
 export interface ValueDeclaration extends BaseNode {
   tag: 'ValueDeclaration'
-  valbind: any // TODO: replace this with proper type
+  valbinds: Array<Valbind>
 }
 
 export interface FunctionDeclaration extends BaseNode {
@@ -49,6 +59,12 @@ export interface FunctionDeclaration extends BaseNode {
   funbind: any // TODO: replace this with proper type
 }
 
+export interface Valbind extends BaseNode {
+  tag: 'Valbind'
+  is_rec: boolean
+  pat: Pattern
+  exp: Expression
+}
 /**
  * Program
  */

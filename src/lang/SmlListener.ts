@@ -3,15 +3,22 @@
 
 import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
+import { PatConstantContext } from "./SmlParser";
+import { PatVariableContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
 import { FloatingPointContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
+import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
+import { PatContext } from "./SmlParser";
+import { DecContext } from "./SmlParser";
+import { ValbindContext } from "./SmlParser";
+import { ProgContext } from "./SmlParser";
 
 
 /**
@@ -19,6 +26,32 @@ import { ExpContext } from "./SmlParser";
  * `SmlParser`.
  */
 export interface SmlListener extends ParseTreeListener {
+	/**
+	 * Enter a parse tree produced by the `PatConstant`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	enterPatConstant?: (ctx: PatConstantContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PatConstant`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	exitPatConstant?: (ctx: PatConstantContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PatVariable`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	enterPatVariable?: (ctx: PatVariableContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PatVariable`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	exitPatVariable?: (ctx: PatVariableContext) => void;
+
 	/**
 	 * Enter a parse tree produced by the `Integer`
 	 * labeled alternative in `SmlParser.con`.
@@ -70,6 +103,19 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitString?: (ctx: StringContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `ValueDecl`
+	 * labeled alternative in `SmlParser.dec`.
+	 * @param ctx the parse tree
+	 */
+	enterValueDecl?: (ctx: ValueDeclContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ValueDecl`
+	 * labeled alternative in `SmlParser.dec`.
+	 * @param ctx the parse tree
+	 */
+	exitValueDecl?: (ctx: ValueDeclContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `Constant`
@@ -131,5 +177,49 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitExp?: (ctx: ExpContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	enterPat?: (ctx: PatContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	exitPat?: (ctx: PatContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.dec`.
+	 * @param ctx the parse tree
+	 */
+	enterDec?: (ctx: DecContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.dec`.
+	 * @param ctx the parse tree
+	 */
+	exitDec?: (ctx: DecContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.valbind`.
+	 * @param ctx the parse tree
+	 */
+	enterValbind?: (ctx: ValbindContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.valbind`.
+	 * @param ctx the parse tree
+	 */
+	exitValbind?: (ctx: ValbindContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.prog`.
+	 * @param ctx the parse tree
+	 */
+	enterProg?: (ctx: ProgContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.prog`.
+	 * @param ctx the parse tree
+	 */
+	exitProg?: (ctx: ProgContext) => void;
 }
 
