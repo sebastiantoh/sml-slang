@@ -113,9 +113,9 @@ const exec_microcode = (cmd: Microcode) => {
       break
 
     default:
-      // @ts-ignore
-      // The following line will throw a compile error if all the case statements are
-      // implemented (i.e. this branch is never taken).
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore: The following line will throw a compile error if all the
+      // case statements are implemented (i.e. this branch is never taken).
       throw new Error(`unknown microcode: ${cmd.tag}`)
   }
 }
