@@ -38,6 +38,7 @@ LPAREN: '(';
 RPAREN: ')';
 REC: 'rec';
 AND: 'and';
+SEMICOLON: ';';
 
 SLASH: '/';
 DIV: 'div';
@@ -92,4 +93,4 @@ dec
 
 valbind: REC? pat EQ exp;
 
-prog: dec+;
+prog: (dec SEMICOLON?)+;
