@@ -7,6 +7,13 @@ let A: Array<Microcode> = []
 let S: Array<Sml.Value> = []
 let E = undefined
 
+// Returns a reverse of the input array without mutating the original
+const reverse = (arr: Array<any>) => {
+  const copy = arr.slice()
+  copy.reverse()
+  return copy
+}
+
 const exec_microcode = (cmd: Microcode) => {
   switch (cmd.tag) {
     /**
@@ -46,6 +53,21 @@ const exec_microcode = (cmd: Microcode) => {
         cmd.operand1
       )
       break
+    case 'Variable':
+      // TODO: lookup env, push to stack
+      break
+    case 'ValueDeclaration':
+      A.concat(reverse(cmd.valbinds))
+      break
+    case 'FunctionDeclaration':
+      // TODO
+      break
+    case 'Valbind':
+      // TODO: add to env
+      break
+    case 'Program':
+      A.concat(reverse(cmd.body))
+      break
 
     /**
      * Instruction Tags
@@ -59,6 +81,9 @@ const exec_microcode = (cmd: Microcode) => {
       break
 
     default:
+      // @ts-ignore
+      // The following line will throw a compile error if all the case statements are
+      // implemented (i.e. this branch is never taken).
       throw new Error(`unknown microcode: ${cmd.tag}`)
   }
 }
