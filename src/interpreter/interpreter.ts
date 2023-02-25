@@ -53,6 +53,19 @@ const exec_microcode = (cmd: Microcode) => {
         cmd.operand1
       )
       break
+    case 'LetExpression':
+      const exps_with_pop = []
+      for (const e of cmd.exps) {
+        exps_with_pop.push(e)
+        exps_with_pop.push({ tag: 'PopI' })
+      }
+      // remove last pop instruction as return value of a let exp is the last exp
+      exps_with_pop.pop()
+
+      // TODO: need to enter new scope
+      A.concat(reverse(exps_with_pop))
+      A.push(cmd.dec)
+      break
     case 'Variable':
       // TODO: lookup env, push to stack
       break
@@ -72,6 +85,9 @@ const exec_microcode = (cmd: Microcode) => {
     /**
      * Instruction Tags
      */
+    case 'PopI':
+      S.pop()
+      break
     case 'BinOpI':
       const snd = S.pop()
       const fst = S.pop()

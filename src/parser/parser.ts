@@ -14,6 +14,7 @@ import {
   FloatingPointContext,
   InfixApplicationContext,
   IntegerContext,
+  LetExpressionContext,
   ParenthesesContext,
   PatConstantContext,
   PatVariableContext,
@@ -32,6 +33,7 @@ import {
   FloatConstant,
   InfixApplication,
   IntConstant,
+  LetExpression,
   Node,
   Pattern,
   Program,
@@ -92,6 +94,13 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitParentheses(ctx: ParenthesesContext): Expression {
     return this.visit(ctx.exp()) as Expression
+  }
+  visitLetExpression(ctx: LetExpressionContext): LetExpression {
+    return {
+      tag: 'LetExpression',
+      dec: this.visit(ctx.dec()) as Declaration,
+      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+    }
   }
 
   /**

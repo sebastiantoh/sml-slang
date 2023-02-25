@@ -1,4 +1,8 @@
-export type Instruction = BinOpI
+export type Instruction = PopI | BinOpI
+
+interface PopI {
+  tag: 'PopI'
+}
 
 interface BinOpI {
   tag: 'BinOpI'
