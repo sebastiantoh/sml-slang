@@ -81,6 +81,7 @@ exp
     | op1=exp id=ID op2=exp                                           # InfixApplication
     | LPAREN exp RPAREN                                               # Parentheses
     | 'let' dec 'in' exp (SEMICOLON exp)* 'end'                       # LetExpression
+    | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
     ;
 
 pat

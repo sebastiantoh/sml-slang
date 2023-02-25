@@ -7,7 +7,7 @@ interface BaseNode {
 /**
  * Expressions
  */
-export type Expression = Constant | InfixApplication | LetExpression
+export type Expression = Constant | InfixApplication | LetExpression | ConditionalExpression
 
 export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant
 export interface IntConstant extends BaseNode {
@@ -38,6 +38,13 @@ export interface LetExpression extends BaseNode {
   tag: 'LetExpression'
   dec: Declaration
   exps: Array<Expression>
+}
+
+export interface ConditionalExpression extends BaseNode {
+  tag: 'ConditionalExpression'
+  pred: Expression
+  consequent: Expression
+  alternative: Expression
 }
 
 /**

@@ -1,18 +1,22 @@
 import { parseAndEvaluateExp } from './utils'
 
-test.skip('true pred', () =>
-  expect(parseAndEvaluateExp('if true then "then" else "else"')).toBe(`"then"`))
+// TODO: add tests where the pred is simply the constant true or false
+// Right now, parser can't parse true / false. Idk if we should add it as a constant
+// even though it doens't appear in the grammar...
 
-test.skip('nested conditionals', () =>
-  expect(
-    parseAndEvaluateExp('if false then if true then 1 else 2 else if false then 3 else 4')
-  ).toBe('4'))
+test('true pred', () =>
+  expect(parseAndEvaluateExp('if 1=1 then "then" else "else"')).toBe(`"then"`))
 
-test.skip('else branch is not evaluated when pred is true', () =>
-  expect(parseAndEvaluateExp('if true then 2 else 37 div 0')).toBe('2'))
+test('false pred', () =>
+  expect(parseAndEvaluateExp('if 1=2 then "then" else "else"')).toBe(`"else"`))
 
-test.skip('then branch is not evaluated when pred is false', () =>
-  expect(parseAndEvaluateExp('if false then 37 div 0 else 3')).toBe('3'))
+test('nested conditionals', () =>
+  expect(parseAndEvaluateExp('if 1=2 then if 1=1 then 1 else 2 else if 1=2 then 3 else 4')).toBe(
+    '4'
+  ))
 
-test.skip('non-constant expression as pred', () =>
-  expect(parseAndEvaluateExp('if 1=2 then 3 else 4')).toBe('4'))
+test('else branch is not evaluated when pred is true', () =>
+  expect(parseAndEvaluateExp('if 1=1 then 2 else 37 div 0')).toBe('2'))
+
+test('then branch is not evaluated when pred is false', () =>
+  expect(parseAndEvaluateExp('if 1=2 then 37 div 0 else 3')).toBe('3'))

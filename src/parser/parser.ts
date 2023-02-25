@@ -8,6 +8,7 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import { SmlLexer } from '../lang/SmlLexer'
 import {
   CharacterContext,
+  ConditionalContext,
   ConstantContext,
   DecContext,
   ExpContext,
@@ -27,6 +28,7 @@ import {
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
   CharConstant,
+  ConditionalExpression,
   Constant,
   Declaration,
   Expression,
@@ -100,6 +102,14 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'LetExpression',
       dec: this.visit(ctx.dec()) as Declaration,
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+    }
+  }
+  visitConditional(ctx: ConditionalContext): ConditionalExpression {
+    return {
+      tag: 'ConditionalExpression',
+      pred: this.visit(ctx._pred) as Expression,
+      consequent: this.visit(ctx._cons) as Expression,
+      alternative: this.visit(ctx._alt) as Expression
     }
   }
 

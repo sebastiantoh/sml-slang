@@ -1,3 +1,5 @@
+import * as assert from 'assert'
+
 import { Node } from '../parser/ast'
 import * as Sml from '../sml'
 import { Instruction } from './instructions'
@@ -66,6 +68,9 @@ const exec_microcode = (cmd: Microcode) => {
       A.concat(reverse(exps_with_pop))
       A.push(cmd.dec)
       break
+    case 'ConditionalExpression':
+      A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred)
+      break
     case 'Variable':
       // TODO: lookup env, push to stack
       break
@@ -87,6 +92,17 @@ const exec_microcode = (cmd: Microcode) => {
      */
     case 'PopI':
       S.pop()
+      break
+    case 'BranchI':
+      const pred_res = S.pop()
+      assert(pred_res !== undefined && pred_res!.type === 'bool')
+
+      if (pred_res.js_val) {
+        A.push(cmd.consequent)
+      } else {
+        A.push(cmd.alternative)
+      }
+
       break
     case 'BinOpI':
       const snd = S.pop()
