@@ -56,6 +56,21 @@ class NodeGenerator {
     visitParentheses(ctx) {
         return this.visit(ctx.exp());
     }
+    visitLetExpression(ctx) {
+        return {
+            tag: 'LetExpression',
+            dec: this.visit(ctx.dec()),
+            exps: ctx.exp().map((ec) => this.visit(ec))
+        };
+    }
+    visitConditional(ctx) {
+        return {
+            tag: 'ConditionalExpression',
+            pred: this.visit(ctx._pred),
+            consequent: this.visit(ctx._cons),
+            alternative: this.visit(ctx._alt)
+        };
+    }
     /**
      * Patterns
      */

@@ -9,6 +9,8 @@ import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
+import { LetExpressionContext } from "./SmlParser";
+import { ConditionalContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
@@ -93,6 +95,20 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitParentheses?: (ctx: ParenthesesContext) => Result;
+    /**
+     * Visit a parse tree produced by the `LetExpression`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitLetExpression?: (ctx: LetExpressionContext) => Result;
+    /**
+     * Visit a parse tree produced by the `Conditional`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitConditional?: (ctx: ConditionalContext) => Result;
     /**
      * Visit a parse tree produced by `SmlParser.con`.
      * @param ctx the parse tree
