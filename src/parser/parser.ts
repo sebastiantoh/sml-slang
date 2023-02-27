@@ -11,7 +11,9 @@ import {
   ConditionalContext,
   ConstantContext,
   DecContext,
+  DecSequenceContext,
   ExpContext,
+  ExpVariableContext,
   FloatingPointContext,
   InfixApplicationContext,
   IntegerContext,
@@ -31,6 +33,7 @@ import {
   ConditionalExpression,
   Constant,
   Declaration,
+  DeclarationSequence,
   Expression,
   FloatConstant,
   InfixApplication,
@@ -86,6 +89,9 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitConstant(ctx: ConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
   }
+  visitExpVariable(ctx: ExpVariableContext): Variable {
+    return { tag: 'Variable', id: ctx._id.text! }
+  }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
     return {
       tag: 'InfixApplication',
@@ -100,7 +106,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitLetExpression(ctx: LetExpressionContext): LetExpression {
     return {
       tag: 'LetExpression',
-      dec: this.visit(ctx.dec()) as Declaration,
+      decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
     }
   }
@@ -133,6 +139,12 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'ValueDeclaration',
       valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
+    }
+  }
+  visitDecSequence(ctx: DecSequenceContext): DeclarationSequence {
+    return {
+      tag: 'DeclarationSequence',
+      decs: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration)
     }
   }
 

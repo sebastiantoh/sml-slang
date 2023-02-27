@@ -1,6 +1,6 @@
 import { parseAndEvaluateExp } from './utils'
 
-test.skip('multiple declarations', () =>
+test('multiple declarations', () =>
   expect(
     parseAndEvaluateExp(`
 let
@@ -11,9 +11,9 @@ in
    a + b
 end
 `)
-  ).toBe(`"3"`))
+  ).toBe(`3`))
 
-test.skip('nested declarations', () =>
+test('nested declarations', () =>
   expect(
     parseAndEvaluateExp(`
 let
@@ -26,9 +26,20 @@ in
    end
 end
 `)
-  ).toBe(`"3"`))
+  ).toBe(`3`))
 
-test.skip('multiple declarations with shadowing', () =>
+test('accessing variable in inner declarations from outer', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+   val a = let val b = 1 in b end
+in
+   b
+end
+`)
+  ).toThrow(/b not found in env/))
+
+test('multiple declarations with shadowing', () =>
   expect(
     parseAndEvaluateExp(`
 let
@@ -38,9 +49,9 @@ in
    x + x
 end
 `)
-  ).toBe(`"4"`))
+  ).toBe(`4`))
 
-test.skip('nested declarations with shadowing', () =>
+test('nested declarations with shadowing', () =>
   expect(
     parseAndEvaluateExp(`
 let
@@ -53,9 +64,9 @@ in
    end
 end
 `)
-  ).toBe(`"4"`))
+  ).toBe(`4`))
 
-test.skip('nested declarations with shadowing and other bindings', () =>
+test('nested declarations with shadowing and other bindings', () =>
   expect(
     parseAndEvaluateExp(`
 let
@@ -72,4 +83,26 @@ in
    end
 end
 `)
-  ).toBe(`"6"`))
+  ).toBe(`6`))
+
+test.skip('rec function without rec keyword', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  val f = fn n => if n = 0 then 1 else n * f (n - 1)
+in
+  f(3)
+end
+`)
+  ).toThrow()) // TODO: add more specific error
+
+test.skip('rec function with rec keyword', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  val rec f = fn n => if n = 0 then 1 else n * f (n - 1)
+in
+  f(3)
+end
+`)
+  ).toEqual(`6`))

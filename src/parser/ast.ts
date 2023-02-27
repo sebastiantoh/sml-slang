@@ -1,4 +1,4 @@
-export type Node = Expression | Pattern | Declaration | Valbind | Program
+export type Node = Expression | Pattern | Declaration | DeclarationSequence | Valbind | Program
 
 interface BaseNode {
   tag: string
@@ -36,7 +36,7 @@ export interface InfixApplication extends BaseNode {
 
 export interface LetExpression extends BaseNode {
   tag: 'LetExpression'
-  dec: Declaration
+  decSequence: DeclarationSequence
   exps: Array<Expression>
 }
 
@@ -60,6 +60,10 @@ export interface Variable extends BaseNode {
 /**
  * Declarations
  */
+export interface DeclarationSequence extends BaseNode {
+  tag: 'DeclarationSequence'
+  decs: Array<Declaration>
+}
 export type Declaration = ValueDeclaration | FunctionDeclaration
 
 export interface ValueDeclaration extends BaseNode {

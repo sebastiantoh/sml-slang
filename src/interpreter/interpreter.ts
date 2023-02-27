@@ -7,13 +7,52 @@ import { Instruction } from './instructions'
 type Microcode = Node | Instruction
 let A: Array<Microcode> = []
 let S: Array<Sml.Value> = []
-let E = undefined
+let E: Environment = { frame: {}, parent: undefined }
+
+// TODO: these types are temporary. Feel free to replace / move them where they belong
+type EnvironmentFrame = { [k: string]: Sml.Value }
+export interface Environment {
+  frame: EnvironmentFrame
+  parent?: Environment
+}
+const extend_env = (env: Environment): Environment => {
+  return { frame: {}, parent: env }
+}
+const lookup_env = (env: Environment | undefined, k: string): Sml.Value => {
+  if (env === undefined) {
+    throw new Error(`${k} not found in env`)
+  }
+  if (env.frame[k] === undefined) {
+    return lookup_env(env.parent, k)
+  }
+  return env.frame[k]
+}
+const assign_in_env = (env: Environment, k: string, v: Sml.Value) => {
+  // Bindings are immutable, though shadowing is possible.
+  // So we simply overwrite what ever value was stored (if any).
+  // Bindings in parent frames cannot be modified.
+  env.frame[k] = v
+}
 
 // Returns a reverse of the input array without mutating the original
 const reverse = (arr: Array<any>) => {
   const copy = arr.slice()
   copy.reverse()
   return copy
+}
+const rev_push = (stack: Array<any>, items: any[]) => {
+  stack.push(...reverse(items))
+}
+
+const interleave = (microcodes: Array<Microcode>, instruction: Instruction) => {
+  const ret = []
+  for (const mc of microcodes) {
+    ret.push(mc)
+    ret.push(instruction)
+  }
+  // remove last added instruction
+  ret.pop()
+  return ret
 }
 
 const exec_microcode = (cmd: Microcode) => {
@@ -56,35 +95,45 @@ const exec_microcode = (cmd: Microcode) => {
       )
       break
     case 'LetExpression':
-      const exps_with_pop = []
-      for (const e of cmd.exps) {
-        exps_with_pop.push(e)
-        exps_with_pop.push({ tag: 'PopI' })
-      }
-      // remove last pop instruction as return value of a let exp is the last exp
-      exps_with_pop.pop()
-
-      // TODO: need to enter new scope
-      A.concat(reverse(exps_with_pop))
-      A.push(cmd.dec)
+      A.push({ tag: 'RestoreEnvI', env: E })
+      rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
+      A.push(cmd.decSequence)
       break
     case 'ConditionalExpression':
       A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred)
       break
     case 'Variable':
-      // TODO: lookup env, push to stack
+      S.push(lookup_env(E, cmd.id))
+      break
+    case 'DeclarationSequence':
+      rev_push(A, cmd.decs)
       break
     case 'ValueDeclaration':
-      A.concat(reverse(cmd.valbinds))
+      rev_push(A, cmd.valbinds)
       break
     case 'FunctionDeclaration':
       // TODO
       break
     case 'Valbind':
-      // TODO: add to env
+      // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
+      // Each declaration are in their own env frame
+      if (cmd.is_rec) {
+        // TODO: add error checking. is_rec is only valid if RHS is a closure
+        // evaluate RHS in new env
+        E = extend_env(E)
+        A.push({ tag: 'AssignI', pat: cmd.pat }, cmd.exp)
+      } else {
+        // Need to evaluate RHS in prev env
+        const prevEnv = E
+        E = extend_env(E)
+        A.push({ tag: 'AssignI', pat: cmd.pat }, { tag: 'RestoreEnvI', env: E }, cmd.exp, {
+          tag: 'RestoreEnvI',
+          env: prevEnv
+        })
+      }
       break
     case 'Program':
-      A.concat(reverse(cmd.body))
+      rev_push(A, cmd.body)
       break
 
     /**
@@ -111,6 +160,29 @@ const exec_microcode = (cmd: Microcode) => {
       // Or we can add builtin operators to context.
       S.push(Sml.builtinBinOperators[cmd.id](fst, snd))
       break
+    case 'RestoreEnvI':
+      E = cmd.env
+      break
+    case 'AssignI':
+      const rhs = S.pop()!
+      if (
+        cmd.pat.tag === 'IntConstant' ||
+        cmd.pat.tag === 'FloatConstant' ||
+        cmd.pat.tag === 'CharConstant' ||
+        cmd.pat.tag === 'StringConstant'
+      ) {
+        if (cmd.pat.val !== rhs.js_val) {
+          throw new Error(
+            `cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`
+          )
+        }
+      } else if (cmd.pat.tag === 'Variable') {
+        assign_in_env(E, cmd.pat.id, rhs)
+      } else {
+        // TODO: handle more complicated patterns here.
+        // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
+      }
+      break
 
     default:
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -124,7 +196,7 @@ export function evaluate(node: Node): Sml.Value {
   A = [node]
   S = []
   // TODO: init env
-  E = undefined
+  E = { frame: {}, parent: undefined }
 
   const step_limit = 1000000
   let i = 0
