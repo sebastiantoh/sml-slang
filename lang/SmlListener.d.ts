@@ -7,6 +7,7 @@ import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
+import { ExpVariableContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
@@ -15,6 +16,7 @@ import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
+import { DecSequenceContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
 import { ProgContext } from "./SmlParser";
 /**
@@ -119,6 +121,18 @@ export interface SmlListener extends ParseTreeListener {
      */
     exitConstant?: (ctx: ConstantContext) => void;
     /**
+     * Enter a parse tree produced by the `ExpVariable`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     */
+    enterExpVariable?: (ctx: ExpVariableContext) => void;
+    /**
+     * Exit a parse tree produced by the `ExpVariable`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     */
+    exitExpVariable?: (ctx: ExpVariableContext) => void;
+    /**
      * Enter a parse tree produced by the `InfixApplication`
      * labeled alternative in `SmlParser.exp`.
      * @param ctx the parse tree
@@ -206,6 +220,16 @@ export interface SmlListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitDec?: (ctx: DecContext) => void;
+    /**
+     * Enter a parse tree produced by `SmlParser.decSequence`.
+     * @param ctx the parse tree
+     */
+    enterDecSequence?: (ctx: DecSequenceContext) => void;
+    /**
+     * Exit a parse tree produced by `SmlParser.decSequence`.
+     * @param ctx the parse tree
+     */
+    exitDecSequence?: (ctx: DecSequenceContext) => void;
     /**
      * Enter a parse tree produced by `SmlParser.valbind`.
      * @param ctx the parse tree
