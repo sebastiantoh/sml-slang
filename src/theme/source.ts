@@ -12,10 +12,10 @@
 // but will keep it here to be in line with current conventions
 // @ts-ignore
 function theme(acequire, exports, _module) {
-    exports.isDark = true
-    exports.cssClass = 'ace-source'
-    exports.cssText =
-        '.ace-source .ace_gutter {\
+  exports.isDark = true
+  exports.cssClass = 'ace-source'
+  exports.cssText =
+    '.ace-source .ace_gutter {\
                         background: #011e3a;\
                         color: rgb(128,145,160)\
                         }\
@@ -165,8 +165,8 @@ function theme(acequire, exports, _module) {
                         }\
                         '
 
-    const dom = acequire('../lib/dom')
-    dom.importCssString(exports.cssText, exports.cssClass)
+  const dom = acequire('../lib/dom')
+  dom.importCssString(exports.cssText, exports.cssClass)
 }
 
 // @ts-ignore
