@@ -1,24 +1,4 @@
-export type Value = Int | Real | String | Char | Bool;
-export interface Int {
-    type: 'int';
-    js_val: number;
-}
-export interface Real {
-    type: 'real';
-    js_val: number;
-}
-export interface String {
-    type: 'string';
-    js_val: string;
-}
-export interface Char {
-    type: 'char';
-    js_val: string;
-}
-export interface Bool {
-    type: 'bool';
-    js_val: boolean;
-}
+import { Value } from './types';
 export declare const valueToString: (sml_val: Value) => string;
 export declare const builtinBinOperators: {
     '/': (a: Value, b: Value) => {

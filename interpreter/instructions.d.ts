@@ -1,5 +1,5 @@
 import { Expression, Pattern } from '../parser/ast';
-import { Environment } from './interpreter';
+import { Environment } from '../types';
 export type Instruction = PopI | BranchI | BinOpI | RestoreEnvI | AssignI;
 interface PopI {
     tag: 'PopI';
