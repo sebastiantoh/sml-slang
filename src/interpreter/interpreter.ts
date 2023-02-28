@@ -3,22 +3,18 @@ import * as assert from 'assert'
 import { Node } from '../parser/ast'
 import * as Sml from '../sml'
 import { Instruction } from './instructions'
+import { Environment, Value } from '../types'
 
 type Microcode = Node | Instruction
 let A: Array<Microcode> = []
-let S: Array<Sml.Value> = []
+let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
 
-// TODO: these types are temporary. Feel free to replace / move them where they belong
-type EnvironmentFrame = { [k: string]: Sml.Value }
-export interface Environment {
-  frame: EnvironmentFrame
-  parent?: Environment
-}
+
 const extend_env = (env: Environment): Environment => {
   return { frame: {}, parent: env }
 }
-const lookup_env = (env: Environment | undefined, k: string): Sml.Value => {
+const lookup_env = (env: Environment | undefined, k: string): Value => {
   if (env === undefined) {
     throw new Error(`${k} not found in env`)
   }
@@ -27,7 +23,7 @@ const lookup_env = (env: Environment | undefined, k: string): Sml.Value => {
   }
   return env.frame[k]
 }
-const assign_in_env = (env: Environment, k: string, v: Sml.Value) => {
+const assign_in_env = (env: Environment, k: string, v: Value) => {
   // Bindings are immutable, though shadowing is possible.
   // So we simply overwrite what ever value was stored (if any).
   // Bindings in parent frames cannot be modified.
@@ -192,7 +188,7 @@ const exec_microcode = (cmd: Microcode) => {
   }
 }
 
-export function evaluate(node: Node): Sml.Value {
+export function evaluate(node: Node): Value {
   A = [node]
   S = []
   // TODO: init env

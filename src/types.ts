@@ -31,6 +31,13 @@ export interface Bool {
   js_val: boolean
 }
 
+type EnvironmentFrame = { [k: string]: Sml.Value }
+
+export interface Environment {
+  frame: EnvironmentFrame
+  parent?: Environment
+}
+
 export enum ErrorType {
   SYNTAX = 'Syntax',
   TYPE = 'Type',
