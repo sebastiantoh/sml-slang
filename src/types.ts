@@ -31,7 +31,7 @@ export interface Bool {
   js_val: boolean
 }
 
-type EnvironmentFrame = { [k: string]: Sml.Value }
+type EnvironmentFrame = { [k: string]: Value }
 
 export interface Environment {
   frame: EnvironmentFrame
@@ -61,15 +61,34 @@ export interface SourceError {
 export interface Context<T = any> {
   /** All the errors gathered */
   errors: SourceError[]
-
-  /** Runtime Sepecific state */
-  runtime: {
-    break: boolean
-    debuggerOn: boolean
-    isRunning: boolean
-    // TODO: add types for env
-    // environmentTree: EnvTree
-    // environments: Environment[]
-    nodes: es.Node[]
-  }
 }
+
+export enum Chapter {
+  SML_SLANG = 1
+}
+
+export enum Variant {
+  DEFAULT = 'sml-slang'
+}
+
+export interface Language {
+  chapter: Chapter
+  variant: Variant
+}
+
+
+// TODO: the following are to support the EnvVisualiser
+// in the frontend. remove?
+// tslint:disable:no-any
+export interface EnvVisualiseFrame {
+  [name: string]: any
+}
+export interface EnvVisualiserEnvironment {
+  id: string
+  name: string
+  tail: EnvVisualiserEnvironment | null
+  callExpression?: es.CallExpression
+  head: EnvVisualiseFrame
+  thisContext?: any
+}
+// tslint:enable:no-any
