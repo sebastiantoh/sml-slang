@@ -2,14 +2,13 @@ import * as assert from 'assert'
 
 import { Node } from '../parser/ast'
 import * as Sml from '../sml'
-import { Instruction } from './instructions'
 import { Environment, Value } from '../types'
+import { Instruction } from './instructions'
 
 type Microcode = Node | Instruction
 let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
-
 
 const extend_env = (env: Environment): Environment => {
   return { frame: {}, parent: env }
