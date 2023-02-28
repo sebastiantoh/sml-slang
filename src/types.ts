@@ -76,7 +76,6 @@ export interface Language {
   variant: Variant
 }
 
-
 // TODO: the following are to support the EnvVisualiser
 // in the frontend. remove?
 // tslint:disable:no-any
