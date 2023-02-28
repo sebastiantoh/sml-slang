@@ -45,6 +45,9 @@ class NodeGenerator {
     visitConstant(ctx) {
         return this.visit(ctx.con());
     }
+    visitExpVariable(ctx) {
+        return { tag: 'Variable', id: ctx._id.text };
+    }
     visitInfixApplication(ctx) {
         return {
             tag: 'InfixApplication',
@@ -59,7 +62,7 @@ class NodeGenerator {
     visitLetExpression(ctx) {
         return {
             tag: 'LetExpression',
-            dec: this.visit(ctx.dec()),
+            decSequence: this.visit(ctx.decSequence()),
             exps: ctx.exp().map((ec) => this.visit(ec))
         };
     }
@@ -90,6 +93,12 @@ class NodeGenerator {
         return {
             tag: 'ValueDeclaration',
             valbinds: ctx.valbind().map((vb) => this.visit(vb))
+        };
+    }
+    visitDecSequence(ctx) {
+        return {
+            tag: 'DeclarationSequence',
+            decs: ctx.dec().map((d) => this.visit(d))
         };
     }
     /**

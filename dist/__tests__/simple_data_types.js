@@ -87,7 +87,7 @@ test('real numbers: subtraction', () => expect((0, utils_1.parseAndEvaluateExp)(
 test('real numbers: multiplication', () => expect((0, utils_1.parseAndEvaluateExp)('1.2 * 3.4')).toBe('4.08'));
 test('real numbers: nonzero / nonzero', () => expect((0, utils_1.parseAndEvaluateExp)(`1.0 / 2.0`)).toBe('0.5'));
 test('real numbers: zero / nonzero', () => expect((0, utils_1.parseAndEvaluateExp)(`0.0 / 2.0`)).toBe('0'));
-test.skip('real numbers: nonzero / zero', () => expect((0, utils_1.parseAndEvaluateExp)(`1.0 / 0`)).toThrow());
+test.skip('real numbers: nonzero / zero', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`1.0 / 0`)).toThrow()); // TODO: add more specific error
 /**
  * Unit
  */

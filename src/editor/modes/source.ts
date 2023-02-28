@@ -1,4 +1,4 @@
-import { Variant } from '../../../types'
+import { Variant } from '../../types'
 import { SourceDocumentation } from '../docTooltip'
 
 /* tslint:disable */

@@ -7,6 +7,7 @@ import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
+import { ExpVariableContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
@@ -15,6 +16,7 @@ import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
+import { DecSequenceContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
 import { ProgContext } from "./SmlParser";
 /**
@@ -82,6 +84,13 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      */
     visitConstant?: (ctx: ConstantContext) => Result;
     /**
+     * Visit a parse tree produced by the `ExpVariable`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitExpVariable?: (ctx: ExpVariableContext) => Result;
+    /**
      * Visit a parse tree produced by the `InfixApplication`
      * labeled alternative in `SmlParser.exp`.
      * @param ctx the parse tree
@@ -133,6 +142,12 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitDec?: (ctx: DecContext) => Result;
+    /**
+     * Visit a parse tree produced by `SmlParser.decSequence`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitDecSequence?: (ctx: DecSequenceContext) => Result;
     /**
      * Visit a parse tree produced by `SmlParser.valbind`.
      * @param ctx the parse tree

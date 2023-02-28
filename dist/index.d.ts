@@ -1,3 +1,4 @@
-import * as Sml from './sml';
 import { Context } from './types';
-export declare function run(code: string, context: Context): Sml.Value;
+import { SourceError, Value } from './types';
+export declare function run(code: string, context: Context): Value;
+export declare function parseError(errors: SourceError[]): string;

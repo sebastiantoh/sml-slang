@@ -47,8 +47,9 @@ export declare class SmlParser extends Parser {
     static readonly RULE_exp = 1;
     static readonly RULE_pat = 2;
     static readonly RULE_dec = 3;
-    static readonly RULE_valbind = 4;
-    static readonly RULE_prog = 5;
+    static readonly RULE_decSequence = 4;
+    static readonly RULE_valbind = 5;
+    static readonly RULE_prog = 6;
     static readonly ruleNames: string[];
     private static readonly _LITERAL_NAMES;
     private static readonly _SYMBOLIC_NAMES;
@@ -64,6 +65,7 @@ export declare class SmlParser extends Parser {
     exp(_p: number): ExpContext;
     pat(): PatContext;
     dec(): DecContext;
+    decSequence(): DecSequenceContext;
     valbind(): ValbindContext;
     prog(): ProgContext;
     sempred(_localctx: RuleContext, ruleIndex: number, predIndex: number): boolean;
@@ -117,6 +119,14 @@ export declare class ConstantContext extends ExpContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
+export declare class ExpVariableContext extends ExpContext {
+    _id: Token;
+    ID(): TerminalNode;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
 export declare class InfixApplicationContext extends ExpContext {
     _op1: ExpContext;
     _id: Token;
@@ -154,7 +164,7 @@ export declare class ParenthesesContext extends ExpContext {
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
 export declare class LetExpressionContext extends ExpContext {
-    dec(): DecContext;
+    decSequence(): DecSequenceContext;
     exp(): ExpContext[];
     exp(i: number): ExpContext;
     SEMICOLON(): TerminalNode[];
@@ -206,6 +216,17 @@ export declare class ValueDeclContext extends DecContext {
     AND(): TerminalNode[];
     AND(i: number): TerminalNode;
     constructor(ctx: DecContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class DecSequenceContext extends ParserRuleContext {
+    dec(): DecContext[];
+    dec(i: number): DecContext;
+    SEMICOLON(): TerminalNode[];
+    SEMICOLON(i: number): TerminalNode;
+    constructor(parent: ParserRuleContext | undefined, invokingState: number);
+    get ruleIndex(): number;
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
