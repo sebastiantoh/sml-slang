@@ -1,10 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.evaluate = void 0;
+const assert = require("assert");
 const Sml = require("../sml");
 let A = [];
 let S = [];
 let E = undefined;
+// Returns a reverse of the input array without mutating the original
+const reverse = (arr) => {
+    const copy = arr.slice();
+    copy.reverse();
+    return copy;
+};
 const exec_microcode = (cmd) => {
     switch (cmd.tag) {
         /**
@@ -40,9 +47,52 @@ const exec_microcode = (cmd) => {
                 id: cmd.id
             }, cmd.operand2, cmd.operand1);
             break;
+        case 'LetExpression':
+            const exps_with_pop = [];
+            for (const e of cmd.exps) {
+                exps_with_pop.push(e);
+                exps_with_pop.push({ tag: 'PopI' });
+            }
+            // remove last pop instruction as return value of a let exp is the last exp
+            exps_with_pop.pop();
+            // TODO: need to enter new scope
+            A.concat(reverse(exps_with_pop));
+            A.push(cmd.dec);
+            break;
+        case 'ConditionalExpression':
+            A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred);
+            break;
+        case 'Variable':
+            // TODO: lookup env, push to stack
+            break;
+        case 'ValueDeclaration':
+            A.concat(reverse(cmd.valbinds));
+            break;
+        case 'FunctionDeclaration':
+            // TODO
+            break;
+        case 'Valbind':
+            // TODO: add to env
+            break;
+        case 'Program':
+            A.concat(reverse(cmd.body));
+            break;
         /**
          * Instruction Tags
          */
+        case 'PopI':
+            S.pop();
+            break;
+        case 'BranchI':
+            const pred_res = S.pop();
+            assert(pred_res !== undefined && pred_res.type === 'bool');
+            if (pred_res.js_val) {
+                A.push(cmd.consequent);
+            }
+            else {
+                A.push(cmd.alternative);
+            }
+            break;
         case 'BinOpI':
             const snd = S.pop();
             const fst = S.pop();
@@ -51,6 +101,9 @@ const exec_microcode = (cmd) => {
             S.push(Sml.builtinBinOperators[cmd.id](fst, snd));
             break;
         default:
+            // @ts-ignore
+            // The following line will throw a compile error if all the case statements are
+            // implemented (i.e. this branch is never taken).
             throw new Error(`unknown microcode: ${cmd.tag}`);
     }
 };

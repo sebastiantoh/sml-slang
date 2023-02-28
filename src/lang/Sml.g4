@@ -38,6 +38,7 @@ LPAREN: '(';
 RPAREN: ')';
 REC: 'rec';
 AND: 'and';
+SEMICOLON: ';';
 
 SLASH: '/';
 DIV: 'div';
@@ -72,6 +73,7 @@ con
 
 exp
     : con                                                             # Constant
+    | id=ID                                                           # ExpVariable
     // Precedence levels can be found on Page 98 of https://smlfamily.github.io/sml90-defn.pdf
     | op1=exp id=(SLASH | DIV | MOD | STAR) op2=exp                   # InfixApplication
     | op1=exp id=(PLUS | MINUS | CARET) op2=exp                       # InfixApplication
@@ -79,6 +81,8 @@ exp
     | op1=exp id=(EQ | NEQ | LT | GT | LTE | GTE) op2=exp             # InfixApplication
     | op1=exp id=ID op2=exp                                           # InfixApplication
     | LPAREN exp RPAREN                                               # Parentheses
+    | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
+    | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
     ;
 
 pat
@@ -90,6 +94,8 @@ dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
     ;
 
+decSequence: (dec SEMICOLON?)+;
+
 valbind: REC? pat EQ exp;
 
-prog: dec+;
+prog: (dec SEMICOLON?)+;

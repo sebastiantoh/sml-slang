@@ -8,12 +8,16 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import { SmlLexer } from '../lang/SmlLexer'
 import {
   CharacterContext,
+  ConditionalContext,
   ConstantContext,
   DecContext,
+  DecSequenceContext,
   ExpContext,
+  ExpVariableContext,
   FloatingPointContext,
   InfixApplicationContext,
   IntegerContext,
+  LetExpressionContext,
   ParenthesesContext,
   PatConstantContext,
   PatVariableContext,
@@ -26,12 +30,15 @@ import {
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
   CharConstant,
+  ConditionalExpression,
   Constant,
   Declaration,
+  DeclarationSequence,
   Expression,
   FloatConstant,
   InfixApplication,
   IntConstant,
+  LetExpression,
   Node,
   Pattern,
   Program,
@@ -82,6 +89,9 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitConstant(ctx: ConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
   }
+  visitExpVariable(ctx: ExpVariableContext): Variable {
+    return { tag: 'Variable', id: ctx._id.text! }
+  }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
     return {
       tag: 'InfixApplication',
@@ -92,6 +102,21 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitParentheses(ctx: ParenthesesContext): Expression {
     return this.visit(ctx.exp()) as Expression
+  }
+  visitLetExpression(ctx: LetExpressionContext): LetExpression {
+    return {
+      tag: 'LetExpression',
+      decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
+      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+    }
+  }
+  visitConditional(ctx: ConditionalContext): ConditionalExpression {
+    return {
+      tag: 'ConditionalExpression',
+      pred: this.visit(ctx._pred) as Expression,
+      consequent: this.visit(ctx._cons) as Expression,
+      alternative: this.visit(ctx._alt) as Expression
+    }
   }
 
   /**
@@ -114,6 +139,12 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'ValueDeclaration',
       valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
+    }
+  }
+  visitDecSequence(ctx: DecSequenceContext): DeclarationSequence {
+    return {
+      tag: 'DeclarationSequence',
+      decs: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration)
     }
   }
 

@@ -137,7 +137,8 @@ test('real numbers: multiplication', () => expect(parseAndEvaluateExp('1.2 * 3.4
 
 test('real numbers: nonzero / nonzero', () => expect(parseAndEvaluateExp(`1.0 / 2.0`)).toBe('0.5'))
 test('real numbers: zero / nonzero', () => expect(parseAndEvaluateExp(`0.0 / 2.0`)).toBe('0'))
-test.skip('real numbers: nonzero / zero', () => expect(parseAndEvaluateExp(`1.0 / 0`)).toThrow())
+test.skip('real numbers: nonzero / zero', () =>
+  expect(() => parseAndEvaluateExp(`1.0 / 0`)).toThrow()) // TODO: add more specific error
 
 /**
  * Unit

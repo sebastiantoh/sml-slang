@@ -11,31 +11,38 @@ import { SmlListener } from "./SmlListener";
 import { SmlVisitor } from "./SmlVisitor";
 export declare class SmlParser extends Parser {
     static readonly T__0 = 1;
-    static readonly WHITESPACE = 2;
-    static readonly INT = 3;
-    static readonly FLOAT = 4;
-    static readonly CHAR = 5;
-    static readonly STRING = 6;
-    static readonly LPAREN = 7;
-    static readonly RPAREN = 8;
-    static readonly REC = 9;
-    static readonly AND = 10;
-    static readonly SLASH = 11;
-    static readonly DIV = 12;
-    static readonly MOD = 13;
-    static readonly STAR = 14;
-    static readonly PLUS = 15;
-    static readonly MINUS = 16;
-    static readonly CARET = 17;
-    static readonly CONS = 18;
-    static readonly AT = 19;
-    static readonly EQ = 20;
-    static readonly NEQ = 21;
-    static readonly LT = 22;
-    static readonly GT = 23;
-    static readonly LTE = 24;
-    static readonly GTE = 25;
-    static readonly ID = 26;
+    static readonly T__1 = 2;
+    static readonly T__2 = 3;
+    static readonly T__3 = 4;
+    static readonly T__4 = 5;
+    static readonly T__5 = 6;
+    static readonly T__6 = 7;
+    static readonly WHITESPACE = 8;
+    static readonly INT = 9;
+    static readonly FLOAT = 10;
+    static readonly CHAR = 11;
+    static readonly STRING = 12;
+    static readonly LPAREN = 13;
+    static readonly RPAREN = 14;
+    static readonly REC = 15;
+    static readonly AND = 16;
+    static readonly SEMICOLON = 17;
+    static readonly SLASH = 18;
+    static readonly DIV = 19;
+    static readonly MOD = 20;
+    static readonly STAR = 21;
+    static readonly PLUS = 22;
+    static readonly MINUS = 23;
+    static readonly CARET = 24;
+    static readonly CONS = 25;
+    static readonly AT = 26;
+    static readonly EQ = 27;
+    static readonly NEQ = 28;
+    static readonly LT = 29;
+    static readonly GT = 30;
+    static readonly LTE = 31;
+    static readonly GTE = 32;
+    static readonly ID = 33;
     static readonly RULE_con = 0;
     static readonly RULE_exp = 1;
     static readonly RULE_pat = 2;
@@ -146,6 +153,28 @@ export declare class ParenthesesContext extends ExpContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
+export declare class LetExpressionContext extends ExpContext {
+    dec(): DecContext;
+    exp(): ExpContext[];
+    exp(i: number): ExpContext;
+    SEMICOLON(): TerminalNode[];
+    SEMICOLON(i: number): TerminalNode;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class ConditionalContext extends ExpContext {
+    _pred: ExpContext;
+    _cons: ExpContext;
+    _alt: ExpContext;
+    exp(): ExpContext[];
+    exp(i: number): ExpContext;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
 export declare class PatContext extends ParserRuleContext {
     constructor(parent: ParserRuleContext | undefined, invokingState: number);
     get ruleIndex(): number;
@@ -195,6 +224,8 @@ export declare class ValbindContext extends ParserRuleContext {
 export declare class ProgContext extends ParserRuleContext {
     dec(): DecContext[];
     dec(i: number): DecContext;
+    SEMICOLON(): TerminalNode[];
+    SEMICOLON(i: number): TerminalNode;
     constructor(parent: ParserRuleContext | undefined, invokingState: number);
     get ruleIndex(): number;
     enterRule(listener: SmlListener): void;
