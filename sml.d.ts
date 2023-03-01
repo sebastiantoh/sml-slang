@@ -53,4 +53,12 @@ export declare const builtinBinOperators: {
         type: string;
         js_val: boolean;
     };
+    andalso: (a: Value, b: Value) => {
+        type: string;
+        js_val: boolean;
+    };
+    orelse: (a: Value, b: Value) => {
+        type: string;
+        js_val: boolean;
+    };
 };

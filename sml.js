@@ -161,6 +161,24 @@ exports.builtinBinOperators = {
             };
         }
         throw new Error('invalid types');
+    },
+    andalso: (a, b) => {
+        if (a.type === 'bool' && b.type === 'bool') {
+            return {
+                type: 'bool',
+                js_val: a.js_val && b.js_val
+            };
+        }
+        throw new Error('invalid types');
+    },
+    orelse: (a, b) => {
+        if (a.type === 'bool' && b.type === 'bool') {
+            return {
+                type: 'bool',
+                js_val: a.js_val || b.js_val
+            };
+        }
+        throw new Error('invalid types');
     }
 };
 //# sourceMappingURL=sml.js.map

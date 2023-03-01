@@ -37,7 +37,9 @@ export declare class SmlLexer extends Lexer {
     static readonly GT = 32;
     static readonly LTE = 33;
     static readonly GTE = 34;
-    static readonly ID = 35;
+    static readonly ANDALSO = 35;
+    static readonly ORELSE = 36;
+    static readonly ID = 37;
     static readonly channelNames: string[];
     static readonly modeNames: string[];
     static readonly ruleNames: string[];

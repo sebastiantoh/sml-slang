@@ -72,6 +72,22 @@ class NodeGenerator {
             exps: ctx.exp().map((ec) => this.visit(ec))
         };
     }
+    visitConjunction(ctx) {
+        return {
+            tag: 'InfixApplication',
+            operand1: this.visit(ctx._op1),
+            operand2: this.visit(ctx._op2),
+            id: 'andalso'
+        };
+    }
+    visitDisjunction(ctx) {
+        return {
+            tag: 'InfixApplication',
+            operand1: this.visit(ctx._op1),
+            operand2: this.visit(ctx._op2),
+            id: 'orelse'
+        };
+    }
     visitConditional(ctx) {
         return {
             tag: 'ConditionalExpression',

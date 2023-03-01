@@ -71,12 +71,14 @@ test('characters: char1 >= char2', () => expect((0, utils_1.parseAndEvaluateExp)
 /**
  * Booleans
  */
-test.skip('booleans: true evaluates to itself', () => expect((0, utils_1.parseAndEvaluateExp)('true')).toBe('true'));
-test.skip('booleans: false evaluates to itself', () => expect((0, utils_1.parseAndEvaluateExp)('false')).toBe('false'));
+test('booleans: true evaluates to itself', () => expect((0, utils_1.parseAndEvaluateExp)('true')).toBe('true'));
+test('booleans: false evaluates to itself', () => expect((0, utils_1.parseAndEvaluateExp)('false')).toBe('false'));
 test.skip('booleans: negation of true', () => expect((0, utils_1.parseAndEvaluateExp)('not true')).toBe('false'));
 test.skip('booleans: negation of false', () => expect((0, utils_1.parseAndEvaluateExp)('not false')).toBe('false'));
-test.skip('booleans: disjunction', () => expect((0, utils_1.parseAndEvaluateExp)('2=2 orelse 37 div 0 = 5')).toBe('true'));
-test.skip('booleans: conjunction', () => expect((0, utils_1.parseAndEvaluateExp)('2=0 andalso 37 div 0 = 5')).toBe('false'));
+test('booleans: disjunction', () => expect((0, utils_1.parseAndEvaluateExp)('2=2 orelse 37 div 0 = 5')).toBe('true'));
+test('booleans: conjunction', () => expect((0, utils_1.parseAndEvaluateExp)('2=0 andalso 37 div 0 = 5')).toBe('false'));
+test('booleans: precedence of logical operators', () => expect((0, utils_1.parseAndEvaluateExp)('true orelse false andalso false')).toBe('true'));
+test('booleans: override precedence of logical operators with parentheses', () => expect((0, utils_1.parseAndEvaluateExp)('(true orelse false) andalso false')).toBe('false'));
 /**
  * Real numbers
  */

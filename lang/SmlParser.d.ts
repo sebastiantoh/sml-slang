@@ -44,7 +44,9 @@ export declare class SmlParser extends Parser {
     static readonly GT = 32;
     static readonly LTE = 33;
     static readonly GTE = 34;
-    static readonly ID = 35;
+    static readonly ANDALSO = 35;
+    static readonly ORELSE = 36;
+    static readonly ID = 37;
     static readonly RULE_con = 0;
     static readonly RULE_exp = 1;
     static readonly RULE_pat = 2;
@@ -179,6 +181,28 @@ export declare class LetExpressionContext extends ExpContext {
     exp(i: number): ExpContext;
     SEMICOLON(): TerminalNode[];
     SEMICOLON(i: number): TerminalNode;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class ConjunctionContext extends ExpContext {
+    _op1: ExpContext;
+    _op2: ExpContext;
+    ANDALSO(): TerminalNode;
+    exp(): ExpContext[];
+    exp(i: number): ExpContext;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class DisjunctionContext extends ExpContext {
+    _op1: ExpContext;
+    _op2: ExpContext;
+    ORELSE(): TerminalNode;
+    exp(): ExpContext[];
+    exp(i: number): ExpContext;
     constructor(ctx: ExpContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;
