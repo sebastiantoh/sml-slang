@@ -32,7 +32,9 @@ LT=31
 GT=32
 LTE=33
 GTE=34
-ID=35
+ANDALSO=35
+ORELSE=36
+ID=37
 'let'=1
 'in'=2
 'end'=3
@@ -62,3 +64,5 @@ ID=35
 '>'=32
 '<='=33
 '>='=34
+'andalso'=35
+'orelse'=36

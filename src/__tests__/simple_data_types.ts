@@ -108,19 +108,22 @@ test('characters: char1 >= char2', () => expect(parseAndEvaluateExp(`#"a" >= #"b
 /**
  * Booleans
  */
-test.skip('booleans: true evaluates to itself', () =>
-  expect(parseAndEvaluateExp('true')).toBe('true'))
-test.skip('booleans: false evaluates to itself', () =>
+test('booleans: true evaluates to itself', () => expect(parseAndEvaluateExp('true')).toBe('true'))
+test('booleans: false evaluates to itself', () =>
   expect(parseAndEvaluateExp('false')).toBe('false'))
 
 test.skip('booleans: negation of true', () => expect(parseAndEvaluateExp('not true')).toBe('false'))
 test.skip('booleans: negation of false', () =>
   expect(parseAndEvaluateExp('not false')).toBe('false'))
 
-test.skip('booleans: disjunction', () =>
+test('booleans: disjunction', () =>
   expect(parseAndEvaluateExp('2=2 orelse 37 div 0 = 5')).toBe('true'))
-test.skip('booleans: conjunction', () =>
+test('booleans: conjunction', () =>
   expect(parseAndEvaluateExp('2=0 andalso 37 div 0 = 5')).toBe('false'))
+test('booleans: precedence of logical operators', () =>
+  expect(parseAndEvaluateExp('true orelse false andalso false')).toBe('true'))
+test('booleans: override precedence of logical operators with parentheses', () =>
+  expect(parseAndEvaluateExp('(true orelse false) andalso false')).toBe('false'))
 
 /**
  * Real numbers

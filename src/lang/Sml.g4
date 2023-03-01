@@ -58,6 +58,8 @@ LT: '<';
 GT: '>';
 LTE: '<=';
 GTE: '>=';
+ANDALSO: 'andalso';
+ORELSE: 'orelse';
 
 ID
     : LETTER (LETTER | DIGIT | '\'' | '_' )*
@@ -86,6 +88,8 @@ exp
     | op1=exp id=ID op2=exp                                           # InfixApplication
     | LPAREN exp RPAREN                                               # Parentheses
     | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
+    | op1=exp ANDALSO op2=exp                                         # Conjunction
+    | op1=exp ORELSE op2=exp                                          # Disjunction
     | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
     ;
 

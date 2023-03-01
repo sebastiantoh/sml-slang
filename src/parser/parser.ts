@@ -10,9 +10,11 @@ import {
   BooleanContext,
   CharacterContext,
   ConditionalContext,
+  ConjunctionContext,
   ConstantContext,
   DecContext,
   DecSequenceContext,
+  DisjunctionContext,
   ExpContext,
   ExpVariableContext,
   FloatingPointContext,
@@ -116,6 +118,22 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'LetExpression',
       decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+    }
+  }
+  visitConjunction(ctx: ConjunctionContext): InfixApplication {
+    return {
+      tag: 'InfixApplication',
+      operand1: this.visit(ctx._op1) as Expression,
+      operand2: this.visit(ctx._op2) as Expression,
+      id: 'andalso'
+    }
+  }
+  visitDisjunction(ctx: DisjunctionContext): InfixApplication {
+    return {
+      tag: 'InfixApplication',
+      operand1: this.visit(ctx._op1) as Expression,
+      operand2: this.visit(ctx._op2) as Expression,
+      id: 'orelse'
     }
   }
   visitConditional(ctx: ConditionalContext): ConditionalExpression {
