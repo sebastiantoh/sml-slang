@@ -7,6 +7,7 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 
 import { SmlLexer } from '../lang/SmlLexer'
 import {
+  BooleanContext,
   CharacterContext,
   ConditionalContext,
   ConstantContext,
@@ -29,6 +30,7 @@ import {
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
+  BoolConstant,
   CharConstant,
   ConditionalExpression,
   Constant,
@@ -80,6 +82,12 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'StringConstant',
       // remove leading and trailing double quotes
       val: ctx.text.slice(1, ctx.text.length - 1)
+    }
+  }
+  visitBoolean(ctx: BooleanContext): BoolConstant {
+    return {
+      tag: 'BoolConstant',
+      val: ctx.TRUE() !== undefined ? true : false
     }
   }
 

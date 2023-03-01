@@ -79,6 +79,12 @@ const exec_microcode = (cmd: Microcode) => {
         js_val: cmd.val
       })
       break
+    case 'BoolConstant':
+      S.push({
+        type: 'bool',
+        js_val: cmd.val
+      })
+      break
     case 'InfixApplication':
       A.push(
         {

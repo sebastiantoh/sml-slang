@@ -34,6 +34,9 @@ fragment SAFECODEPOINT: ~ ["\\\u0000-\u001F];
 // reference: https://stackoverflow.com/questions/66902057/antlr-how-to-accept-double-quotes-inside-double-quoted-string-while-parsing
 fragment ASCII: ESC | SAFECODEPOINT;
 
+TRUE: 'true';
+FALSE: 'false';
+
 LPAREN: '(';
 RPAREN: ')';
 REC: 'rec';
@@ -65,10 +68,11 @@ ID
 /** Productions */
 
 con
-    : INT           # Integer
-    | FLOAT         # FloatingPoint
-    | CHAR          # Character
-    | STRING        # String
+    : INT              # Integer
+    | FLOAT            # FloatingPoint
+    | CHAR             # Character
+    | STRING           # String
+    | (TRUE | FALSE)   # Boolean
     ;
 
 exp
