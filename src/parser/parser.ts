@@ -125,7 +125,7 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'InfixApplication',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: 'andalso'
+      id: ctx.ANDALSO().text
     }
   }
   visitDisjunction(ctx: DisjunctionContext): InfixApplication {
@@ -133,7 +133,7 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'InfixApplication',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: 'orelse'
+      id: ctx.ORELSE().text
     }
   }
   visitConditional(ctx: ConditionalContext): ConditionalExpression {
