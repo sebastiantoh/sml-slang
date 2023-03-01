@@ -77,7 +77,7 @@ class NodeGenerator {
             tag: 'InfixApplication',
             operand1: this.visit(ctx._op1),
             operand2: this.visit(ctx._op2),
-            id: 'andalso'
+            id: ctx.ANDALSO().text
         };
     }
     visitDisjunction(ctx) {
@@ -85,7 +85,7 @@ class NodeGenerator {
             tag: 'InfixApplication',
             operand1: this.visit(ctx._op1),
             operand2: this.visit(ctx._op2),
-            id: 'orelse'
+            id: ctx.ORELSE().text
         };
     }
     visitConditional(ctx) {
