@@ -22,27 +22,29 @@ export declare class SmlParser extends Parser {
     static readonly FLOAT = 10;
     static readonly CHAR = 11;
     static readonly STRING = 12;
-    static readonly LPAREN = 13;
-    static readonly RPAREN = 14;
-    static readonly REC = 15;
-    static readonly AND = 16;
-    static readonly SEMICOLON = 17;
-    static readonly SLASH = 18;
-    static readonly DIV = 19;
-    static readonly MOD = 20;
-    static readonly STAR = 21;
-    static readonly PLUS = 22;
-    static readonly MINUS = 23;
-    static readonly CARET = 24;
-    static readonly CONS = 25;
-    static readonly AT = 26;
-    static readonly EQ = 27;
-    static readonly NEQ = 28;
-    static readonly LT = 29;
-    static readonly GT = 30;
-    static readonly LTE = 31;
-    static readonly GTE = 32;
-    static readonly ID = 33;
+    static readonly TRUE = 13;
+    static readonly FALSE = 14;
+    static readonly LPAREN = 15;
+    static readonly RPAREN = 16;
+    static readonly REC = 17;
+    static readonly AND = 18;
+    static readonly SEMICOLON = 19;
+    static readonly SLASH = 20;
+    static readonly DIV = 21;
+    static readonly MOD = 22;
+    static readonly STAR = 23;
+    static readonly PLUS = 24;
+    static readonly MINUS = 25;
+    static readonly CARET = 26;
+    static readonly CONS = 27;
+    static readonly AT = 28;
+    static readonly EQ = 29;
+    static readonly NEQ = 30;
+    static readonly LT = 31;
+    static readonly GT = 32;
+    static readonly LTE = 33;
+    static readonly GTE = 34;
+    static readonly ID = 35;
     static readonly RULE_con = 0;
     static readonly RULE_exp = 1;
     static readonly RULE_pat = 2;
@@ -102,6 +104,14 @@ export declare class CharacterContext extends ConContext {
 }
 export declare class StringContext extends ConContext {
     STRING(): TerminalNode;
+    constructor(ctx: ConContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class BooleanContext extends ConContext {
+    TRUE(): TerminalNode | undefined;
+    FALSE(): TerminalNode | undefined;
     constructor(ctx: ConContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;

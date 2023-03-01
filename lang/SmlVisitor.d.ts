@@ -5,6 +5,7 @@ import { IntegerContext } from "./SmlParser";
 import { FloatingPointContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
+import { BooleanContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
@@ -69,6 +70,13 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitString?: (ctx: StringContext) => Result;
+    /**
+     * Visit a parse tree produced by the `Boolean`
+     * labeled alternative in `SmlParser.con`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitBoolean?: (ctx: BooleanContext) => Result;
     /**
      * Visit a parse tree produced by the `ValueDecl`
      * labeled alternative in `SmlParser.dec`.

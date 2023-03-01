@@ -39,6 +39,12 @@ class NodeGenerator {
             val: ctx.text.slice(1, ctx.text.length - 1)
         };
     }
+    visitBoolean(ctx) {
+        return {
+            tag: 'BoolConstant',
+            val: ctx.TRUE() !== undefined ? true : false
+        };
+    }
     /**
      * Expressions
      */
