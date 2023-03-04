@@ -112,7 +112,7 @@ class NodeGenerator {
     /**
      * Match
      */
-    visitPatMatch(ctx) {
+    visitPatmatch(ctx) {
         return {
             tag: 'Match',
             pat: this.visit(ctx.pat()),

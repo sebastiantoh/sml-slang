@@ -62,22 +62,22 @@ in
    end
 end
 `)).toBe(`6`));
-test.skip('shadowed function calling function with same name in body', () => expect((0, utils_1.parseAndEvaluateExp)(`
+test('shadowed function calling function with same name in body', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
   val f = fn n => n + 1
   val f = fn n => f (f n)
 in
-  f(3)
-end;
+  f 3
+end
 `)).toBe(`5`));
-test.skip('rec function without rec keyword', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`
+test('rec function without rec keyword', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`
 let
   val f = fn n => if n = 0 then 1 else n * f (n - 1)
 in
-  f(3)
+  f 3
 end
-`)).toThrow()); // TODO: add more specific error
-test.skip('rec function with rec keyword', () => expect((0, utils_1.parseAndEvaluateExp)(`
+`)).toThrow(/f not found in env/)); // TODO: add more specific error
+test('rec function with rec keyword', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
   val rec f = fn n => if n = 0 then 1 else n * f (n - 1)
 in

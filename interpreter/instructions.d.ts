@@ -1,6 +1,6 @@
 import { Expression, Pattern } from '../parser/ast';
 import { Environment } from '../types';
-export type Instruction = PopI | BranchI | BinOpI | BinLogicalOpI | RestoreEnvI | AssignI;
+export type Instruction = PopI | BranchI | BinOpI | BinLogicalOpI | RestoreEnvI | AssignI | ApplicationI;
 interface PopI {
     tag: 'PopI';
 }
@@ -25,5 +25,8 @@ interface RestoreEnvI {
 interface AssignI {
     tag: 'AssignI';
     pat: Pattern;
+}
+interface ApplicationI {
+    tag: 'ApplicationI';
 }
 export {};
