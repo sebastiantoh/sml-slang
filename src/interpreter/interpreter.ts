@@ -162,7 +162,7 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'Program': {
-      rev_push(A, cmd.body)
+      rev_push(A, cmd.body.decs)
       break
     }
 

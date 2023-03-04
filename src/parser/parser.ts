@@ -193,7 +193,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitProg(ctx: ProgContext): Program {
     return {
       tag: 'Program',
-      body: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration)
+      body: this.visit(ctx.decSequence()) as DeclarationSequence
     }
   }
 

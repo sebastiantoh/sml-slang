@@ -103,5 +103,5 @@ export interface Valbind extends BaseNode {
  */
 export interface Program extends BaseNode {
   tag: 'Program'
-  body: Array<Declaration>
+  body: DeclarationSequence
 }

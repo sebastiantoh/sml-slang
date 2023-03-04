@@ -102,8 +102,10 @@ dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
     ;
 
-decSequence: (dec SEMICOLON?)+;
+// TODO: everywhere that uses "dec" in the
+// grammar rules online should be replaced with this instead
+decSequence: (dec SEMICOLON?)* dec;
 
 valbind: REC? pat EQ exp;
 
-prog: (dec SEMICOLON?)+;
+prog: decSequence;
