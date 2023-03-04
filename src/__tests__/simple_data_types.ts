@@ -16,6 +16,8 @@ test('integers: subtraction', () => expect(parseAndEvaluateExp('4 - 5')).toBe('~
 test('integers: multiplication', () => expect(parseAndEvaluateExp('6 * 7')).toBe('42'))
 
 test('integers: division', () => expect(parseAndEvaluateExp('5 div 2')).toBe('2'))
+test('integers: division by zero', () =>
+  expect(() => parseAndEvaluateExp('5 div 0')).toThrow(/division by zero/))
 
 test('integers: posInt mod posInt', () => expect(parseAndEvaluateExp(`5 mod 2`)).toBe('1'))
 test('integers: posInt mod negInt', () => expect(parseAndEvaluateExp(`5 mod ~2`)).toBe('~1'))
@@ -140,8 +142,8 @@ test('real numbers: multiplication', () => expect(parseAndEvaluateExp('1.2 * 3.4
 
 test('real numbers: nonzero / nonzero', () => expect(parseAndEvaluateExp(`1.0 / 2.0`)).toBe('0.5'))
 test('real numbers: zero / nonzero', () => expect(parseAndEvaluateExp(`0.0 / 2.0`)).toBe('0'))
-test.skip('real numbers: nonzero / zero', () =>
-  expect(() => parseAndEvaluateExp(`1.0 / 0`)).toThrow()) // TODO: add more specific error
+test('real numbers: nonzero / zero', () =>
+  expect(() => parseAndEvaluateExp(`1.0 / 0.0`)).toThrow(/division by zero/))
 
 /**
  * Unit

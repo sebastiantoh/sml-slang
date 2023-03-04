@@ -85,6 +85,18 @@ end
 `)
   ).toBe(`6`))
 
+test.skip('shadowed function calling function with same name in body', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  val f = fn n => n + 1
+  val f = fn n => f (f n)
+in
+  f(3)
+end;
+`)
+  ).toBe(`5`))
+
 test.skip('rec function without rec keyword', () =>
   expect(() =>
     parseAndEvaluateExp(`
@@ -106,3 +118,14 @@ in
 end
 `)
   ).toEqual(`6`))
+
+test('rec binding on a non-function', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  val rec f = 2
+in
+  f
+end
+`)
+  ).toThrow(/using rec requires binding a function/))

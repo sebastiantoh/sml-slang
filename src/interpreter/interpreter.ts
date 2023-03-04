@@ -50,42 +50,54 @@ const interleave = (microcodes: Array<Microcode>, instruction: Instruction) => {
   return ret
 }
 
+// All the case statements are wrapped in a { }. This is to prevent scopes
+// from interfering with each other (we don't want fallthroughs anyways).
+// Without this wrapping, the declaration of a const x in one case, would prevent
+// the declaration of the same const x in another disjoint case
 const exec_microcode = (cmd: Microcode) => {
   switch (cmd.tag) {
     /**
      * Node Tags
      */
-    case 'IntConstant':
+    case 'IntConstant': {
       S.push({
         type: 'int',
         js_val: cmd.val
       })
       break
-    case 'FloatConstant':
+    }
+    case 'FloatConstant': {
       S.push({
         type: 'real',
         js_val: cmd.val
       })
       break
-    case 'CharConstant':
+    }
+    case 'CharConstant': {
       S.push({
         type: 'char',
         js_val: cmd.val
       })
       break
-    case 'StringConstant':
+    }
+    case 'StringConstant': {
       S.push({
         type: 'string',
         js_val: cmd.val
       })
       break
-    case 'BoolConstant':
+    }
+    case 'BoolConstant': {
       S.push({
         type: 'bool',
         js_val: cmd.val
       })
       break
-    case 'InfixApplication':
+    }
+    case 'Application': {
+      throw new Error('TODO')
+    }
+    case 'InfixApplication': {
       A.push(
         {
           tag: 'BinOpI',
@@ -95,32 +107,63 @@ const exec_microcode = (cmd: Microcode) => {
         cmd.operand1
       )
       break
-    case 'LetExpression':
+    }
+    case 'LetExpression': {
       A.push({ tag: 'RestoreEnvI', env: E })
       rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
       A.push(cmd.decSequence)
       break
-    case 'ConditionalExpression':
+    }
+    case 'BinaryLogicalOperator': {
+      A.push(
+        {
+          tag: 'BinLogicalOpI',
+          id: cmd.id,
+          op2: cmd.operand2
+        },
+        cmd.operand1
+      )
+      break
+    }
+    case 'ConditionalExpression': {
       A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred)
       break
-    case 'Variable':
+    }
+    case 'Function': {
+      S.push({
+        type: 'fn',
+        matches: cmd.matches,
+        env: E
+      })
+      break
+    }
+    case 'Match': {
+      throw new Error('TODO')
+      break
+    }
+    case 'Matches': {
+      throw new Error('TODO')
+      break
+    }
+    case 'Variable': {
       S.push(lookup_env(E, cmd.id))
       break
-    case 'DeclarationSequence':
+    }
+    case 'DeclarationSequence': {
       rev_push(A, cmd.decs)
       break
-    case 'ValueDeclaration':
+    }
+    case 'ValueDeclaration': {
       rev_push(A, cmd.valbinds)
       break
-    case 'FunctionDeclaration':
-      // TODO
-      break
-    case 'Valbind':
+    }
+    case 'Valbind': {
       // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
       // Each declaration are in their own env frame
       if (cmd.is_rec) {
-        // TODO: add error checking. is_rec is only valid if RHS is a closure
-        // evaluate RHS in new env
+        if (cmd.exp.tag !== 'Function') {
+          throw new Error('using rec requires binding a function')
+        }
         E = extend_env(E)
         A.push({ tag: 'AssignI', pat: cmd.pat }, cmd.exp)
       } else {
@@ -133,17 +176,20 @@ const exec_microcode = (cmd: Microcode) => {
         })
       }
       break
-    case 'Program':
-      rev_push(A, cmd.body)
+    }
+    case 'Program': {
+      rev_push(A, cmd.body.decs)
       break
+    }
 
     /**
      * Instruction Tags
      */
-    case 'PopI':
+    case 'PopI': {
       S.pop()
       break
-    case 'BranchI':
+    }
+    case 'BranchI': {
       const pred_res = S.pop()
       assert(pred_res !== undefined && pred_res!.type === 'bool')
 
@@ -154,17 +200,51 @@ const exec_microcode = (cmd: Microcode) => {
       }
 
       break
-    case 'BinOpI':
+    }
+    case 'BinOpI': {
       const snd = S.pop()
       const fst = S.pop()
-      // TODO: should first lookup context first, before looking up builtin operators
-      // Or we can add builtin operators to context.
+      // We do not allow users to define custom infix / binary operators
+      // So we directly look up builtinBinOperators instead of looking up
+      // the env
       S.push(Sml.builtinBinOperators[cmd.id](fst, snd))
       break
-    case 'RestoreEnvI':
+    }
+    case 'BinLogicalOpI': {
+      const fst = S.pop()!
+
+      assert(fst.type !== 'fn')
+
+      // Perform shortcircuiting if possible
+      if (cmd.id === 'orelse' && fst.js_val) {
+        S.push({
+          type: 'bool',
+          js_val: true
+        })
+      } else if (cmd.id === 'andalso' && !fst.js_val) {
+        S.push({
+          type: 'bool',
+          js_val: false
+        })
+      } else {
+        // no shortcircuiting possible, so we push first operand back on stack
+        // then evaluate normally as if it's a binary op
+        S.push(fst)
+        A.push(
+          {
+            tag: 'BinOpI',
+            id: cmd.id
+          },
+          cmd.op2
+        )
+      }
+      break
+    }
+    case 'RestoreEnvI': {
       E = cmd.env
       break
-    case 'AssignI':
+    }
+    case 'AssignI': {
       const rhs = S.pop()!
       if (
         cmd.pat.tag === 'IntConstant' ||
@@ -172,7 +252,7 @@ const exec_microcode = (cmd: Microcode) => {
         cmd.pat.tag === 'CharConstant' ||
         cmd.pat.tag === 'StringConstant'
       ) {
-        if (cmd.pat.val !== rhs.js_val) {
+        if (rhs.type === 'fn' || cmd.pat.val !== rhs.js_val) {
           throw new Error(
             `cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`
           )
@@ -184,12 +264,13 @@ const exec_microcode = (cmd: Microcode) => {
         // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
       }
       break
-
-    default:
+    }
+    default: {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore: The following line will throw a compile error if all the
       // case statements are implemented (i.e. this branch is never taken).
       throw new Error(`unknown microcode: ${cmd.tag}`)
+    }
   }
 }
 

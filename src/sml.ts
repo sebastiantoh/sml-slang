@@ -18,6 +18,10 @@ export const valueToString = (sml_val: Value) => {
       return `#"${sml_val.js_val}"`
     case 'bool':
       return sml_val.js_val.toString()
+    case 'fn':
+      // TODO: once we have a typechecker, we can
+      // include more info in the string repr, e.g param types and return types
+      return 'fn'
   }
 }
 
@@ -26,9 +30,11 @@ export const valueToString = (sml_val: Value) => {
 export const builtinBinOperators = {
   '/': (a: Value, b: Value) => {
     if (a.type === 'real' && b.type === 'real') {
+      if (b.js_val === 0) {
+        throw new Error('division by zero')
+      }
       return {
         type: 'real',
-        // TODO: handle div by 0?
         js_val: a.js_val / b.js_val
       }
     }
@@ -36,9 +42,11 @@ export const builtinBinOperators = {
   },
   div: (a: Value, b: Value) => {
     if (a.type === 'int' && b.type === 'int') {
+      if (b.js_val === 0) {
+        throw new Error('division by zero')
+      }
       return {
         type: 'int',
-        // TODO: handle div by 0?
         js_val: Math.floor(a.js_val / b.js_val)
       }
     }

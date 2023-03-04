@@ -13,14 +13,18 @@ import { BooleanContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
+import { ApplicationContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
 import { ConjunctionContext } from "./SmlParser";
 import { DisjunctionContext } from "./SmlParser";
 import { ConditionalContext } from "./SmlParser";
+import { FunctionContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
+import { PatmatchContext } from "./SmlParser";
+import { MatchesContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { DecSequenceContext } from "./SmlParser";
@@ -117,6 +121,14 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitExpVariable?: (ctx: ExpVariableContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by the `Application`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitApplication?: (ctx: ApplicationContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by the `InfixApplication`
 	 * labeled alternative in `SmlParser.exp`.
 	 * @param ctx the parse tree
@@ -165,6 +177,14 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitConditional?: (ctx: ConditionalContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by the `Function`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitFunction?: (ctx: FunctionContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `SmlParser.con`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -177,6 +197,20 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitExp?: (ctx: ExpContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SmlParser.patmatch`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPatmatch?: (ctx: PatmatchContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SmlParser.matches`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMatches?: (ctx: MatchesContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SmlParser.pat`.

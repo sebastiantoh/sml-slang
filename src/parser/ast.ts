@@ -1,4 +1,12 @@
-export type Node = Expression | Pattern | Declaration | DeclarationSequence | Valbind | Program
+export type Node =
+  | Expression
+  | Match
+  | Matches
+  | Pattern
+  | Declaration
+  | DeclarationSequence
+  | Valbind
+  | Program
 
 interface BaseNode {
   tag: string
@@ -7,7 +15,14 @@ interface BaseNode {
 /**
  * Expressions
  */
-export type Expression = Constant | InfixApplication | LetExpression | ConditionalExpression
+export type Expression =
+  | Constant
+  | Application
+  | InfixApplication
+  | LetExpression
+  | BinaryLogicalOperator
+  | ConditionalExpression
+  | Function
 
 export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant
 export interface IntConstant extends BaseNode {
@@ -31,6 +46,12 @@ export interface BoolConstant extends BaseNode {
   val: boolean
 }
 
+export interface Application extends BaseNode {
+  tag: 'Application'
+  fn: Expression
+  arg: Expression
+}
+
 export interface InfixApplication extends BaseNode {
   tag: 'InfixApplication'
   operand1: Expression
@@ -44,11 +65,36 @@ export interface LetExpression extends BaseNode {
   exps: Array<Expression>
 }
 
+export interface BinaryLogicalOperator extends BaseNode {
+  tag: 'BinaryLogicalOperator'
+  operand1: Expression
+  operand2: Expression
+  id: 'andalso' | 'orelse'
+}
+
 export interface ConditionalExpression extends BaseNode {
   tag: 'ConditionalExpression'
   pred: Expression
   consequent: Expression
   alternative: Expression
+}
+
+export interface Function extends BaseNode {
+  tag: 'Function'
+  matches: Matches
+}
+
+/**
+ * Match
+ */
+export interface Match extends BaseNode {
+  tag: 'Match'
+  pat: Pattern
+  exp: Expression
+}
+export interface Matches extends BaseNode {
+  tag: 'Matches'
+  matches: Array<Match>
 }
 
 /**
@@ -68,16 +114,13 @@ export interface DeclarationSequence extends BaseNode {
   tag: 'DeclarationSequence'
   decs: Array<Declaration>
 }
-export type Declaration = ValueDeclaration | FunctionDeclaration
+// TODO: FunctionDeclaration should not be a separate ast node. Should desugar to val rec fbind ^
+// (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
+export type Declaration = ValueDeclaration
 
 export interface ValueDeclaration extends BaseNode {
   tag: 'ValueDeclaration'
   valbinds: Array<Valbind>
-}
-
-export interface FunctionDeclaration extends BaseNode {
-  tag: 'FunctionDeclaration'
-  funbind: any // TODO: replace this with proper type
 }
 
 export interface Valbind extends BaseNode {
@@ -91,5 +134,5 @@ export interface Valbind extends BaseNode {
  */
 export interface Program extends BaseNode {
   tag: 'Program'
-  body: Array<Declaration>
+  body: DeclarationSequence
 }

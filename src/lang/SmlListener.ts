@@ -13,14 +13,18 @@ import { BooleanContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
+import { ApplicationContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
 import { ConjunctionContext } from "./SmlParser";
 import { DisjunctionContext } from "./SmlParser";
 import { ConditionalContext } from "./SmlParser";
+import { FunctionContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
+import { PatmatchContext } from "./SmlParser";
+import { MatchesContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { DecSequenceContext } from "./SmlParser";
@@ -164,6 +168,19 @@ export interface SmlListener extends ParseTreeListener {
 	exitExpVariable?: (ctx: ExpVariableContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `Application`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	enterApplication?: (ctx: ApplicationContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Application`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	exitApplication?: (ctx: ApplicationContext) => void;
+
+	/**
 	 * Enter a parse tree produced by the `InfixApplication`
 	 * labeled alternative in `SmlParser.exp`.
 	 * @param ctx the parse tree
@@ -242,6 +259,19 @@ export interface SmlListener extends ParseTreeListener {
 	exitConditional?: (ctx: ConditionalContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `Function`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	enterFunction?: (ctx: FunctionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Function`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	exitFunction?: (ctx: FunctionContext) => void;
+
+	/**
 	 * Enter a parse tree produced by `SmlParser.con`.
 	 * @param ctx the parse tree
 	 */
@@ -262,6 +292,28 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitExp?: (ctx: ExpContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.patmatch`.
+	 * @param ctx the parse tree
+	 */
+	enterPatmatch?: (ctx: PatmatchContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.patmatch`.
+	 * @param ctx the parse tree
+	 */
+	exitPatmatch?: (ctx: PatmatchContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.matches`.
+	 * @param ctx the parse tree
+	 */
+	enterMatches?: (ctx: MatchesContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.matches`.
+	 * @param ctx the parse tree
+	 */
+	exitMatches?: (ctx: MatchesContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SmlParser.pat`.

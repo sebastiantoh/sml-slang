@@ -7,6 +7,7 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 
 import { SmlLexer } from '../lang/SmlLexer'
 import {
+  ApplicationContext,
   BooleanContext,
   CharacterContext,
   ConditionalContext,
@@ -18,11 +19,14 @@ import {
   ExpContext,
   ExpVariableContext,
   FloatingPointContext,
+  FunctionContext,
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
+  MatchesContext,
   ParenthesesContext,
   PatConstantContext,
+  PatmatchContext,
   PatVariableContext,
   ProgContext,
   SmlParser,
@@ -32,6 +36,8 @@ import {
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
+  Application,
+  BinaryLogicalOperator,
   BoolConstant,
   CharConstant,
   ConditionalExpression,
@@ -40,9 +46,12 @@ import {
   DeclarationSequence,
   Expression,
   FloatConstant,
+  Function,
   InfixApplication,
   IntConstant,
   LetExpression,
+  Match,
+  Matches,
   Node,
   Pattern,
   Program,
@@ -102,6 +111,13 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitExpVariable(ctx: ExpVariableContext): Variable {
     return { tag: 'Variable', id: ctx._id.text! }
   }
+  visitApplication(ctx: ApplicationContext): Application {
+    return {
+      tag: 'Application',
+      fn: this.visit(ctx._fn) as Expression,
+      arg: this.visit(ctx._arg) as Expression
+    }
+  }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
     return {
       tag: 'InfixApplication',
@@ -120,20 +136,20 @@ class NodeGenerator implements SmlVisitor<Node> {
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
     }
   }
-  visitConjunction(ctx: ConjunctionContext): InfixApplication {
+  visitConjunction(ctx: ConjunctionContext): BinaryLogicalOperator {
     return {
-      tag: 'InfixApplication',
+      tag: 'BinaryLogicalOperator',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ANDALSO().text
+      id: ctx.ANDALSO().text as 'andalso'
     }
   }
-  visitDisjunction(ctx: DisjunctionContext): InfixApplication {
+  visitDisjunction(ctx: DisjunctionContext): BinaryLogicalOperator {
     return {
-      tag: 'InfixApplication',
+      tag: 'BinaryLogicalOperator',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ORELSE().text
+      id: ctx.ORELSE().text as 'orelse'
     }
   }
   visitConditional(ctx: ConditionalContext): ConditionalExpression {
@@ -142,6 +158,29 @@ class NodeGenerator implements SmlVisitor<Node> {
       pred: this.visit(ctx._pred) as Expression,
       consequent: this.visit(ctx._cons) as Expression,
       alternative: this.visit(ctx._alt) as Expression
+    }
+  }
+  visitFunction(ctx: FunctionContext): Function {
+    return {
+      tag: 'Function',
+      matches: this.visit(ctx.matches()) as Matches
+    }
+  }
+
+  /**
+   * Match
+   */
+  visitPatMatch(ctx: PatmatchContext): Match {
+    return {
+      tag: 'Match',
+      pat: this.visit(ctx.pat()) as Pattern,
+      exp: this.visit(ctx.exp()) as Expression
+    }
+  }
+  visitMatches(ctx: MatchesContext): Matches {
+    return {
+      tag: 'Matches',
+      matches: ctx.patmatch().map((m: PatmatchContext) => this.visit(m) as Match)
     }
   }
 
@@ -192,7 +231,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitProg(ctx: ProgContext): Program {
     return {
       tag: 'Program',
-      body: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration)
+      body: this.visit(ctx.decSequence()) as DeclarationSequence
     }
   }
 
