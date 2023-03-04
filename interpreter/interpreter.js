@@ -143,16 +143,13 @@ const exec_microcode = (cmd) => {
             rev_push(A, cmd.valbinds);
             break;
         }
-        case 'FunctionDeclaration': {
-            // TODO: desugar to val rec fbind. (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
-            break;
-        }
         case 'Valbind': {
             // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
             // Each declaration are in their own env frame
             if (cmd.is_rec) {
-                // TODO: add error checking. is_rec is only valid if RHS is a closure
-                // evaluate RHS in new env
+                if (cmd.exp.tag !== 'Function') {
+                    throw new Error('using rec requires binding a function');
+                }
                 E = extend_env(E);
                 A.push({ tag: 'AssignI', pat: cmd.pat }, cmd.exp);
             }

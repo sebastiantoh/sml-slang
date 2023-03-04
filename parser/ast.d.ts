@@ -86,14 +86,10 @@ export interface DeclarationSequence extends BaseNode {
     tag: 'DeclarationSequence';
     decs: Array<Declaration>;
 }
-export type Declaration = ValueDeclaration | FunctionDeclaration;
+export type Declaration = ValueDeclaration;
 export interface ValueDeclaration extends BaseNode {
     tag: 'ValueDeclaration';
     valbinds: Array<Valbind>;
-}
-export interface FunctionDeclaration extends BaseNode {
-    tag: 'FunctionDeclaration';
-    funbind: any;
 }
 export interface Valbind extends BaseNode {
     tag: 'Valbind';
