@@ -170,7 +170,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   /**
    * Match
    */
-  visitPatMatch(ctx: PatmatchContext): Match {
+  visitPatmatch(ctx: PatmatchContext): Match {
     return {
       tag: 'Match',
       pat: this.visit(ctx.pat()) as Pattern,
