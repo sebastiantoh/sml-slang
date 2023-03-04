@@ -91,4 +91,18 @@ in
   f
 end
 `)).toThrow(/using rec requires binding a function/));
+test('function with multiple matches and function application arg matches with >1 of these patterns - should match with first possible match', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  val add_one_if_two = fn 2 => 3 | x => x
+in
+  add_one_if_two 2
+end
+`)).toEqual(`3`));
+test('function with multiple matches and function application arg only matches with 1 of these patterns', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  val add_one_if_two = fn 2 => 3 | x => x
+in
+  add_one_if_two 10
+end
+`)).toEqual(`10`));
 //# sourceMappingURL=let_exp.js.map
