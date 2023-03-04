@@ -30,7 +30,7 @@ export interface BoolConstant extends BaseNode {
 export interface Application extends BaseNode {
     tag: 'Application';
     fn: Expression;
-    param: Expression;
+    arg: Expression;
 }
 export interface InfixApplication extends BaseNode {
     tag: 'InfixApplication';

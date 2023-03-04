@@ -58,7 +58,7 @@ class NodeGenerator {
         return {
             tag: 'Application',
             fn: this.visit(ctx._fn),
-            param: this.visit(ctx._param)
+            arg: this.visit(ctx._arg)
         };
     }
     visitInfixApplication(ctx) {

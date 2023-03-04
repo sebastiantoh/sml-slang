@@ -148,7 +148,7 @@ export declare class ExpVariableContext extends ExpContext {
 }
 export declare class ApplicationContext extends ExpContext {
     _fn: ExpContext;
-    _param: ExpContext;
+    _arg: ExpContext;
     exp(): ExpContext[];
     exp(i: number): ExpContext;
     constructor(ctx: ExpContext);

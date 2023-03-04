@@ -257,7 +257,7 @@ class SmlParser extends Parser_1.Parser {
                                             throw this.createFailedPredicateException("this.precpred(this._ctx, 12)");
                                         }
                                         this.state = 57;
-                                        _localctx._param = this.exp(13);
+                                        _localctx._arg = this.exp(13);
                                     }
                                     break;
                                 case 2:
