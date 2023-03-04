@@ -1,4 +1,3 @@
-import * as es from 'estree';
 import { Matches } from './parser/ast';
 export type Value = Int | Real | String | Char | Bool | Fn;
 export interface Int {
@@ -33,6 +32,55 @@ export interface Environment {
     frame: EnvironmentFrame;
     parent?: Environment;
 }
+export interface Errored {
+    status: 'errored';
+    error: SourceError;
+}
+export interface Finished {
+    status: 'finished';
+    value: any;
+    type: any;
+    name?: string;
+}
+export type Result = Finished | Errored;
+export type RuntimeResult = Omit<Finished, 'status'>;
+export interface FrameTemp {
+    [name: string]: RuntimeResult;
+}
+export interface EnvironmentTemp {
+    id: string;
+    name?: string;
+    tail: EnvironmentTemp | null;
+    head: FrameTemp;
+}
+export interface Context<T = any> {
+    /** The external symbols that exist in the Context. */
+    externalSymbols: string[];
+    /** Runtime specific state */
+    runtime: {
+        isRunning: boolean;
+        environments: Environment[];
+        value: any;
+        nodes: Node[];
+    };
+    numberOfOuterEnvironments: number;
+    prelude: string | null;
+    /**
+     * Used for storing external properties.
+     * For e.g, this can be used to store some application-related
+     * context for use in your own built-in functions (like `display(a)`)
+     */
+    externalContext?: T;
+}
+export interface Position {
+    line: number;
+    column: number;
+}
+export interface SourceLocation {
+    source?: string | null;
+    start: Position;
+    end: Position;
+}
 export declare enum ErrorType {
     SYNTAX = "Syntax",
     TYPE = "Type",
@@ -45,33 +93,8 @@ export declare enum ErrorSeverity {
 export interface SourceError {
     type: ErrorType;
     severity: ErrorSeverity;
-    location: es.SourceLocation;
+    location: SourceLocation;
     explain(): string;
     elaborate(): string;
-}
-export interface Context<T = any> {
-    /** All the errors gathered */
-    errors: SourceError[];
-}
-export declare enum Chapter {
-    SML_SLANG = 1
-}
-export declare enum Variant {
-    DEFAULT = "sml-slang"
-}
-export interface Language {
-    chapter: Chapter;
-    variant: Variant;
-}
-export interface EnvVisualiseFrame {
-    [name: string]: any;
-}
-export interface EnvVisualiserEnvironment {
-    id: string;
-    name: string;
-    tail: EnvVisualiserEnvironment | null;
-    callExpression?: es.CallExpression;
-    head: EnvVisualiseFrame;
-    thisContext?: any;
 }
 export {};

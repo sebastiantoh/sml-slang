@@ -1,3 +1,3 @@
-import { Context, Variant } from './types';
-declare const createContext: <T>(variant?: Variant, externalSymbols?: string[], externalContext?: T | undefined) => Context;
+import { Context } from './types';
+declare const createContext: <T>(externalSymbols?: string[], externalContext?: T | undefined) => Context;
 export default createContext;
