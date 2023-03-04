@@ -157,8 +157,9 @@ const exec_microcode = (cmd: Microcode) => {
     case 'BinOpI':
       const snd = S.pop()
       const fst = S.pop()
-      // TODO: should first lookup context first, before looking up builtin operators
-      // Or we can add builtin operators to context.
+      // We do not allow users to define custom infix / binary operators
+      // So we directly look up builtinBinOperators instead of looking up
+      // the env
       S.push(Sml.builtinBinOperators[cmd.id](fst, snd))
       break
     case 'RestoreEnvI':
