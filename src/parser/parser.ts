@@ -23,10 +23,10 @@ import {
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
-  MatchContext,
   MatchesContext,
   ParenthesesContext,
   PatConstantContext,
+  PatmatchContext,
   PatVariableContext,
   ProgContext,
   SmlParser,
@@ -170,7 +170,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   /**
    * Match
    */
-  visitMatch(ctx: MatchContext): Match {
+  visitPatMatch(ctx: PatmatchContext): Match {
     return {
       tag: 'Match',
       pat: this.visit(ctx.pat()) as Pattern,
@@ -180,7 +180,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitMatches(ctx: MatchesContext): Matches {
     return {
       tag: 'Matches',
-      matches: ctx.match().map((m: MatchContext) => this.visit(m) as Match)
+      matches: ctx.patmatch().map((m: PatmatchContext) => this.visit(m) as Match)
     }
   }
 

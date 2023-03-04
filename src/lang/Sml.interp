@@ -87,7 +87,7 @@ ID
 rule names:
 con
 exp
-match
+patmatch
 matches
 pat
 dec

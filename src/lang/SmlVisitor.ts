@@ -23,7 +23,7 @@ import { ConditionalContext } from "./SmlParser";
 import { FunctionContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
-import { MatchContext } from "./SmlParser";
+import { PatmatchContext } from "./SmlParser";
 import { MatchesContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
@@ -199,11 +199,11 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitExp?: (ctx: ExpContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `SmlParser.match`.
+	 * Visit a parse tree produced by `SmlParser.patmatch`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitMatch?: (ctx: MatchContext) => Result;
+	visitPatmatch?: (ctx: PatmatchContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SmlParser.matches`.

@@ -70,7 +70,7 @@ export class SmlParser extends Parser {
 	public static readonly ID = 40;
 	public static readonly RULE_con = 0;
 	public static readonly RULE_exp = 1;
-	public static readonly RULE_match = 2;
+	public static readonly RULE_patmatch = 2;
 	public static readonly RULE_matches = 3;
 	public static readonly RULE_pat = 4;
 	public static readonly RULE_dec = 5;
@@ -79,7 +79,7 @@ export class SmlParser extends Parser {
 	public static readonly RULE_prog = 8;
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
-		"con", "exp", "match", "matches", "pat", "dec", "decSequence", "valbind", 
+		"con", "exp", "patmatch", "matches", "pat", "dec", "decSequence", "valbind", 
 		"prog",
 	];
 
@@ -534,9 +534,9 @@ export class SmlParser extends Parser {
 		return _localctx;
 	}
 	// @RuleVersion(0)
-	public match(): MatchContext {
-		let _localctx: MatchContext = new MatchContext(this._ctx, this.state);
-		this.enterRule(_localctx, 4, SmlParser.RULE_match);
+	public patmatch(): PatmatchContext {
+		let _localctx: PatmatchContext = new PatmatchContext(this._ctx, this.state);
+		this.enterRule(_localctx, 4, SmlParser.RULE_patmatch);
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
@@ -571,7 +571,7 @@ export class SmlParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 88;
-			this.match();
+			this.patmatch();
 			this.state = 93;
 			this._errHandler.sync(this);
 			_alt = this.interpreter.adaptivePredict(this._input, 5, this._ctx);
@@ -582,7 +582,7 @@ export class SmlParser extends Parser {
 					this.state = 89;
 					this.match(SmlParser.T__8);
 					this.state = 90;
-					this.match();
+					this.patmatch();
 					}
 					}
 				}
@@ -1449,7 +1449,7 @@ export class FunctionContext extends ExpContext {
 }
 
 
-export class MatchContext extends ParserRuleContext {
+export class PatmatchContext extends ParserRuleContext {
 	public pat(): PatContext {
 		return this.getRuleContext(0, PatContext);
 	}
@@ -1460,23 +1460,23 @@ export class MatchContext extends ParserRuleContext {
 		super(parent, invokingState);
 	}
 	// @Override
-	public get ruleIndex(): number { return SmlParser.RULE_match; }
+	public get ruleIndex(): number { return SmlParser.RULE_patmatch; }
 	// @Override
 	public enterRule(listener: SmlListener): void {
-		if (listener.enterMatch) {
-			listener.enterMatch(this);
+		if (listener.enterPatmatch) {
+			listener.enterPatmatch(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: SmlListener): void {
-		if (listener.exitMatch) {
-			listener.exitMatch(this);
+		if (listener.exitPatmatch) {
+			listener.exitPatmatch(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: SmlVisitor<Result>): Result {
-		if (visitor.visitMatch) {
-			return visitor.visitMatch(this);
+		if (visitor.visitPatmatch) {
+			return visitor.visitPatmatch(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
@@ -1485,13 +1485,13 @@ export class MatchContext extends ParserRuleContext {
 
 
 export class MatchesContext extends ParserRuleContext {
-	public match(): MatchContext[];
-	public match(i: number): MatchContext;
-	public match(i?: number): MatchContext | MatchContext[] {
+	public patmatch(): PatmatchContext[];
+	public patmatch(i: number): PatmatchContext;
+	public patmatch(i?: number): PatmatchContext | PatmatchContext[] {
 		if (i === undefined) {
-			return this.getRuleContexts(MatchContext);
+			return this.getRuleContexts(PatmatchContext);
 		} else {
-			return this.getRuleContext(i, MatchContext);
+			return this.getRuleContext(i, PatmatchContext);
 		}
 	}
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {

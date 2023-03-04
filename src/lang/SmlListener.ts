@@ -23,7 +23,7 @@ import { ConditionalContext } from "./SmlParser";
 import { FunctionContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
-import { MatchContext } from "./SmlParser";
+import { PatmatchContext } from "./SmlParser";
 import { MatchesContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
@@ -294,15 +294,15 @@ export interface SmlListener extends ParseTreeListener {
 	exitExp?: (ctx: ExpContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `SmlParser.match`.
+	 * Enter a parse tree produced by `SmlParser.patmatch`.
 	 * @param ctx the parse tree
 	 */
-	enterMatch?: (ctx: MatchContext) => void;
+	enterPatmatch?: (ctx: PatmatchContext) => void;
 	/**
-	 * Exit a parse tree produced by `SmlParser.match`.
+	 * Exit a parse tree produced by `SmlParser.patmatch`.
 	 * @param ctx the parse tree
 	 */
-	exitMatch?: (ctx: MatchContext) => void;
+	exitPatmatch?: (ctx: PatmatchContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SmlParser.matches`.
