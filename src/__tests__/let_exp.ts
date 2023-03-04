@@ -118,3 +118,14 @@ in
 end
 `)
   ).toEqual(`6`))
+
+test('rec binding on a non-function', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  val rec f = 2
+in
+  f
+end
+`)
+  ).toThrow(/using rec requires binding a function/))
