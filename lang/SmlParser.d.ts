@@ -17,43 +17,48 @@ export declare class SmlParser extends Parser {
     static readonly T__4 = 5;
     static readonly T__5 = 6;
     static readonly T__6 = 7;
-    static readonly WHITESPACE = 8;
-    static readonly INT = 9;
-    static readonly FLOAT = 10;
-    static readonly CHAR = 11;
-    static readonly STRING = 12;
-    static readonly TRUE = 13;
-    static readonly FALSE = 14;
-    static readonly LPAREN = 15;
-    static readonly RPAREN = 16;
-    static readonly REC = 17;
-    static readonly AND = 18;
-    static readonly SEMICOLON = 19;
-    static readonly SLASH = 20;
-    static readonly DIV = 21;
-    static readonly MOD = 22;
-    static readonly STAR = 23;
-    static readonly PLUS = 24;
-    static readonly MINUS = 25;
-    static readonly CARET = 26;
-    static readonly CONS = 27;
-    static readonly AT = 28;
-    static readonly EQ = 29;
-    static readonly NEQ = 30;
-    static readonly LT = 31;
-    static readonly GT = 32;
-    static readonly LTE = 33;
-    static readonly GTE = 34;
-    static readonly ANDALSO = 35;
-    static readonly ORELSE = 36;
-    static readonly ID = 37;
+    static readonly T__7 = 8;
+    static readonly T__8 = 9;
+    static readonly T__9 = 10;
+    static readonly WHITESPACE = 11;
+    static readonly INT = 12;
+    static readonly FLOAT = 13;
+    static readonly CHAR = 14;
+    static readonly STRING = 15;
+    static readonly TRUE = 16;
+    static readonly FALSE = 17;
+    static readonly LPAREN = 18;
+    static readonly RPAREN = 19;
+    static readonly REC = 20;
+    static readonly AND = 21;
+    static readonly SEMICOLON = 22;
+    static readonly SLASH = 23;
+    static readonly DIV = 24;
+    static readonly MOD = 25;
+    static readonly STAR = 26;
+    static readonly PLUS = 27;
+    static readonly MINUS = 28;
+    static readonly CARET = 29;
+    static readonly CONS = 30;
+    static readonly AT = 31;
+    static readonly EQ = 32;
+    static readonly NEQ = 33;
+    static readonly LT = 34;
+    static readonly GT = 35;
+    static readonly LTE = 36;
+    static readonly GTE = 37;
+    static readonly ANDALSO = 38;
+    static readonly ORELSE = 39;
+    static readonly ID = 40;
     static readonly RULE_con = 0;
     static readonly RULE_exp = 1;
-    static readonly RULE_pat = 2;
-    static readonly RULE_dec = 3;
-    static readonly RULE_decSequence = 4;
-    static readonly RULE_valbind = 5;
-    static readonly RULE_prog = 6;
+    static readonly RULE_patmatch = 2;
+    static readonly RULE_matches = 3;
+    static readonly RULE_pat = 4;
+    static readonly RULE_dec = 5;
+    static readonly RULE_decSequence = 6;
+    static readonly RULE_valbind = 7;
+    static readonly RULE_prog = 8;
     static readonly ruleNames: string[];
     private static readonly _LITERAL_NAMES;
     private static readonly _SYMBOLIC_NAMES;
@@ -67,6 +72,8 @@ export declare class SmlParser extends Parser {
     con(): ConContext;
     exp(): ExpContext;
     exp(_p: number): ExpContext;
+    patmatch(): PatmatchContext;
+    matches(): MatchesContext;
     pat(): PatContext;
     dec(): DecContext;
     decSequence(): DecSequenceContext;
@@ -134,6 +141,16 @@ export declare class ConstantContext extends ExpContext {
 export declare class ExpVariableContext extends ExpContext {
     _id: Token;
     ID(): TerminalNode;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class ApplicationContext extends ExpContext {
+    _fn: ExpContext;
+    _param: ExpContext;
+    exp(): ExpContext[];
+    exp(i: number): ExpContext;
     constructor(ctx: ExpContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;
@@ -219,6 +236,31 @@ export declare class ConditionalContext extends ExpContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
+export declare class FunctionContext extends ExpContext {
+    matches(): MatchesContext;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class PatmatchContext extends ParserRuleContext {
+    pat(): PatContext;
+    exp(): ExpContext;
+    constructor(parent: ParserRuleContext | undefined, invokingState: number);
+    get ruleIndex(): number;
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class MatchesContext extends ParserRuleContext {
+    patmatch(): PatmatchContext[];
+    patmatch(i: number): PatmatchContext;
+    constructor(parent: ParserRuleContext | undefined, invokingState: number);
+    get ruleIndex(): number;
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
 export declare class PatContext extends ParserRuleContext {
     constructor(parent: ParserRuleContext | undefined, invokingState: number);
     get ruleIndex(): number;
@@ -277,10 +319,7 @@ export declare class ValbindContext extends ParserRuleContext {
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
 export declare class ProgContext extends ParserRuleContext {
-    dec(): DecContext[];
-    dec(i: number): DecContext;
-    SEMICOLON(): TerminalNode[];
-    SEMICOLON(i: number): TerminalNode;
+    decSequence(): DecSequenceContext;
     constructor(parent: ParserRuleContext | undefined, invokingState: number);
     get ruleIndex(): number;
     enterRule(listener: SmlListener): void;

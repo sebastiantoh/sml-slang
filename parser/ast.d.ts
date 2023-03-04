@@ -1,11 +1,11 @@
-export type Node = Expression | Pattern | Declaration | DeclarationSequence | Valbind | Program;
+export type Node = Expression | Match | Matches | Pattern | Declaration | DeclarationSequence | Valbind | Program;
 interface BaseNode {
     tag: string;
 }
 /**
  * Expressions
  */
-export type Expression = Constant | InfixApplication | LetExpression | BinaryLogicalOperator | ConditionalExpression;
+export type Expression = Constant | Application | InfixApplication | LetExpression | BinaryLogicalOperator | ConditionalExpression | Function;
 export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant;
 export interface IntConstant extends BaseNode {
     tag: 'IntConstant';
@@ -26,6 +26,11 @@ export interface CharConstant extends BaseNode {
 export interface BoolConstant extends BaseNode {
     tag: 'BoolConstant';
     val: boolean;
+}
+export interface Application extends BaseNode {
+    tag: 'Application';
+    fn: Expression;
+    param: Expression;
 }
 export interface InfixApplication extends BaseNode {
     tag: 'InfixApplication';
@@ -49,6 +54,22 @@ export interface ConditionalExpression extends BaseNode {
     pred: Expression;
     consequent: Expression;
     alternative: Expression;
+}
+export interface Function extends BaseNode {
+    tag: 'Function';
+    matches: Matches;
+}
+/**
+ * Match
+ */
+export interface Match extends BaseNode {
+    tag: 'Match';
+    pat: Pattern;
+    exp: Expression;
+}
+export interface Matches extends BaseNode {
+    tag: 'Matches';
+    matches: Array<Match>;
 }
 /**
  * Patterns
@@ -85,6 +106,6 @@ export interface Valbind extends BaseNode {
  */
 export interface Program extends BaseNode {
     tag: 'Program';
-    body: Array<Declaration>;
+    body: DeclarationSequence;
 }
 export {};

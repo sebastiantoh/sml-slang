@@ -54,6 +54,13 @@ class NodeGenerator {
     visitExpVariable(ctx) {
         return { tag: 'Variable', id: ctx._id.text };
     }
+    visitApplication(ctx) {
+        return {
+            tag: 'Application',
+            fn: this.visit(ctx._fn),
+            param: this.visit(ctx._param)
+        };
+    }
     visitInfixApplication(ctx) {
         return {
             tag: 'InfixApplication',
@@ -94,6 +101,28 @@ class NodeGenerator {
             pred: this.visit(ctx._pred),
             consequent: this.visit(ctx._cons),
             alternative: this.visit(ctx._alt)
+        };
+    }
+    visitFunction(ctx) {
+        return {
+            tag: 'Function',
+            matches: this.visit(ctx.matches())
+        };
+    }
+    /**
+     * Match
+     */
+    visitPatMatch(ctx) {
+        return {
+            tag: 'Match',
+            pat: this.visit(ctx.pat()),
+            exp: this.visit(ctx.exp())
+        };
+    }
+    visitMatches(ctx) {
+        return {
+            tag: 'Matches',
+            matches: ctx.patmatch().map((m) => this.visit(m))
         };
     }
     /**
@@ -140,7 +169,7 @@ class NodeGenerator {
     visitProg(ctx) {
         return {
             tag: 'Program',
-            body: ctx.dec().map((d) => this.visit(d))
+            body: this.visit(ctx.decSequence())
         };
     }
     visit(tree) {

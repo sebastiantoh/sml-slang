@@ -87,6 +87,9 @@ const exec_microcode = (cmd) => {
             });
             break;
         }
+        case 'Application': {
+            throw new Error('TODO');
+        }
         case 'InfixApplication': {
             A.push({
                 tag: 'BinOpI',
@@ -112,6 +115,22 @@ const exec_microcode = (cmd) => {
             A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred);
             break;
         }
+        case 'Function': {
+            S.push({
+                type: 'fn',
+                matches: cmd.matches,
+                env: E
+            });
+            break;
+        }
+        case 'Match': {
+            throw new Error('TODO');
+            break;
+        }
+        case 'Matches': {
+            throw new Error('TODO');
+            break;
+        }
         case 'Variable': {
             S.push(lookup_env(E, cmd.id));
             break;
@@ -125,7 +144,7 @@ const exec_microcode = (cmd) => {
             break;
         }
         case 'FunctionDeclaration': {
-            // TODO
+            // TODO: desugar to val rec fbind. (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
             break;
         }
         case 'Valbind': {
@@ -149,7 +168,7 @@ const exec_microcode = (cmd) => {
             break;
         }
         case 'Program': {
-            rev_push(A, cmd.body);
+            rev_push(A, cmd.body.decs);
             break;
         }
         /**
@@ -181,6 +200,7 @@ const exec_microcode = (cmd) => {
         }
         case 'BinLogicalOpI': {
             const fst = S.pop();
+            assert(fst.type !== 'fn');
             // Perform shortcircuiting if possible
             if (cmd.id === 'orelse' && fst.js_val) {
                 S.push({
@@ -215,7 +235,7 @@ const exec_microcode = (cmd) => {
                 cmd.pat.tag === 'FloatConstant' ||
                 cmd.pat.tag === 'CharConstant' ||
                 cmd.pat.tag === 'StringConstant') {
-                if (cmd.pat.val !== rhs.js_val) {
+                if (rhs.type === 'fn' || cmd.pat.val !== rhs.js_val) {
                     throw new Error(`cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`);
                 }
             }

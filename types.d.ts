@@ -1,5 +1,6 @@
 import * as es from 'estree';
-export type Value = Int | Real | String | Char | Bool;
+import { Matches } from './parser/ast';
+export type Value = Int | Real | String | Char | Bool | Fn;
 export interface Int {
     type: 'int';
     js_val: number;
@@ -19,6 +20,11 @@ export interface Char {
 export interface Bool {
     type: 'bool';
     js_val: boolean;
+}
+export interface Fn {
+    type: 'fn';
+    matches: Matches;
+    env: Environment;
 }
 type EnvironmentFrame = {
     [k: string]: Value;
