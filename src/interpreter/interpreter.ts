@@ -157,10 +157,6 @@ const exec_microcode = (cmd: Microcode) => {
       rev_push(A, cmd.valbinds)
       break
     }
-    case 'FunctionDeclaration': {
-      // TODO: desugar to val rec fbind. (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
-      break
-    }
     case 'Valbind': {
       // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
       // Each declaration are in their own env frame

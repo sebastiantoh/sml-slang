@@ -114,16 +114,13 @@ export interface DeclarationSequence extends BaseNode {
   tag: 'DeclarationSequence'
   decs: Array<Declaration>
 }
-export type Declaration = ValueDeclaration | FunctionDeclaration
+// TODO: FunctionDeclaration should not be a separate ast node. Should desugar to val rec fbind ^
+// (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
+export type Declaration = ValueDeclaration
 
 export interface ValueDeclaration extends BaseNode {
   tag: 'ValueDeclaration'
   valbinds: Array<Valbind>
-}
-
-export interface FunctionDeclaration extends BaseNode {
-  tag: 'FunctionDeclaration'
-  funbind: any // TODO: replace this with proper type
 }
 
 export interface Valbind extends BaseNode {
