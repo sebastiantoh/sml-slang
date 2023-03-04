@@ -34,6 +34,9 @@ fragment SAFECODEPOINT: ~ ["\\\u0000-\u001F];
 // reference: https://stackoverflow.com/questions/66902057/antlr-how-to-accept-double-quotes-inside-double-quoted-string-while-parsing
 fragment ASCII: ESC | SAFECODEPOINT;
 
+TRUE: 'true';
+FALSE: 'false';
+
 LPAREN: '(';
 RPAREN: ')';
 REC: 'rec';
@@ -55,6 +58,8 @@ LT: '<';
 GT: '>';
 LTE: '<=';
 GTE: '>=';
+ANDALSO: 'andalso';
+ORELSE: 'orelse';
 
 ID
     : LETTER (LETTER | DIGIT | '\'' | '_' )*
@@ -65,10 +70,11 @@ ID
 /** Productions */
 
 con
-    : INT           # Integer
-    | FLOAT         # FloatingPoint
-    | CHAR          # Character
-    | STRING        # String
+    : INT              # Integer
+    | FLOAT            # FloatingPoint
+    | CHAR             # Character
+    | STRING           # String
+    | (TRUE | FALSE)   # Boolean
     ;
 
 exp
@@ -82,6 +88,8 @@ exp
     | op1=exp id=ID op2=exp                                           # InfixApplication
     | LPAREN exp RPAREN                                               # Parentheses
     | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
+    | op1=exp ANDALSO op2=exp                                         # Conjunction
+    | op1=exp ORELSE op2=exp                                          # Disjunction
     | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
     ;
 

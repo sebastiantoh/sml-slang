@@ -1,13 +1,15 @@
 import { parseAndEvaluateExp } from './utils'
 
-// TODO: add tests where the pred is simply the constant true or false
-// Right now, parser can't parse true / false. Idk if we should add it as a constant
-// even though it doens't appear in the grammar...
+test('true literal as pred', () =>
+  expect(parseAndEvaluateExp('if true then "then" else "else"')).toBe(`"then"`))
 
-test('true pred', () =>
+test('false literal as pred', () =>
+  expect(parseAndEvaluateExp('if false then "then" else "else"')).toBe(`"else"`))
+
+test('pred evaluating to true', () =>
   expect(parseAndEvaluateExp('if 1=1 then "then" else "else"')).toBe(`"then"`))
 
-test('false pred', () =>
+test('pred evaluating to false', () =>
   expect(parseAndEvaluateExp('if 1=2 then "then" else "else"')).toBe(`"else"`))
 
 test('nested conditionals', () =>

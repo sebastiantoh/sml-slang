@@ -9,12 +9,15 @@ import { IntegerContext } from "./SmlParser";
 import { FloatingPointContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
+import { BooleanContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
+import { ConjunctionContext } from "./SmlParser";
+import { DisjunctionContext } from "./SmlParser";
 import { ConditionalContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
@@ -82,6 +85,14 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitString?: (ctx: StringContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by the `Boolean`
+	 * labeled alternative in `SmlParser.con`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitBoolean?: (ctx: BooleanContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by the `ValueDecl`
 	 * labeled alternative in `SmlParser.dec`.
 	 * @param ctx the parse tree
@@ -128,6 +139,22 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitLetExpression?: (ctx: LetExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `Conjunction`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitConjunction?: (ctx: ConjunctionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `Disjunction`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitDisjunction?: (ctx: DisjunctionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `Conditional`

@@ -7,11 +7,14 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 
 import { SmlLexer } from '../lang/SmlLexer'
 import {
+  BooleanContext,
   CharacterContext,
   ConditionalContext,
+  ConjunctionContext,
   ConstantContext,
   DecContext,
   DecSequenceContext,
+  DisjunctionContext,
   ExpContext,
   ExpVariableContext,
   FloatingPointContext,
@@ -29,6 +32,7 @@ import {
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
+  BoolConstant,
   CharConstant,
   ConditionalExpression,
   Constant,
@@ -82,6 +86,12 @@ class NodeGenerator implements SmlVisitor<Node> {
       val: ctx.text.slice(1, ctx.text.length - 1)
     }
   }
+  visitBoolean(ctx: BooleanContext): BoolConstant {
+    return {
+      tag: 'BoolConstant',
+      val: ctx.TRUE() !== undefined ? true : false
+    }
+  }
 
   /**
    * Expressions
@@ -108,6 +118,22 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'LetExpression',
       decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+    }
+  }
+  visitConjunction(ctx: ConjunctionContext): InfixApplication {
+    return {
+      tag: 'InfixApplication',
+      operand1: this.visit(ctx._op1) as Expression,
+      operand2: this.visit(ctx._op2) as Expression,
+      id: ctx.ANDALSO().text
+    }
+  }
+  visitDisjunction(ctx: DisjunctionContext): InfixApplication {
+    return {
+      tag: 'InfixApplication',
+      operand1: this.visit(ctx._op1) as Expression,
+      operand2: this.visit(ctx._op2) as Expression,
+      id: ctx.ORELSE().text
     }
   }
   visitConditional(ctx: ConditionalContext): ConditionalExpression {

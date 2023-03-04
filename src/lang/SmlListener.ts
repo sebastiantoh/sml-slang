@@ -9,12 +9,15 @@ import { IntegerContext } from "./SmlParser";
 import { FloatingPointContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
+import { BooleanContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
+import { ConjunctionContext } from "./SmlParser";
+import { DisjunctionContext } from "./SmlParser";
 import { ConditionalContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
@@ -109,6 +112,19 @@ export interface SmlListener extends ParseTreeListener {
 	exitString?: (ctx: StringContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `Boolean`
+	 * labeled alternative in `SmlParser.con`.
+	 * @param ctx the parse tree
+	 */
+	enterBoolean?: (ctx: BooleanContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Boolean`
+	 * labeled alternative in `SmlParser.con`.
+	 * @param ctx the parse tree
+	 */
+	exitBoolean?: (ctx: BooleanContext) => void;
+
+	/**
 	 * Enter a parse tree produced by the `ValueDecl`
 	 * labeled alternative in `SmlParser.dec`.
 	 * @param ctx the parse tree
@@ -185,6 +201,32 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitLetExpression?: (ctx: LetExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `Conjunction`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	enterConjunction?: (ctx: ConjunctionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Conjunction`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	exitConjunction?: (ctx: ConjunctionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `Disjunction`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	enterDisjunction?: (ctx: DisjunctionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Disjunction`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 */
+	exitDisjunction?: (ctx: DisjunctionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `Conditional`

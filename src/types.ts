@@ -24,8 +24,6 @@ export interface Char {
   js_val: string
 }
 
-// Technically, bool is a builtin datatype defined with datatype bool = true | false;
-// TODO: see if we need to fix this
 export interface Bool {
   type: 'bool'
   js_val: boolean
