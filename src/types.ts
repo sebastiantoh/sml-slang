@@ -35,59 +35,59 @@ export interface Environment {
 }
 
 export interface Errored {
-  status: 'errored';
-  error: SourceError;
+  status: 'errored'
+  error: SourceError
 }
 
 export interface Finished {
-  status: 'finished';
+  status: 'finished'
   // TODO: update this to sml Value and Type
-  value: any;
-  type: any;
-  name?: string;
+  value: any
+  type: any
+  name?: string
 }
 
-export type Result = Finished | Errored;
+export type Result = Finished | Errored
 
 // used for tracking non-finished results during runtime
-export type RuntimeResult = Omit<Finished, 'status'>;
+export type RuntimeResult = Omit<Finished, 'status'>
 
 // TODO: merge frame and env temp types with
 // EnvironmentFrame and Environment respectively
 export interface FrameTemp {
-  [name: string]: RuntimeResult;
+  [name: string]: RuntimeResult
 }
 
 export interface EnvironmentTemp {
-  id: string;
-  name?: string;
-  tail: EnvironmentTemp | null;
-  head: FrameTemp;
+  id: string
+  name?: string
+  tail: EnvironmentTemp | null
+  head: FrameTemp
 }
 
 export interface Context<T = any> {
   /** The external symbols that exist in the Context. */
-  externalSymbols: string[];
+  externalSymbols: string[]
 
   /** Runtime specific state */
   runtime: {
-    isRunning: boolean;
-    environments: Environment[];
+    isRunning: boolean
+    environments: Environment[]
     // TODO: udpate to sml value?
-    value: any;
-    nodes: Node[];
-  };
+    value: any
+    nodes: Node[]
+  }
 
-  numberOfOuterEnvironments: number;
+  numberOfOuterEnvironments: number
 
-  prelude: string | null;
+  prelude: string | null
 
   /**
    * Used for storing external properties.
    * For e.g, this can be used to store some application-related
    * context for use in your own built-in functions (like `display(a)`)
    */
-  externalContext?: T;
+  externalContext?: T
 
   // typeEnvironments: TypeEnvironment[];
   // contractEnvironments: ContractEnvironment[];
@@ -95,15 +95,15 @@ export interface Context<T = any> {
 
 export interface Position {
   /* >= 1 */
-  line: number;
+  line: number
   /* >= 0 */
-  column: number;
+  column: number
 }
 
 export interface SourceLocation {
-  source?: string | null;
-  start: Position;
-  end: Position;
+  source?: string | null
+  start: Position
+  end: Position
 }
 
 export enum ErrorType {
