@@ -11,6 +11,7 @@ test('integers: addition', () => expect((0, utils_1.parseAndEvaluateExp)('1 + 2'
 test('integers: subtraction', () => expect((0, utils_1.parseAndEvaluateExp)('4 - 5')).toBe('~1'));
 test('integers: multiplication', () => expect((0, utils_1.parseAndEvaluateExp)('6 * 7')).toBe('42'));
 test('integers: division', () => expect((0, utils_1.parseAndEvaluateExp)('5 div 2')).toBe('2'));
+test('integers: division by zero', () => expect(() => (0, utils_1.parseAndEvaluateExp)('5 div 0')).toThrow(/division by zero/));
 test('integers: posInt mod posInt', () => expect((0, utils_1.parseAndEvaluateExp)(`5 mod 2`)).toBe('1'));
 test('integers: posInt mod negInt', () => expect((0, utils_1.parseAndEvaluateExp)(`5 mod ~2`)).toBe('~1'));
 test('integers: negInt mod posInt', () => expect((0, utils_1.parseAndEvaluateExp)(`~5 mod 2`)).toBe('1'));
@@ -89,7 +90,7 @@ test('real numbers: subtraction', () => expect((0, utils_1.parseAndEvaluateExp)(
 test('real numbers: multiplication', () => expect((0, utils_1.parseAndEvaluateExp)('1.2 * 3.4')).toBe('4.08'));
 test('real numbers: nonzero / nonzero', () => expect((0, utils_1.parseAndEvaluateExp)(`1.0 / 2.0`)).toBe('0.5'));
 test('real numbers: zero / nonzero', () => expect((0, utils_1.parseAndEvaluateExp)(`0.0 / 2.0`)).toBe('0'));
-test.skip('real numbers: nonzero / zero', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`1.0 / 0`)).toThrow()); // TODO: add more specific error
+test('real numbers: nonzero / zero', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`1.0 / 0.0`)).toThrow(/division by zero/));
 /**
  * Unit
  */

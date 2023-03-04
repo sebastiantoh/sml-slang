@@ -74,7 +74,7 @@ class NodeGenerator {
     }
     visitConjunction(ctx) {
         return {
-            tag: 'InfixApplication',
+            tag: 'BinaryLogicalOperator',
             operand1: this.visit(ctx._op1),
             operand2: this.visit(ctx._op2),
             id: ctx.ANDALSO().text
@@ -82,7 +82,7 @@ class NodeGenerator {
     }
     visitDisjunction(ctx) {
         return {
-            tag: 'InfixApplication',
+            tag: 'BinaryLogicalOperator',
             operand1: this.visit(ctx._op1),
             operand2: this.visit(ctx._op2),
             id: ctx.ORELSE().text

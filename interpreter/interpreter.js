@@ -43,68 +43,92 @@ const interleave = (microcodes, instruction) => {
     ret.pop();
     return ret;
 };
+// All the case statements are wrapped in a { }. This is to prevent scopes
+// from interfering with each other (we don't want fallthroughs anyways).
+// Without this wrapping, the declaration of a const x in one case, would prevent
+// the declaration of the same const x in another disjoint case
 const exec_microcode = (cmd) => {
     switch (cmd.tag) {
         /**
          * Node Tags
          */
-        case 'IntConstant':
+        case 'IntConstant': {
             S.push({
                 type: 'int',
                 js_val: cmd.val
             });
             break;
-        case 'FloatConstant':
+        }
+        case 'FloatConstant': {
             S.push({
                 type: 'real',
                 js_val: cmd.val
             });
             break;
-        case 'CharConstant':
+        }
+        case 'CharConstant': {
             S.push({
                 type: 'char',
                 js_val: cmd.val
             });
             break;
-        case 'StringConstant':
+        }
+        case 'StringConstant': {
             S.push({
                 type: 'string',
                 js_val: cmd.val
             });
             break;
-        case 'BoolConstant':
+        }
+        case 'BoolConstant': {
             S.push({
                 type: 'bool',
                 js_val: cmd.val
             });
             break;
-        case 'InfixApplication':
+        }
+        case 'InfixApplication': {
             A.push({
                 tag: 'BinOpI',
                 id: cmd.id
             }, cmd.operand2, cmd.operand1);
             break;
-        case 'LetExpression':
+        }
+        case 'LetExpression': {
             A.push({ tag: 'RestoreEnvI', env: E });
             rev_push(A, interleave(cmd.exps, { tag: 'PopI' }));
             A.push(cmd.decSequence);
             break;
-        case 'ConditionalExpression':
+        }
+        case 'BinaryLogicalOperator': {
+            A.push({
+                tag: 'BinLogicalOpI',
+                id: cmd.id,
+                op2: cmd.operand2
+            }, cmd.operand1);
+            break;
+        }
+        case 'ConditionalExpression': {
             A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred);
             break;
-        case 'Variable':
+        }
+        case 'Variable': {
             S.push(lookup_env(E, cmd.id));
             break;
-        case 'DeclarationSequence':
+        }
+        case 'DeclarationSequence': {
             rev_push(A, cmd.decs);
             break;
-        case 'ValueDeclaration':
+        }
+        case 'ValueDeclaration': {
             rev_push(A, cmd.valbinds);
             break;
-        case 'FunctionDeclaration':
+        }
+        case 'FunctionDeclaration': {
             // TODO
             break;
-        case 'Valbind':
+        }
+        case 'Valbind': {
             // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
             // Each declaration are in their own env frame
             if (cmd.is_rec) {
@@ -123,16 +147,19 @@ const exec_microcode = (cmd) => {
                 });
             }
             break;
-        case 'Program':
+        }
+        case 'Program': {
             rev_push(A, cmd.body);
             break;
+        }
         /**
          * Instruction Tags
          */
-        case 'PopI':
+        case 'PopI': {
             S.pop();
             break;
-        case 'BranchI':
+        }
+        case 'BranchI': {
             const pred_res = S.pop();
             assert(pred_res !== undefined && pred_res.type === 'bool');
             if (pred_res.js_val) {
@@ -142,17 +169,47 @@ const exec_microcode = (cmd) => {
                 A.push(cmd.alternative);
             }
             break;
-        case 'BinOpI':
+        }
+        case 'BinOpI': {
             const snd = S.pop();
             const fst = S.pop();
-            // TODO: should first lookup context first, before looking up builtin operators
-            // Or we can add builtin operators to context.
+            // We do not allow users to define custom infix / binary operators
+            // So we directly look up builtinBinOperators instead of looking up
+            // the env
             S.push(Sml.builtinBinOperators[cmd.id](fst, snd));
             break;
-        case 'RestoreEnvI':
+        }
+        case 'BinLogicalOpI': {
+            const fst = S.pop();
+            // Perform shortcircuiting if possible
+            if (cmd.id === 'orelse' && fst.js_val) {
+                S.push({
+                    type: 'bool',
+                    js_val: true
+                });
+            }
+            else if (cmd.id === 'andalso' && !fst.js_val) {
+                S.push({
+                    type: 'bool',
+                    js_val: false
+                });
+            }
+            else {
+                // no shortcircuiting possible, so we push first operand back on stack
+                // then evaluate normally as if it's a binary op
+                S.push(fst);
+                A.push({
+                    tag: 'BinOpI',
+                    id: cmd.id
+                }, cmd.op2);
+            }
+            break;
+        }
+        case 'RestoreEnvI': {
             E = cmd.env;
             break;
-        case 'AssignI':
+        }
+        case 'AssignI': {
             const rhs = S.pop();
             if (cmd.pat.tag === 'IntConstant' ||
                 cmd.pat.tag === 'FloatConstant' ||
@@ -170,11 +227,13 @@ const exec_microcode = (cmd) => {
                 // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
             }
             break;
-        default:
+        }
+        default: {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: The following line will throw a compile error if all the
             // case statements are implemented (i.e. this branch is never taken).
             throw new Error(`unknown microcode: ${cmd.tag}`);
+        }
     }
 };
 function evaluate(node) {
