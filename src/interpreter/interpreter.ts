@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 
-import { Node } from '../parser/ast'
+import { Matches, Node } from '../parser/ast'
 import * as Sml from '../sml'
 import { Environment, Value } from '../types'
 import { Instruction } from './instructions'
@@ -95,7 +95,8 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'Application': {
-      throw new Error('TODO')
+      A.push({ tag: 'ApplicationI' }, cmd.arg, cmd.fn)
+      break
     }
     case 'InfixApplication': {
       A.push(
@@ -262,7 +263,55 @@ const exec_microcode = (cmd: Microcode) => {
       } else {
         // TODO: handle more complicated patterns here.
         // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
+        throw new Error(`TODO: unimplemented ${cmd.pat}`)
       }
+      break
+    }
+    case 'ApplicationI': {
+      // TODO: handle builtin functions differently
+      // TODO: handle tail calls
+      const arg = S.pop()!
+      const fn = S.pop()!
+      assert(fn.type === 'fn')
+
+      E = extend_env(fn.env)
+
+      let found_match = false
+      for (const { pat, exp } of fn.matches.matches) {
+        // Find the first pattern that matches the given arg, then
+        // perform relevant bindings, and evaluate the associated expression
+        if (
+          (pat.tag === 'IntConstant' && arg.type === 'int') ||
+          (pat.tag === 'FloatConstant' && arg.type === 'real') ||
+          (pat.tag === 'CharConstant' && arg.type === 'char') ||
+          (pat.tag === 'StringConstant' && arg.type === 'string')
+        ) {
+          const is_match = pat.val === arg.js_val
+          if (is_match) {
+            // Don't need to extend env here since both pat and args are constant
+            A.push(exp)
+            found_match = true
+          }
+        } else if (pat.tag === 'Variable') {
+          // variables match the arg by default
+          assign_in_env(E, pat.id, arg)
+          A.push(exp)
+          found_match = true
+        } else {
+          throw new Error(`TODO: unimplemented ${pat}`)
+        }
+
+        if (found_match) {
+          break
+        }
+      }
+
+      A.push({ tag: 'RestoreEnvI', env: E })
+
+      if (!found_match) {
+        throw new Error(`no match found for ${arg}`)
+      }
+
       break
     }
     default: {
