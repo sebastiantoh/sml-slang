@@ -50,6 +50,11 @@ const interleave = (microcodes: Array<Microcode>, instruction: Instruction) => {
   return ret
 }
 
+// Some of the body of the cases are wrapped in a { }. This is
+// to prevent scopes from interfering with each other
+// (we don't want fallthroughs anyways)
+// Without this wrapping, the declaration of a const x in one case, would prevent
+// the declaration of the same const x in another disjoint case
 const exec_microcode = (cmd: Microcode) => {
   switch (cmd.tag) {
     /**
@@ -99,6 +104,16 @@ const exec_microcode = (cmd: Microcode) => {
       A.push({ tag: 'RestoreEnvI', env: E })
       rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
       A.push(cmd.decSequence)
+      break
+    case 'BinaryLogicalOperator':
+      A.push(
+        {
+          tag: 'BinLogicalOpI',
+          id: cmd.id,
+          op2: cmd.operand2
+        },
+        cmd.operand1
+      )
       break
     case 'ConditionalExpression':
       A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred)
@@ -154,7 +169,7 @@ const exec_microcode = (cmd: Microcode) => {
       }
 
       break
-    case 'BinOpI':
+    case 'BinOpI': {
       const snd = S.pop()
       const fst = S.pop()
       // We do not allow users to define custom infix / binary operators
@@ -162,6 +177,35 @@ const exec_microcode = (cmd: Microcode) => {
       // the env
       S.push(Sml.builtinBinOperators[cmd.id](fst, snd))
       break
+    }
+    case 'BinLogicalOpI': {
+      const fst = S.pop()!
+
+      // Perform shortcircuiting if possible
+      if (cmd.id === 'orelse' && fst.js_val) {
+        S.push({
+          type: 'bool',
+          js_val: true
+        })
+      } else if (cmd.id === 'andalso' && !fst.js_val) {
+        S.push({
+          type: 'bool',
+          js_val: false
+        })
+      } else {
+        // no shortcircuiting possible, so we push first operand back on stack
+        // then evaluate normally as if it's a binary op
+        S.push(fst)
+        A.push(
+          {
+            tag: 'BinOpI',
+            id: cmd.id
+          },
+          cmd.op2
+        )
+      }
+      break
+    }
     case 'RestoreEnvI':
       E = cmd.env
       break

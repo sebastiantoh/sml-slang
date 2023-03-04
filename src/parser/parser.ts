@@ -32,6 +32,7 @@ import {
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
+  BinaryLogicalOperator,
   BoolConstant,
   CharConstant,
   ConditionalExpression,
@@ -120,20 +121,20 @@ class NodeGenerator implements SmlVisitor<Node> {
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
     }
   }
-  visitConjunction(ctx: ConjunctionContext): InfixApplication {
+  visitConjunction(ctx: ConjunctionContext): BinaryLogicalOperator {
     return {
-      tag: 'InfixApplication',
+      tag: 'BinaryLogicalOperator',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ANDALSO().text
+      id: ctx.ANDALSO().text as 'andalso'
     }
   }
-  visitDisjunction(ctx: DisjunctionContext): InfixApplication {
+  visitDisjunction(ctx: DisjunctionContext): BinaryLogicalOperator {
     return {
-      tag: 'InfixApplication',
+      tag: 'BinaryLogicalOperator',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ORELSE().text
+      id: ctx.ORELSE().text as 'orelse'
     }
   }
   visitConditional(ctx: ConditionalContext): ConditionalExpression {
