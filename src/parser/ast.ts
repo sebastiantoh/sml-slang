@@ -17,6 +17,7 @@ interface BaseNode {
  */
 export type Expression =
   | Constant
+  | Application
   | InfixApplication
   | LetExpression
   | BinaryLogicalOperator
@@ -43,6 +44,12 @@ export interface CharConstant extends BaseNode {
 export interface BoolConstant extends BaseNode {
   tag: 'BoolConstant'
   val: boolean
+}
+
+export interface Application extends BaseNode {
+  tag: 'Application'
+  fn: Expression
+  arg: Expression
 }
 
 export interface InfixApplication extends BaseNode {

@@ -94,6 +94,9 @@ const exec_microcode = (cmd: Microcode) => {
       })
       break
     }
+    case 'Application': {
+      throw new Error('TODO')
+    }
     case 'InfixApplication': {
       A.push(
         {

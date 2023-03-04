@@ -7,6 +7,7 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 
 import { SmlLexer } from '../lang/SmlLexer'
 import {
+  ApplicationContext,
   BooleanContext,
   CharacterContext,
   ConditionalContext,
@@ -35,6 +36,7 @@ import {
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
 import {
+  Application,
   BinaryLogicalOperator,
   BoolConstant,
   CharConstant,
@@ -108,6 +110,13 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitExpVariable(ctx: ExpVariableContext): Variable {
     return { tag: 'Variable', id: ctx._id.text! }
+  }
+  visitApplication(ctx: ApplicationContext): Application {
+    return {
+      tag: 'Application',
+      fn: this.visit(ctx._fn) as Expression,
+      arg: this.visit(ctx._arg) as Expression
+    }
   }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
     return {
