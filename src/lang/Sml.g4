@@ -102,6 +102,8 @@ dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
     ;
 
+// TODO: does this work for dec ; dec?
+// might need to remove the trailing ;
 decSequence: (dec SEMICOLON?)+;
 
 valbind: REC? pat EQ exp;
