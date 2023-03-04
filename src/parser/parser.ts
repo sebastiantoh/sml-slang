@@ -18,9 +18,12 @@ import {
   ExpContext,
   ExpVariableContext,
   FloatingPointContext,
+  FunctionContext,
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
+  MatchContext,
+  MatchesContext,
   ParenthesesContext,
   PatConstantContext,
   PatVariableContext,
@@ -41,9 +44,12 @@ import {
   DeclarationSequence,
   Expression,
   FloatConstant,
+  Function,
   InfixApplication,
   IntConstant,
   LetExpression,
+  Match,
+  Matches,
   Node,
   Pattern,
   Program,
@@ -143,6 +149,29 @@ class NodeGenerator implements SmlVisitor<Node> {
       pred: this.visit(ctx._pred) as Expression,
       consequent: this.visit(ctx._cons) as Expression,
       alternative: this.visit(ctx._alt) as Expression
+    }
+  }
+  visitFunction(ctx: FunctionContext): Function {
+    return {
+      tag: 'Function',
+      matches: this.visit(ctx.matches()) as Matches
+    }
+  }
+
+  /**
+   * Match
+   */
+  visitMatch(ctx: MatchContext): Match {
+    return {
+      tag: 'Match',
+      pat: this.visit(ctx.pat()) as Pattern,
+      exp: this.visit(ctx.exp()) as Expression
+    }
+  }
+  visitMatches(ctx: MatchesContext): Matches {
+    return {
+      tag: 'Matches',
+      matches: ctx.match().map((m: MatchContext) => this.visit(m) as Match)
     }
   }
 

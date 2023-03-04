@@ -1,4 +1,12 @@
-export type Node = Expression | Pattern | Declaration | DeclarationSequence | Valbind | Program
+export type Node =
+  | Expression
+  | Match
+  | Matches
+  | Pattern
+  | Declaration
+  | DeclarationSequence
+  | Valbind
+  | Program
 
 interface BaseNode {
   tag: string
@@ -13,6 +21,7 @@ export type Expression =
   | LetExpression
   | BinaryLogicalOperator
   | ConditionalExpression
+  | Function
 
 export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant
 export interface IntConstant extends BaseNode {
@@ -61,6 +70,24 @@ export interface ConditionalExpression extends BaseNode {
   pred: Expression
   consequent: Expression
   alternative: Expression
+}
+
+export interface Function extends BaseNode {
+  tag: 'Function'
+  matches: Matches
+}
+
+/**
+ * Match
+ */
+export interface Match extends BaseNode {
+  tag: 'Match'
+  pat: Pattern
+  exp: Expression
+}
+export interface Matches extends BaseNode {
+  tag: 'Matches'
+  matches: Array<Match>
 }
 
 /**
