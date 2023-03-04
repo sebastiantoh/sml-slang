@@ -1,5 +1,3 @@
-import * as es from 'estree'
-
 // Represents a JS value and annotates it with its SML type
 // Should have a "type" field, denoting the SML type
 export type Value = Int | Real | String | Char | Bool
@@ -36,6 +34,78 @@ export interface Environment {
   parent?: Environment
 }
 
+export interface Errored {
+  status: 'errored';
+  error: SourceError;
+}
+
+export interface Finished {
+  status: 'finished';
+  // TODO: update this to sml Value and Type
+  value: any;
+  type: any;
+  name?: string;
+}
+
+export type Result = Finished | Errored;
+
+// used for tracking non-finished results during runtime
+export type RuntimeResult = Omit<Finished, 'status'>;
+
+// TODO: merge frame and env temp types with
+// EnvironmentFrame and Environment respectively
+export interface FrameTemp {
+  [name: string]: RuntimeResult;
+}
+
+export interface EnvironmentTemp {
+  id: string;
+  name?: string;
+  tail: EnvironmentTemp | null;
+  head: FrameTemp;
+}
+
+export interface Context<T = any> {
+  /** The external symbols that exist in the Context. */
+  externalSymbols: string[];
+
+  /** Runtime specific state */
+  runtime: {
+    isRunning: boolean;
+    environments: Environment[];
+    // TODO: udpate to sml value?
+    value: any;
+    nodes: Node[];
+  };
+
+  numberOfOuterEnvironments: number;
+
+  prelude: string | null;
+
+  /**
+   * Used for storing external properties.
+   * For e.g, this can be used to store some application-related
+   * context for use in your own built-in functions (like `display(a)`)
+   */
+  externalContext?: T;
+
+  // typeEnvironments: TypeEnvironment[];
+  // contractEnvironments: ContractEnvironment[];
+}
+
+export interface Position {
+  /* >= 1 */
+  line: number;
+  /* >= 0 */
+  column: number;
+}
+
+export interface SourceLocation {
+  source?: string | null;
+  start: Position;
+  end: Position;
+}
+
 export enum ErrorType {
   SYNTAX = 'Syntax',
   TYPE = 'Type',
@@ -51,41 +121,7 @@ export enum ErrorSeverity {
 export interface SourceError {
   type: ErrorType
   severity: ErrorSeverity
-  location: es.SourceLocation
+  location: SourceLocation
   explain(): string
   elaborate(): string
 }
-
-export interface Context<T = any> {
-  /** All the errors gathered */
-  errors: SourceError[]
-}
-
-export enum Chapter {
-  SML_SLANG = 1
-}
-
-export enum Variant {
-  DEFAULT = 'sml-slang'
-}
-
-export interface Language {
-  chapter: Chapter
-  variant: Variant
-}
-
-// TODO: the following are to support the EnvVisualiser
-// in the frontend. remove?
-// tslint:disable:no-any
-export interface EnvVisualiseFrame {
-  [name: string]: any
-}
-export interface EnvVisualiserEnvironment {
-  id: string
-  name: string
-  tail: EnvVisualiserEnvironment | null
-  callExpression?: es.CallExpression
-  head: EnvVisualiseFrame
-  thisContext?: any
-}
-// tslint:enable:no-any
