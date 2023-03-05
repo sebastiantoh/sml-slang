@@ -359,7 +359,7 @@ class SmlParser extends Parser_1.Parser {
                                         this.state = 69;
                                         _localctx._id = this._input.LT(1);
                                         _la = this._input.LA(1);
-                                        if (!(((((_la - 33)) & ~0x1F) === 0 && ((1 << (_la - 33)) & ((1 << (SmlParser.EQ - 33)) | (1 << (SmlParser.NEQ - 33)) | (1 << (SmlParser.LT - 33)) | (1 << (SmlParser.GT - 33)) | (1 << (SmlParser.LTE - 33)) | (1 << (SmlParser.GTE - 33)))) !== 0))) {
+                                        if (!(((((_la - 34)) & ~0x1F) === 0 && ((1 << (_la - 34)) & ((1 << (SmlParser.EQ - 34)) | (1 << (SmlParser.NEQ - 34)) | (1 << (SmlParser.LT - 34)) | (1 << (SmlParser.GT - 34)) | (1 << (SmlParser.LTE - 34)) | (1 << (SmlParser.GTE - 34)))) !== 0))) {
                                             _localctx._id = this._errHandler.recoverInline(this);
                                         }
                                         else {
@@ -773,36 +773,37 @@ SmlParser.T__7 = 8;
 SmlParser.T__8 = 9;
 SmlParser.T__9 = 10;
 SmlParser.WHITESPACE = 11;
-SmlParser.INT = 12;
-SmlParser.FLOAT = 13;
-SmlParser.CHAR = 14;
-SmlParser.STRING = 15;
-SmlParser.TRUE = 16;
-SmlParser.FALSE = 17;
-SmlParser.LPAREN = 18;
-SmlParser.RPAREN = 19;
-SmlParser.REC = 20;
-SmlParser.AND = 21;
-SmlParser.SEMICOLON = 22;
-SmlParser.UNIT = 23;
-SmlParser.SLASH = 24;
-SmlParser.DIV = 25;
-SmlParser.MOD = 26;
-SmlParser.STAR = 27;
-SmlParser.PLUS = 28;
-SmlParser.MINUS = 29;
-SmlParser.CARET = 30;
-SmlParser.CONS = 31;
-SmlParser.AT = 32;
-SmlParser.EQ = 33;
-SmlParser.NEQ = 34;
-SmlParser.LT = 35;
-SmlParser.GT = 36;
-SmlParser.LTE = 37;
-SmlParser.GTE = 38;
-SmlParser.ANDALSO = 39;
-SmlParser.ORELSE = 40;
-SmlParser.ID = 41;
+SmlParser.COMMENT = 12;
+SmlParser.INT = 13;
+SmlParser.FLOAT = 14;
+SmlParser.CHAR = 15;
+SmlParser.STRING = 16;
+SmlParser.TRUE = 17;
+SmlParser.FALSE = 18;
+SmlParser.LPAREN = 19;
+SmlParser.RPAREN = 20;
+SmlParser.REC = 21;
+SmlParser.AND = 22;
+SmlParser.SEMICOLON = 23;
+SmlParser.UNIT = 24;
+SmlParser.SLASH = 25;
+SmlParser.DIV = 26;
+SmlParser.MOD = 27;
+SmlParser.STAR = 28;
+SmlParser.PLUS = 29;
+SmlParser.MINUS = 30;
+SmlParser.CARET = 31;
+SmlParser.CONS = 32;
+SmlParser.AT = 33;
+SmlParser.EQ = 34;
+SmlParser.NEQ = 35;
+SmlParser.LT = 36;
+SmlParser.GT = 37;
+SmlParser.LTE = 38;
+SmlParser.GTE = 39;
+SmlParser.ANDALSO = 40;
+SmlParser.ORELSE = 41;
+SmlParser.ID = 42;
 SmlParser.RULE_con = 0;
 SmlParser.RULE_exp = 1;
 SmlParser.RULE_patmatch = 2;
@@ -820,19 +821,20 @@ SmlParser.ruleNames = [
 SmlParser._LITERAL_NAMES = [
     undefined, "'let'", "'in'", "'end'", "'if'", "'then'", "'else'", "'fn'",
     "'=>'", "'|'", "'val'", undefined, undefined, undefined, undefined, undefined,
-    "'true'", "'false'", "'('", "')'", "'rec'", "'and'", "';'", "'()'", "'/'",
-    "'div'", "'mod'", "'*'", "'+'", "'-'", "'^'", "'::'", "'@'", "'='", "'<>'",
-    "'<'", "'>'", "'<='", "'>='", "'andalso'", "'orelse'",
+    undefined, "'true'", "'false'", "'('", "')'", "'rec'", "'and'", "';'",
+    "'()'", "'/'", "'div'", "'mod'", "'*'", "'+'", "'-'", "'^'", "'::'", "'@'",
+    "'='", "'<>'", "'<'", "'>'", "'<='", "'>='", "'andalso'", "'orelse'",
 ];
 SmlParser._SYMBOLIC_NAMES = [
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-    undefined, undefined, undefined, undefined, "WHITESPACE", "INT", "FLOAT",
-    "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", "RPAREN", "REC", "AND", "SEMICOLON",
-    "UNIT", "SLASH", "DIV", "MOD", "STAR", "PLUS", "MINUS", "CARET", "CONS",
-    "AT", "EQ", "NEQ", "LT", "GT", "LTE", "GTE", "ANDALSO", "ORELSE", "ID",
+    undefined, undefined, undefined, undefined, "WHITESPACE", "COMMENT", "INT",
+    "FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", "RPAREN", "REC",
+    "AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR", "PLUS", "MINUS",
+    "CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE", "GTE", "ANDALSO",
+    "ORELSE", "ID",
 ];
 SmlParser.VOCABULARY = new VocabularyImpl_1.VocabularyImpl(SmlParser._LITERAL_NAMES, SmlParser._SYMBOLIC_NAMES, []);
-SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03+\x83\x04\x02" +
+SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03,\x83\x04\x02" +
     "\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
     "\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x03\x02\x03\x02\x03\x02\x03\x02\x03" +
     "\x02\x03\x02\x05\x02\x1B\n\x02\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03" +
@@ -847,18 +849,18 @@ SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241
     "\x03\x07\x03\x07\x07\x07m\n\x07\f\x07\x0E\x07p\v\x07\x03\b\x03\b\x05\b" +
     "t\n\b\x06\bv\n\b\r\b\x0E\bw\x03\t\x05\t{\n\t\x03\t\x03\t\x03\t\x03\t\x03" +
     "\n\x03\n\x03\n\x02\x02\x03\x04\v\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f" +
-    "\x02\x0E\x02\x10\x02\x12\x02\x02\x07\x03\x02\x12\x13\x03\x02\x1A\x1D\x03" +
-    "\x02\x1E \x03\x02!\"\x03\x02#(\x02\x93\x02\x1A\x03\x02\x02\x02\x049\x03" +
+    "\x02\x0E\x02\x10\x02\x12\x02\x02\x07\x03\x02\x13\x14\x03\x02\x1B\x1E\x03" +
+    "\x02\x1F!\x03\x02\"#\x03\x02$)\x02\x93\x02\x1A\x03\x02\x02\x02\x049\x03" +
     "\x02\x02\x02\x06W\x03\x02\x02\x02\b[\x03\x02\x02\x02\nf\x03\x02\x02\x02" +
     "\fh\x03\x02\x02\x02\x0Eu\x03\x02\x02\x02\x10z\x03\x02\x02\x02\x12\x80" +
-    "\x03\x02\x02\x02\x14\x1B\x07\x0E\x02\x02\x15\x1B\x07\x0F\x02\x02\x16\x1B" +
-    "\x07\x10\x02\x02\x17\x1B\x07\x11\x02\x02\x18\x1B\t\x02\x02\x02\x19\x1B" +
-    "\x07\x19\x02\x02\x1A\x14\x03\x02\x02\x02\x1A\x15\x03\x02\x02\x02\x1A\x16" +
+    "\x03\x02\x02\x02\x14\x1B\x07\x0F\x02\x02\x15\x1B\x07\x10\x02\x02\x16\x1B" +
+    "\x07\x11\x02\x02\x17\x1B\x07\x12\x02\x02\x18\x1B\t\x02\x02\x02\x19\x1B" +
+    "\x07\x1A\x02\x02\x1A\x14\x03\x02\x02\x02\x1A\x15\x03\x02\x02\x02\x1A\x16" +
     "\x03\x02\x02\x02\x1A\x17\x03\x02\x02\x02\x1A\x18\x03\x02\x02\x02\x1A\x19" +
     "\x03\x02\x02\x02\x1B\x03\x03\x02\x02\x02\x1C\x1D\b\x03\x01\x02\x1D:\x05" +
-    "\x02\x02\x02\x1E:\x07+\x02\x02\x1F \x07\x14\x02\x02 !\x05\x04\x03\x02" +
-    "!\"\x07\x15\x02\x02\":\x03\x02\x02\x02#$\x07\x03\x02\x02$%\x05\x0E\b\x02" +
-    "%&\x07\x04\x02\x02&+\x05\x04\x03\x02\'(\x07\x18\x02\x02(*\x05\x04\x03" +
+    "\x02\x02\x02\x1E:\x07,\x02\x02\x1F \x07\x15\x02\x02 !\x05\x04\x03\x02" +
+    "!\"\x07\x16\x02\x02\":\x03\x02\x02\x02#$\x07\x03\x02\x02$%\x05\x0E\b\x02" +
+    "%&\x07\x04\x02\x02&+\x05\x04\x03\x02\'(\x07\x19\x02\x02(*\x05\x04\x03" +
     "\x02)\'\x03\x02\x02\x02*-\x03\x02\x02\x02+)\x03\x02\x02\x02+,\x03\x02" +
     "\x02\x02,.\x03\x02\x02\x02-+\x03\x02\x02\x02./\x07\x05\x02\x02/:\x03\x02" +
     "\x02\x0201\x07\x06\x02\x0212\x05\x04\x03\x0223\x07\x07\x02\x0234\x05\x04" +
@@ -868,8 +870,8 @@ SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241
     "\x02\x02\x02;<\f\x0E\x02\x02<S\x05\x04\x03\x0F=>\f\r\x02\x02>?\t\x03\x02" +
     "\x02?S\x05\x04\x03\x0E@A\f\f\x02\x02AB\t\x04\x02\x02BS\x05\x04\x03\rC" +
     "D\f\v\x02\x02DE\t\x05\x02\x02ES\x05\x04\x03\vFG\f\n\x02\x02GH\t\x06\x02" +
-    "\x02HS\x05\x04\x03\vIJ\f\t\x02\x02JK\x07+\x02\x02KS\x05\x04\x03\nLM\f" +
-    "\x06\x02\x02MN\x07)\x02\x02NS\x05\x04\x03\x07OP\f\x05\x02\x02PQ\x07*\x02" +
+    "\x02HS\x05\x04\x03\vIJ\f\t\x02\x02JK\x07,\x02\x02KS\x05\x04\x03\nLM\f" +
+    "\x06\x02\x02MN\x07*\x02\x02NS\x05\x04\x03\x07OP\f\x05\x02\x02PQ\x07+\x02" +
     "\x02QS\x05\x04\x03\x06R;\x03\x02\x02\x02R=\x03\x02\x02\x02R@\x03\x02\x02" +
     "\x02RC\x03\x02\x02\x02RF\x03\x02\x02\x02RI\x03\x02\x02\x02RL\x03\x02\x02" +
     "\x02RO\x03\x02\x02\x02SV\x03\x02\x02\x02TR\x03\x02\x02\x02TU\x03\x02\x02" +
@@ -877,15 +879,15 @@ SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241
     "\x02YZ\x05\x04\x03\x02Z\x07\x03\x02\x02\x02[`\x05\x06\x04\x02\\]\x07\v" +
     "\x02\x02]_\x05\x06\x04\x02^\\\x03\x02\x02\x02_b\x03\x02\x02\x02`^\x03" +
     "\x02\x02\x02`a\x03\x02\x02\x02a\t\x03\x02\x02\x02b`\x03\x02\x02\x02cg" +
-    "\x05\x02\x02\x02dg\x07\x19\x02\x02eg\x07+\x02\x02fc\x03\x02\x02\x02fd" +
+    "\x05\x02\x02\x02dg\x07\x1A\x02\x02eg\x07,\x02\x02fc\x03\x02\x02\x02fd" +
     "\x03\x02\x02\x02fe\x03\x02\x02\x02g\v\x03\x02\x02\x02hi\x07\f\x02\x02" +
-    "in\x05\x10\t\x02jk\x07\x17\x02\x02km\x05\x10\t\x02lj\x03\x02\x02\x02m" +
+    "in\x05\x10\t\x02jk\x07\x18\x02\x02km\x05\x10\t\x02lj\x03\x02\x02\x02m" +
     "p\x03\x02\x02\x02nl\x03\x02\x02\x02no\x03\x02\x02\x02o\r\x03\x02\x02\x02" +
-    "pn\x03\x02\x02\x02qs\x05\f\x07\x02rt\x07\x18\x02\x02sr\x03\x02\x02\x02" +
+    "pn\x03\x02\x02\x02qs\x05\f\x07\x02rt\x07\x19\x02\x02sr\x03\x02\x02\x02" +
     "st\x03\x02\x02\x02tv\x03\x02\x02\x02uq\x03\x02\x02\x02vw\x03\x02\x02\x02" +
-    "wu\x03\x02\x02\x02wx\x03\x02\x02\x02x\x0F\x03\x02\x02\x02y{\x07\x16\x02" +
+    "wu\x03\x02\x02\x02wx\x03\x02\x02\x02x\x0F\x03\x02\x02\x02y{\x07\x17\x02" +
     "\x02zy\x03\x02\x02\x02z{\x03\x02\x02\x02{|\x03\x02\x02\x02|}\x05\n\x06" +
-    "\x02}~\x07#\x02\x02~\x7F\x05\x04\x03\x02\x7F\x11\x03\x02\x02\x02\x80\x81" +
+    "\x02}~\x07$\x02\x02~\x7F\x05\x04\x03\x02\x7F\x11\x03\x02\x02\x02\x80\x81" +
     "\x05\x0E\b\x02\x81\x13\x03\x02\x02\x02\r\x1A+9RT`fnswz";
 class ConContext extends ParserRuleContext_1.ParserRuleContext {
     constructor(parent, invokingState) {

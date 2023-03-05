@@ -105,4 +105,12 @@ in
   add_one_if_two 10
 end
 `)).toEqual(`10`));
+test('env is properly restored outside scope of function', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  val duplicate_name = 1000
+  val add_one = fn duplicate_name => duplicate_name + 1
+in
+  (add_one 2) + duplicate_name
+end
+`)).toEqual(`1003`));
 //# sourceMappingURL=let_exp.js.map

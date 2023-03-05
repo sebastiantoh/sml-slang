@@ -280,7 +280,6 @@ const exec_microcode = (cmd) => {
             break;
         }
         case 'ApplicationI': {
-            // TODO: handle builtin functions differently
             // TODO: handle tail calls
             const arg = S.pop();
             const fn = S.pop();
@@ -289,6 +288,7 @@ const exec_microcode = (cmd) => {
                 break;
             }
             assert(fn.type === 'fn');
+            A.push({ tag: 'RestoreEnvI', env: E });
             E = extend_env(fn.env);
             let found_match = false;
             for (const { pat, exp } of fn.matches.matches) {
@@ -318,7 +318,6 @@ const exec_microcode = (cmd) => {
                     break;
                 }
             }
-            A.push({ tag: 'RestoreEnvI', env: E });
             if (!found_match) {
                 throw new Error(`no match found for ${arg}`);
             }
