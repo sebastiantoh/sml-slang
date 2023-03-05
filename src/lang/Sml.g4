@@ -42,6 +42,7 @@ RPAREN: ')';
 REC: 'rec';
 AND: 'and';
 SEMICOLON: ';';
+UNIT: '()';
 
 SLASH: '/';
 DIV: 'div';
@@ -75,6 +76,7 @@ con
     | CHAR             # Character
     | STRING           # String
     | (TRUE | FALSE)   # Boolean
+    | UNIT             # Unit
     ;
 
 exp
@@ -105,6 +107,7 @@ matches: patmatch ('|' patmatch)*;
 
 pat
     : con                                                             # PatConstant
+    | UNIT                                                            # PatUnit
     | id=ID                                                           # PatVariable
     ;
 

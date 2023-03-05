@@ -151,4 +151,4 @@ test('real numbers: nonzero / zero', () =>
 /**
  * Unit
  */
-test.skip('unit: evaluate to themselves', () => expect(parseAndEvaluateExp('()')).toBe('()'))
+test('unit: evaluate to themselves', () => expect(parseAndEvaluateExp('()')).toBe('()'))

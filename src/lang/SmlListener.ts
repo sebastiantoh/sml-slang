@@ -4,12 +4,14 @@
 import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { PatConstantContext } from "./SmlParser";
+import { PatUnitContext } from "./SmlParser";
 import { PatVariableContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
 import { FloatingPointContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
 import { BooleanContext } from "./SmlParser";
+import { UnitContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
@@ -49,6 +51,19 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitPatConstant?: (ctx: PatConstantContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PatUnit`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	enterPatUnit?: (ctx: PatUnitContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PatUnit`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	exitPatUnit?: (ctx: PatUnitContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `PatVariable`
@@ -127,6 +142,19 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitBoolean?: (ctx: BooleanContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `Unit`
+	 * labeled alternative in `SmlParser.con`.
+	 * @param ctx the parse tree
+	 */
+	enterUnit?: (ctx: UnitContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Unit`
+	 * labeled alternative in `SmlParser.con`.
+	 * @param ctx the parse tree
+	 */
+	exitUnit?: (ctx: UnitContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `ValueDecl`

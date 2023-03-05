@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 
-import { Matches, Node } from '../parser/ast'
+import { Node } from '../parser/ast'
 import * as Sml from '../sml'
 import { Environment, Value } from '../types'
 import { Instruction } from './instructions'
@@ -99,6 +99,12 @@ const exec_microcode = (cmd: Microcode) => {
       S.push({
         type: 'bool',
         js_val: cmd.val
+      })
+      break
+    }
+    case 'UnitConstant': {
+      S.push({
+        type: 'unit'
       })
       break
     }
@@ -222,7 +228,9 @@ const exec_microcode = (cmd: Microcode) => {
     case 'BinLogicalOpI': {
       const fst = S.pop()!
 
-      assert(fst.type !== 'fn' && fst.type !== 'builtin_fn')
+      if (fst.type !== 'bool') {
+        throw new Error('invalid types')
+      }
 
       // Perform shortcircuiting if possible
       if (cmd.id === 'orelse' && fst.js_val) {
@@ -255,13 +263,32 @@ const exec_microcode = (cmd: Microcode) => {
     }
     case 'AssignI': {
       const rhs = S.pop()!
-      if (
+
+      // If pat is a constant, then we don't perform env assignment.
+      // But we check if the pat and the RHS are valid
+      // Examples of valid constant assignment: 1=1, true=true, ()=()
+      // Examples of non-valid constant assignment: 1=2, true=false
+      if (cmd.pat.tag === 'UnitConstant') {
+        if (rhs.type !== 'unit') {
+          throw new Error(`cannot bind () to ${rhs}. can only bind () to itself`)
+        }
+      } else if (
         cmd.pat.tag === 'IntConstant' ||
         cmd.pat.tag === 'FloatConstant' ||
         cmd.pat.tag === 'CharConstant' ||
-        cmd.pat.tag === 'StringConstant'
+        cmd.pat.tag === 'StringConstant' ||
+        cmd.pat.tag === 'BoolConstant'
       ) {
-        if (rhs.type === 'fn' || rhs.type === 'builtin_fn' || cmd.pat.val !== rhs.js_val) {
+        if (
+          (rhs.type !== 'int' &&
+            rhs.type !== 'real' &&
+            rhs.type !== 'char' &&
+            rhs.type !== 'string' &&
+            rhs.type !== 'bool') ||
+          // For constants containing values (non-unit), the values must be equal.
+          // Otherwise, we throw error
+          cmd.pat.val !== rhs.js_val
+        ) {
           throw new Error(
             `cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`
           )

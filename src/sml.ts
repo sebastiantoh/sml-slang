@@ -18,6 +18,8 @@ export const valueToString = (sml_val: Value) => {
       return `#"${sml_val.js_val}"`
     case 'bool':
       return sml_val.js_val.toString()
+    case 'unit':
+      return '()'
     case 'fn':
       // TODO: once we have a typechecker, we can
       // include more info in the string repr, e.g param types and return types

@@ -27,10 +27,12 @@ import {
   ParenthesesContext,
   PatConstantContext,
   PatmatchContext,
+  PatUnitContext,
   PatVariableContext,
   ProgContext,
   SmlParser,
   StringContext,
+  UnitContext,
   ValbindContext,
   ValueDeclContext
 } from '../lang/SmlParser'
@@ -56,6 +58,7 @@ import {
   Pattern,
   Program,
   StringConstant,
+  UnitConstant,
   Valbind,
   ValueDeclaration,
   Variable
@@ -99,6 +102,11 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'BoolConstant',
       val: ctx.TRUE() !== undefined ? true : false
+    }
+  }
+  visitUnit(_ctx: UnitContext): UnitConstant {
+    return {
+      tag: 'UnitConstant'
     }
   }
 
@@ -189,6 +197,11 @@ class NodeGenerator implements SmlVisitor<Node> {
    */
   visitPatConstant(ctx: PatConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
+  }
+  visitPatUnit(_ctx: PatUnitContext): UnitConstant {
+    return {
+      tag: 'UnitConstant'
+    }
   }
   visitPatVariable(ctx: PatVariableContext): Variable {
     return {

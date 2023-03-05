@@ -2,7 +2,7 @@ import { Matches } from './parser/ast'
 
 // Represents a JS value and annotates it with its SML type
 // Should have a "type" field, denoting the SML type
-export type Value = Int | Real | String | Char | Bool | Fn | BuiltinFn
+export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn
 
 export interface Int {
   type: 'int'
@@ -27,6 +27,10 @@ export interface Char {
 export interface Bool {
   type: 'bool'
   js_val: boolean
+}
+
+export interface Unit {
+  type: 'unit'
 }
 
 export interface Fn {
