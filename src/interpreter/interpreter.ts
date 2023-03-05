@@ -315,6 +315,7 @@ const exec_microcode = (cmd: Microcode) => {
 
       assert(fn.type === 'fn')
 
+      A.push({ tag: 'RestoreEnvI', env: E })
       E = extend_env(fn.env)
 
       let found_match = false
@@ -346,8 +347,6 @@ const exec_microcode = (cmd: Microcode) => {
           break
         }
       }
-
-      A.push({ tag: 'RestoreEnvI', env: E })
 
       if (!found_match) {
         throw new Error(`no match found for ${arg}`)

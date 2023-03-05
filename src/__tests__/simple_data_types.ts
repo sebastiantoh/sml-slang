@@ -1,7 +1,5 @@
 import { parseAndEvaluateExp } from './utils'
 
-// TODO: fix tests that are skipped
-
 /**
  * Integers
  */
