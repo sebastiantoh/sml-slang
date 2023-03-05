@@ -76,7 +76,7 @@ let
 in
   f 3
 end
-`)).toThrow(/f not found in env/)); // TODO: add more specific error
+`)).toThrow(/f not found in env/));
 test('rec function with rec keyword', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
   val rec f = fn n => if n = 0 then 1 else n * f (n - 1)

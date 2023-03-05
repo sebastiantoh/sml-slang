@@ -51,8 +51,8 @@ test('strings: nonempty concat nonempty', () => expect((0, utils_1.parseAndEvalu
 test('strings: nonempty concat empty', () => expect((0, utils_1.parseAndEvaluateExp)(`"abc" ^ ""`)).toBe(`"abc"`));
 test('strings: empty concat nonempty', () => expect((0, utils_1.parseAndEvaluateExp)(`"" ^ "def"`)).toBe(`"def"`));
 test('strings: empty concat empty', () => expect((0, utils_1.parseAndEvaluateExp)(`"" ^ ""`)).toBe(`""`));
-test.skip('strings: size', () => expect((0, utils_1.parseAndEvaluateExp)(`size "abc"`)).toBe('3'));
-test.skip('strings: size of empty string', () => expect((0, utils_1.parseAndEvaluateExp)(`size ""`)).toBe('0'));
+test('strings: size', () => expect((0, utils_1.parseAndEvaluateExp)(`size "abc"`)).toBe('3'));
+test('strings: size of empty string', () => expect((0, utils_1.parseAndEvaluateExp)(`size ""`)).toBe('0'));
 /**
  * Character
  */
@@ -74,8 +74,10 @@ test('characters: char1 >= char2', () => expect((0, utils_1.parseAndEvaluateExp)
  */
 test('booleans: true evaluates to itself', () => expect((0, utils_1.parseAndEvaluateExp)('true')).toBe('true'));
 test('booleans: false evaluates to itself', () => expect((0, utils_1.parseAndEvaluateExp)('false')).toBe('false'));
-test.skip('booleans: negation of true', () => expect((0, utils_1.parseAndEvaluateExp)('not true')).toBe('false'));
-test.skip('booleans: negation of false', () => expect((0, utils_1.parseAndEvaluateExp)('not false')).toBe('false'));
+test('booleans: negation of true', () => expect((0, utils_1.parseAndEvaluateExp)('not true')).toBe('false'));
+test('booleans: negation of false', () => expect((0, utils_1.parseAndEvaluateExp)('not false')).toBe('true'));
+test('booleans: double negation of true', () => expect((0, utils_1.parseAndEvaluateExp)('not (not true)')).toBe('true'));
+test('booleans: double negation of false', () => expect((0, utils_1.parseAndEvaluateExp)('not (not false)')).toBe('false'));
 test('booleans: disjunction', () => expect((0, utils_1.parseAndEvaluateExp)('2=2 orelse 37 div 0 = 5')).toBe('true'));
 test('booleans: conjunction', () => expect((0, utils_1.parseAndEvaluateExp)('2=0 andalso 37 div 0 = 5')).toBe('false'));
 test('booleans: precedence of logical operators', () => expect((0, utils_1.parseAndEvaluateExp)('true orelse false andalso false')).toBe('true'));
@@ -94,5 +96,5 @@ test('real numbers: nonzero / zero', () => expect(() => (0, utils_1.parseAndEval
 /**
  * Unit
  */
-test.skip('unit: evaluate to themselves', () => expect((0, utils_1.parseAndEvaluateExp)('()')).toBe('()'));
+test('unit: evaluate to themselves', () => expect((0, utils_1.parseAndEvaluateExp)('()')).toBe('()'));
 //# sourceMappingURL=simple_data_types.js.map

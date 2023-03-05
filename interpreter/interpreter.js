@@ -6,6 +6,13 @@ const Sml = require("../sml");
 let A = [];
 let S = [];
 let E = { frame: {}, parent: undefined };
+const init_env = () => {
+    const env = { frame: {}, parent: undefined };
+    for (const fn of Sml.builtinFns) {
+        assign_in_env(env, fn.id, fn);
+    }
+    return env;
+};
 const extend_env = (env) => {
     return { frame: {}, parent: env };
 };
@@ -84,6 +91,12 @@ const exec_microcode = (cmd) => {
             S.push({
                 type: 'bool',
                 js_val: cmd.val
+            });
+            break;
+        }
+        case 'UnitConstant': {
+            S.push({
+                type: 'unit'
             });
             break;
         }
@@ -198,7 +211,9 @@ const exec_microcode = (cmd) => {
         }
         case 'BinLogicalOpI': {
             const fst = S.pop();
-            assert(fst.type !== 'fn');
+            if (fst.type !== 'bool') {
+                throw new Error('invalid types');
+            }
             // Perform shortcircuiting if possible
             if (cmd.id === 'orelse' && fst.js_val) {
                 S.push({
@@ -229,11 +244,28 @@ const exec_microcode = (cmd) => {
         }
         case 'AssignI': {
             const rhs = S.pop();
-            if (cmd.pat.tag === 'IntConstant' ||
+            // If pat is a constant, then we don't perform env assignment.
+            // But we check if the pat and the RHS are valid
+            // Examples of valid constant assignment: 1=1, true=true, ()=()
+            // Examples of non-valid constant assignment: 1=2, true=false
+            if (cmd.pat.tag === 'UnitConstant') {
+                if (rhs.type !== 'unit') {
+                    throw new Error(`cannot bind () to ${rhs}. can only bind () to itself`);
+                }
+            }
+            else if (cmd.pat.tag === 'IntConstant' ||
                 cmd.pat.tag === 'FloatConstant' ||
                 cmd.pat.tag === 'CharConstant' ||
-                cmd.pat.tag === 'StringConstant') {
-                if (rhs.type === 'fn' || cmd.pat.val !== rhs.js_val) {
+                cmd.pat.tag === 'StringConstant' ||
+                cmd.pat.tag === 'BoolConstant') {
+                if ((rhs.type !== 'int' &&
+                    rhs.type !== 'real' &&
+                    rhs.type !== 'char' &&
+                    rhs.type !== 'string' &&
+                    rhs.type !== 'bool') ||
+                    // For constants containing values (non-unit), the values must be equal.
+                    // Otherwise, we throw error
+                    cmd.pat.val !== rhs.js_val) {
                     throw new Error(`cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`);
                 }
             }
@@ -252,6 +284,10 @@ const exec_microcode = (cmd) => {
             // TODO: handle tail calls
             const arg = S.pop();
             const fn = S.pop();
+            if (fn.type === 'builtin_fn') {
+                S.push(fn.apply(arg));
+                break;
+            }
             assert(fn.type === 'fn');
             E = extend_env(fn.env);
             let found_match = false;
@@ -299,8 +335,7 @@ const exec_microcode = (cmd) => {
 function evaluate(node) {
     A = [node];
     S = [];
-    // TODO: init env
-    E = { frame: {}, parent: undefined };
+    E = init_env();
     const step_limit = 1000000;
     let i = 0;
     while (i < step_limit) {

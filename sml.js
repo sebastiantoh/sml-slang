@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.builtinBinOperators = exports.valueToString = void 0;
+exports.builtinFns = exports.builtinBinOperators = exports.valueToString = void 0;
 const valueToString = (sml_val) => {
     switch (sml_val.type) {
         case 'int':
@@ -19,10 +19,14 @@ const valueToString = (sml_val) => {
             return `#"${sml_val.js_val}"`;
         case 'bool':
             return sml_val.js_val.toString();
+        case 'unit':
+            return '()';
         case 'fn':
             // TODO: once we have a typechecker, we can
             // include more info in the string repr, e.g param types and return types
             return 'fn';
+        case 'builtin_fn':
+            return `${sml_val.id}: builtin_fn`;
     }
 };
 exports.valueToString = valueToString;
@@ -189,4 +193,32 @@ exports.builtinBinOperators = {
         throw new Error('invalid types');
     }
 };
+exports.builtinFns = [
+    {
+        type: 'builtin_fn',
+        id: 'size',
+        apply: (arg) => {
+            if (arg.type === 'string') {
+                return {
+                    type: 'int',
+                    js_val: arg.js_val.length
+                };
+            }
+            throw new Error('invalid types');
+        }
+    },
+    {
+        type: 'builtin_fn',
+        id: 'not',
+        apply: (arg) => {
+            if (arg.type === 'bool') {
+                return {
+                    type: 'bool',
+                    js_val: !arg.js_val
+                };
+            }
+            throw new Error('invalid types');
+        }
+    }
+];
 //# sourceMappingURL=sml.js.map

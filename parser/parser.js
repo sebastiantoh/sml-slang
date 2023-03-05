@@ -45,6 +45,11 @@ class NodeGenerator {
             val: ctx.TRUE() !== undefined ? true : false
         };
     }
+    visitUnit(_ctx) {
+        return {
+            tag: 'UnitConstant'
+        };
+    }
     /**
      * Expressions
      */
@@ -130,6 +135,11 @@ class NodeGenerator {
      */
     visitPatConstant(ctx) {
         return this.visit(ctx.con());
+    }
+    visitPatUnit(_ctx) {
+        return {
+            tag: 'UnitConstant'
+        };
     }
     visitPatVariable(ctx) {
         return {

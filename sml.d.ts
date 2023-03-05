@@ -1,4 +1,4 @@
-import { Value } from './types';
+import { BuiltinFn, Value } from './types';
 export declare const valueToString: (sml_val: Value) => string;
 export declare const builtinBinOperators: {
     '/': (a: Value, b: Value) => {
@@ -62,3 +62,4 @@ export declare const builtinBinOperators: {
         js_val: boolean;
     };
 };
+export declare const builtinFns: Array<BuiltinFn>;

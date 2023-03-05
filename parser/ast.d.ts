@@ -6,7 +6,7 @@ interface BaseNode {
  * Expressions
  */
 export type Expression = Constant | Application | InfixApplication | LetExpression | BinaryLogicalOperator | ConditionalExpression | Function;
-export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant;
+export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant | UnitConstant;
 export interface IntConstant extends BaseNode {
     tag: 'IntConstant';
     val: number;
@@ -26,6 +26,9 @@ export interface CharConstant extends BaseNode {
 export interface BoolConstant extends BaseNode {
     tag: 'BoolConstant';
     val: boolean;
+}
+export interface UnitConstant extends BaseNode {
+    tag: 'UnitConstant';
 }
 export interface Application extends BaseNode {
     tag: 'Application';

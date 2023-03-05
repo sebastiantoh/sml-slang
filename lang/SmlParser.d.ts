@@ -32,24 +32,25 @@ export declare class SmlParser extends Parser {
     static readonly REC = 20;
     static readonly AND = 21;
     static readonly SEMICOLON = 22;
-    static readonly SLASH = 23;
-    static readonly DIV = 24;
-    static readonly MOD = 25;
-    static readonly STAR = 26;
-    static readonly PLUS = 27;
-    static readonly MINUS = 28;
-    static readonly CARET = 29;
-    static readonly CONS = 30;
-    static readonly AT = 31;
-    static readonly EQ = 32;
-    static readonly NEQ = 33;
-    static readonly LT = 34;
-    static readonly GT = 35;
-    static readonly LTE = 36;
-    static readonly GTE = 37;
-    static readonly ANDALSO = 38;
-    static readonly ORELSE = 39;
-    static readonly ID = 40;
+    static readonly UNIT = 23;
+    static readonly SLASH = 24;
+    static readonly DIV = 25;
+    static readonly MOD = 26;
+    static readonly STAR = 27;
+    static readonly PLUS = 28;
+    static readonly MINUS = 29;
+    static readonly CARET = 30;
+    static readonly CONS = 31;
+    static readonly AT = 32;
+    static readonly EQ = 33;
+    static readonly NEQ = 34;
+    static readonly LT = 35;
+    static readonly GT = 36;
+    static readonly LTE = 37;
+    static readonly GTE = 38;
+    static readonly ANDALSO = 39;
+    static readonly ORELSE = 40;
+    static readonly ID = 41;
     static readonly RULE_con = 0;
     static readonly RULE_exp = 1;
     static readonly RULE_patmatch = 2;
@@ -121,6 +122,13 @@ export declare class StringContext extends ConContext {
 export declare class BooleanContext extends ConContext {
     TRUE(): TerminalNode | undefined;
     FALSE(): TerminalNode | undefined;
+    constructor(ctx: ConContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class UnitContext extends ConContext {
+    UNIT(): TerminalNode;
     constructor(ctx: ConContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;
@@ -268,6 +276,13 @@ export declare class PatContext extends ParserRuleContext {
 }
 export declare class PatConstantContext extends PatContext {
     con(): ConContext;
+    constructor(ctx: PatContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class PatUnitContext extends PatContext {
+    UNIT(): TerminalNode;
     constructor(ctx: PatContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;
