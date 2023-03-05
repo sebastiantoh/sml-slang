@@ -39,36 +39,37 @@ export class SmlParser extends Parser {
 	public static readonly T__8 = 9;
 	public static readonly T__9 = 10;
 	public static readonly WHITESPACE = 11;
-	public static readonly INT = 12;
-	public static readonly FLOAT = 13;
-	public static readonly CHAR = 14;
-	public static readonly STRING = 15;
-	public static readonly TRUE = 16;
-	public static readonly FALSE = 17;
-	public static readonly LPAREN = 18;
-	public static readonly RPAREN = 19;
-	public static readonly REC = 20;
-	public static readonly AND = 21;
-	public static readonly SEMICOLON = 22;
-	public static readonly UNIT = 23;
-	public static readonly SLASH = 24;
-	public static readonly DIV = 25;
-	public static readonly MOD = 26;
-	public static readonly STAR = 27;
-	public static readonly PLUS = 28;
-	public static readonly MINUS = 29;
-	public static readonly CARET = 30;
-	public static readonly CONS = 31;
-	public static readonly AT = 32;
-	public static readonly EQ = 33;
-	public static readonly NEQ = 34;
-	public static readonly LT = 35;
-	public static readonly GT = 36;
-	public static readonly LTE = 37;
-	public static readonly GTE = 38;
-	public static readonly ANDALSO = 39;
-	public static readonly ORELSE = 40;
-	public static readonly ID = 41;
+	public static readonly COMMENT = 12;
+	public static readonly INT = 13;
+	public static readonly FLOAT = 14;
+	public static readonly CHAR = 15;
+	public static readonly STRING = 16;
+	public static readonly TRUE = 17;
+	public static readonly FALSE = 18;
+	public static readonly LPAREN = 19;
+	public static readonly RPAREN = 20;
+	public static readonly REC = 21;
+	public static readonly AND = 22;
+	public static readonly SEMICOLON = 23;
+	public static readonly UNIT = 24;
+	public static readonly SLASH = 25;
+	public static readonly DIV = 26;
+	public static readonly MOD = 27;
+	public static readonly STAR = 28;
+	public static readonly PLUS = 29;
+	public static readonly MINUS = 30;
+	public static readonly CARET = 31;
+	public static readonly CONS = 32;
+	public static readonly AT = 33;
+	public static readonly EQ = 34;
+	public static readonly NEQ = 35;
+	public static readonly LT = 36;
+	public static readonly GT = 37;
+	public static readonly LTE = 38;
+	public static readonly GTE = 39;
+	public static readonly ANDALSO = 40;
+	public static readonly ORELSE = 41;
+	public static readonly ID = 42;
 	public static readonly RULE_con = 0;
 	public static readonly RULE_exp = 1;
 	public static readonly RULE_patmatch = 2;
@@ -87,16 +88,17 @@ export class SmlParser extends Parser {
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
 		undefined, "'let'", "'in'", "'end'", "'if'", "'then'", "'else'", "'fn'", 
 		"'=>'", "'|'", "'val'", undefined, undefined, undefined, undefined, undefined, 
-		"'true'", "'false'", "'('", "')'", "'rec'", "'and'", "';'", "'()'", "'/'", 
-		"'div'", "'mod'", "'*'", "'+'", "'-'", "'^'", "'::'", "'@'", "'='", "'<>'", 
-		"'<'", "'>'", "'<='", "'>='", "'andalso'", "'orelse'",
+		undefined, "'true'", "'false'", "'('", "')'", "'rec'", "'and'", "';'", 
+		"'()'", "'/'", "'div'", "'mod'", "'*'", "'+'", "'-'", "'^'", "'::'", "'@'", 
+		"'='", "'<>'", "'<'", "'>'", "'<='", "'>='", "'andalso'", "'orelse'",
 	];
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, "WHITESPACE", "INT", "FLOAT", 
-		"CHAR", "STRING", "TRUE", "FALSE", "LPAREN", "RPAREN", "REC", "AND", "SEMICOLON", 
-		"UNIT", "SLASH", "DIV", "MOD", "STAR", "PLUS", "MINUS", "CARET", "CONS", 
-		"AT", "EQ", "NEQ", "LT", "GT", "LTE", "GTE", "ANDALSO", "ORELSE", "ID",
+		undefined, undefined, undefined, undefined, "WHITESPACE", "COMMENT", "INT", 
+		"FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", "RPAREN", "REC", 
+		"AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR", "PLUS", "MINUS", 
+		"CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE", "GTE", "ANDALSO", 
+		"ORELSE", "ID",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(SmlParser._LITERAL_NAMES, SmlParser._SYMBOLIC_NAMES, []);
 
@@ -458,7 +460,7 @@ export class SmlParser extends Parser {
 						this.state = 69;
 						(_localctx as InfixApplicationContext)._id = this._input.LT(1);
 						_la = this._input.LA(1);
-						if (!(((((_la - 33)) & ~0x1F) === 0 && ((1 << (_la - 33)) & ((1 << (SmlParser.EQ - 33)) | (1 << (SmlParser.NEQ - 33)) | (1 << (SmlParser.LT - 33)) | (1 << (SmlParser.GT - 33)) | (1 << (SmlParser.LTE - 33)) | (1 << (SmlParser.GTE - 33)))) !== 0))) {
+						if (!(((((_la - 34)) & ~0x1F) === 0 && ((1 << (_la - 34)) & ((1 << (SmlParser.EQ - 34)) | (1 << (SmlParser.NEQ - 34)) | (1 << (SmlParser.LT - 34)) | (1 << (SmlParser.GT - 34)) | (1 << (SmlParser.LTE - 34)) | (1 << (SmlParser.GTE - 34)))) !== 0))) {
 							(_localctx as InfixApplicationContext)._id = this._errHandler.recoverInline(this);
 						} else {
 							if (this._input.LA(1) === Token.EOF) {
@@ -862,7 +864,7 @@ export class SmlParser extends Parser {
 	}
 
 	public static readonly _serializedATN: string =
-		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03+\x83\x04\x02" +
+		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03,\x83\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
 		"\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x03\x02\x03\x02\x03\x02\x03\x02\x03" +
 		"\x02\x03\x02\x05\x02\x1B\n\x02\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03" +
@@ -877,18 +879,18 @@ export class SmlParser extends Parser {
 		"\x03\x07\x03\x07\x07\x07m\n\x07\f\x07\x0E\x07p\v\x07\x03\b\x03\b\x05\b" +
 		"t\n\b\x06\bv\n\b\r\b\x0E\bw\x03\t\x05\t{\n\t\x03\t\x03\t\x03\t\x03\t\x03" +
 		"\n\x03\n\x03\n\x02\x02\x03\x04\v\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f" +
-		"\x02\x0E\x02\x10\x02\x12\x02\x02\x07\x03\x02\x12\x13\x03\x02\x1A\x1D\x03" +
-		"\x02\x1E \x03\x02!\"\x03\x02#(\x02\x93\x02\x1A\x03\x02\x02\x02\x049\x03" +
+		"\x02\x0E\x02\x10\x02\x12\x02\x02\x07\x03\x02\x13\x14\x03\x02\x1B\x1E\x03" +
+		"\x02\x1F!\x03\x02\"#\x03\x02$)\x02\x93\x02\x1A\x03\x02\x02\x02\x049\x03" +
 		"\x02\x02\x02\x06W\x03\x02\x02\x02\b[\x03\x02\x02\x02\nf\x03\x02\x02\x02" +
 		"\fh\x03\x02\x02\x02\x0Eu\x03\x02\x02\x02\x10z\x03\x02\x02\x02\x12\x80" +
-		"\x03\x02\x02\x02\x14\x1B\x07\x0E\x02\x02\x15\x1B\x07\x0F\x02\x02\x16\x1B" +
-		"\x07\x10\x02\x02\x17\x1B\x07\x11\x02\x02\x18\x1B\t\x02\x02\x02\x19\x1B" +
-		"\x07\x19\x02\x02\x1A\x14\x03\x02\x02\x02\x1A\x15\x03\x02\x02\x02\x1A\x16" +
+		"\x03\x02\x02\x02\x14\x1B\x07\x0F\x02\x02\x15\x1B\x07\x10\x02\x02\x16\x1B" +
+		"\x07\x11\x02\x02\x17\x1B\x07\x12\x02\x02\x18\x1B\t\x02\x02\x02\x19\x1B" +
+		"\x07\x1A\x02\x02\x1A\x14\x03\x02\x02\x02\x1A\x15\x03\x02\x02\x02\x1A\x16" +
 		"\x03\x02\x02\x02\x1A\x17\x03\x02\x02\x02\x1A\x18\x03\x02\x02\x02\x1A\x19" +
 		"\x03\x02\x02\x02\x1B\x03\x03\x02\x02\x02\x1C\x1D\b\x03\x01\x02\x1D:\x05" +
-		"\x02\x02\x02\x1E:\x07+\x02\x02\x1F \x07\x14\x02\x02 !\x05\x04\x03\x02" +
-		"!\"\x07\x15\x02\x02\":\x03\x02\x02\x02#$\x07\x03\x02\x02$%\x05\x0E\b\x02" +
-		"%&\x07\x04\x02\x02&+\x05\x04\x03\x02\'(\x07\x18\x02\x02(*\x05\x04\x03" +
+		"\x02\x02\x02\x1E:\x07,\x02\x02\x1F \x07\x15\x02\x02 !\x05\x04\x03\x02" +
+		"!\"\x07\x16\x02\x02\":\x03\x02\x02\x02#$\x07\x03\x02\x02$%\x05\x0E\b\x02" +
+		"%&\x07\x04\x02\x02&+\x05\x04\x03\x02\'(\x07\x19\x02\x02(*\x05\x04\x03" +
 		"\x02)\'\x03\x02\x02\x02*-\x03\x02\x02\x02+)\x03\x02\x02\x02+,\x03\x02" +
 		"\x02\x02,.\x03\x02\x02\x02-+\x03\x02\x02\x02./\x07\x05\x02\x02/:\x03\x02" +
 		"\x02\x0201\x07\x06\x02\x0212\x05\x04\x03\x0223\x07\x07\x02\x0234\x05\x04" +
@@ -898,8 +900,8 @@ export class SmlParser extends Parser {
 		"\x02\x02\x02;<\f\x0E\x02\x02<S\x05\x04\x03\x0F=>\f\r\x02\x02>?\t\x03\x02" +
 		"\x02?S\x05\x04\x03\x0E@A\f\f\x02\x02AB\t\x04\x02\x02BS\x05\x04\x03\rC" +
 		"D\f\v\x02\x02DE\t\x05\x02\x02ES\x05\x04\x03\vFG\f\n\x02\x02GH\t\x06\x02" +
-		"\x02HS\x05\x04\x03\vIJ\f\t\x02\x02JK\x07+\x02\x02KS\x05\x04\x03\nLM\f" +
-		"\x06\x02\x02MN\x07)\x02\x02NS\x05\x04\x03\x07OP\f\x05\x02\x02PQ\x07*\x02" +
+		"\x02HS\x05\x04\x03\vIJ\f\t\x02\x02JK\x07,\x02\x02KS\x05\x04\x03\nLM\f" +
+		"\x06\x02\x02MN\x07*\x02\x02NS\x05\x04\x03\x07OP\f\x05\x02\x02PQ\x07+\x02" +
 		"\x02QS\x05\x04\x03\x06R;\x03\x02\x02\x02R=\x03\x02\x02\x02R@\x03\x02\x02" +
 		"\x02RC\x03\x02\x02\x02RF\x03\x02\x02\x02RI\x03\x02\x02\x02RL\x03\x02\x02" +
 		"\x02RO\x03\x02\x02\x02SV\x03\x02\x02\x02TR\x03\x02\x02\x02TU\x03\x02\x02" +
@@ -907,15 +909,15 @@ export class SmlParser extends Parser {
 		"\x02YZ\x05\x04\x03\x02Z\x07\x03\x02\x02\x02[`\x05\x06\x04\x02\\]\x07\v" +
 		"\x02\x02]_\x05\x06\x04\x02^\\\x03\x02\x02\x02_b\x03\x02\x02\x02`^\x03" +
 		"\x02\x02\x02`a\x03\x02\x02\x02a\t\x03\x02\x02\x02b`\x03\x02\x02\x02cg" +
-		"\x05\x02\x02\x02dg\x07\x19\x02\x02eg\x07+\x02\x02fc\x03\x02\x02\x02fd" +
+		"\x05\x02\x02\x02dg\x07\x1A\x02\x02eg\x07,\x02\x02fc\x03\x02\x02\x02fd" +
 		"\x03\x02\x02\x02fe\x03\x02\x02\x02g\v\x03\x02\x02\x02hi\x07\f\x02\x02" +
-		"in\x05\x10\t\x02jk\x07\x17\x02\x02km\x05\x10\t\x02lj\x03\x02\x02\x02m" +
+		"in\x05\x10\t\x02jk\x07\x18\x02\x02km\x05\x10\t\x02lj\x03\x02\x02\x02m" +
 		"p\x03\x02\x02\x02nl\x03\x02\x02\x02no\x03\x02\x02\x02o\r\x03\x02\x02\x02" +
-		"pn\x03\x02\x02\x02qs\x05\f\x07\x02rt\x07\x18\x02\x02sr\x03\x02\x02\x02" +
+		"pn\x03\x02\x02\x02qs\x05\f\x07\x02rt\x07\x19\x02\x02sr\x03\x02\x02\x02" +
 		"st\x03\x02\x02\x02tv\x03\x02\x02\x02uq\x03\x02\x02\x02vw\x03\x02\x02\x02" +
-		"wu\x03\x02\x02\x02wx\x03\x02\x02\x02x\x0F\x03\x02\x02\x02y{\x07\x16\x02" +
+		"wu\x03\x02\x02\x02wx\x03\x02\x02\x02x\x0F\x03\x02\x02\x02y{\x07\x17\x02" +
 		"\x02zy\x03\x02\x02\x02z{\x03\x02\x02\x02{|\x03\x02\x02\x02|}\x05\n\x06" +
-		"\x02}~\x07#\x02\x02~\x7F\x05\x04\x03\x02\x7F\x11\x03\x02\x02\x02\x80\x81" +
+		"\x02}~\x07$\x02\x02~\x7F\x05\x04\x03\x02\x7F\x11\x03\x02\x02\x02\x80\x81" +
 		"\x05\x0E\b\x02\x81\x13\x03\x02\x02\x02\r\x1A+9RT`fnswz";
 	public static __ATN: ATN;
 	public static get _ATN(): ATN {

@@ -3,6 +3,7 @@ grammar Sml;
 /** Tokens */
 
 WHITESPACE: [ \r\n\t]+ -> skip;
+COMMENT: '(*' .*? '*)' -> skip;
 
 INT
     : '~'? NUM

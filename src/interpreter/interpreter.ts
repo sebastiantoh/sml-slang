@@ -303,7 +303,6 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'ApplicationI': {
-      // TODO: handle builtin functions differently
       // TODO: handle tail calls
       const arg = S.pop()!
       const fn = S.pop()!
