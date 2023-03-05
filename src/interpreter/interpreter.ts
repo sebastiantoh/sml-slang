@@ -10,6 +10,14 @@ let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
 
+const init_env = (): Environment => {
+  const env = { frame: {}, parent: undefined }
+  for (const fn of Sml.builtinFns) {
+    assign_in_env(env, fn.id, fn)
+  }
+  return env
+}
+
 const extend_env = (env: Environment): Environment => {
   return { frame: {}, parent: env }
 }
@@ -214,7 +222,7 @@ const exec_microcode = (cmd: Microcode) => {
     case 'BinLogicalOpI': {
       const fst = S.pop()!
 
-      assert(fst.type !== 'fn')
+      assert(fst.type !== 'fn' && fst.type !== 'builtin_fn')
 
       // Perform shortcircuiting if possible
       if (cmd.id === 'orelse' && fst.js_val) {
@@ -253,7 +261,7 @@ const exec_microcode = (cmd: Microcode) => {
         cmd.pat.tag === 'CharConstant' ||
         cmd.pat.tag === 'StringConstant'
       ) {
-        if (rhs.type === 'fn' || cmd.pat.val !== rhs.js_val) {
+        if (rhs.type === 'fn' || rhs.type === 'builtin_fn' || cmd.pat.val !== rhs.js_val) {
           throw new Error(
             `cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`
           )
@@ -272,6 +280,12 @@ const exec_microcode = (cmd: Microcode) => {
       // TODO: handle tail calls
       const arg = S.pop()!
       const fn = S.pop()!
+
+      if (fn.type === 'builtin_fn') {
+        S.push(fn.apply(arg))
+        break
+      }
+
       assert(fn.type === 'fn')
 
       E = extend_env(fn.env)
@@ -326,8 +340,7 @@ const exec_microcode = (cmd: Microcode) => {
 export function evaluate(node: Node): Value {
   A = [node]
   S = []
-  // TODO: init env
-  E = { frame: {}, parent: undefined }
+  E = init_env()
 
   const step_limit = 1000000
   let i = 0

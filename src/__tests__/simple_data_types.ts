@@ -81,8 +81,8 @@ test('strings: empty concat nonempty', () =>
   expect(parseAndEvaluateExp(`"" ^ "def"`)).toBe(`"def"`))
 test('strings: empty concat empty', () => expect(parseAndEvaluateExp(`"" ^ ""`)).toBe(`""`))
 
-test.skip('strings: size', () => expect(parseAndEvaluateExp(`size "abc"`)).toBe('3'))
-test.skip('strings: size of empty string', () => expect(parseAndEvaluateExp(`size ""`)).toBe('0'))
+test('strings: size', () => expect(parseAndEvaluateExp(`size "abc"`)).toBe('3'))
+test('strings: size of empty string', () => expect(parseAndEvaluateExp(`size ""`)).toBe('0'))
 
 /**
  * Character
@@ -114,9 +114,12 @@ test('booleans: true evaluates to itself', () => expect(parseAndEvaluateExp('tru
 test('booleans: false evaluates to itself', () =>
   expect(parseAndEvaluateExp('false')).toBe('false'))
 
-test.skip('booleans: negation of true', () => expect(parseAndEvaluateExp('not true')).toBe('false'))
-test.skip('booleans: negation of false', () =>
-  expect(parseAndEvaluateExp('not false')).toBe('false'))
+test('booleans: negation of true', () => expect(parseAndEvaluateExp('not true')).toBe('false'))
+test('booleans: negation of false', () => expect(parseAndEvaluateExp('not false')).toBe('true'))
+test('booleans: double negation of true', () =>
+  expect(parseAndEvaluateExp('not (not true)')).toBe('true'))
+test('booleans: double negation of false', () =>
+  expect(parseAndEvaluateExp('not (not false)')).toBe('false'))
 
 test('booleans: disjunction', () =>
   expect(parseAndEvaluateExp('2=2 orelse 37 div 0 = 5')).toBe('true'))

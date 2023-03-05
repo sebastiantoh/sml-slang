@@ -106,7 +106,7 @@ in
   f 3
 end
 `)
-  ).toThrow(/f not found in env/)) // TODO: add more specific error
+  ).toThrow(/f not found in env/))
 
 test('rec function with rec keyword', () =>
   expect(
