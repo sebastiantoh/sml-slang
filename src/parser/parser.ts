@@ -23,6 +23,7 @@ import {
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
+  LocalDeclContext,
   MatchesContext,
   ParenthesesContext,
   PatConstantContext,
@@ -52,6 +53,7 @@ import {
   InfixApplication,
   IntConstant,
   LetExpression,
+  LocalDeclaration,
   Match,
   Matches,
   Node,
@@ -217,6 +219,13 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'ValueDeclaration',
       valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
+    }
+  }
+  visitLocalDecl(ctx: LocalDeclContext): LocalDeclaration {
+    return {
+      tag: 'LocalDeclaration',
+      localDecs: this.visit(ctx._localDecs) as DeclarationSequence,
+      decs: this.visit(ctx._decs) as DeclarationSequence
     }
   }
   visitDecSequence(ctx: DecSequenceContext): DeclarationSequence {

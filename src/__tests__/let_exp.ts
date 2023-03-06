@@ -163,3 +163,78 @@ in
 end
 `)
   ).toEqual(`1003`))
+
+test('local declarations are accessible in subsequent declarations', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    val x = x + y
+  end
+in
+  x
+end
+`)
+  ).toBe(`3`))
+
+test('local declaration - accessing variable outside of scope', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    val x = x + y
+  end
+in
+  y
+end
+`)
+  ).toThrow(/y not found in env/))
+
+test('nested local declarations', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    local
+      val z = x + y
+    in
+      val x = x + y + z
+    end
+    val x = x
+  end
+in
+  x
+end
+`)
+  ).toBe(`6`))
+
+test('nested local declarations - accessing variable outside of scope', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    local
+      val z = x + y
+    in
+      val x = x + y + z
+      val k = z
+    end
+    val x = z
+  end
+in
+  x
+end
+`)
+  ).toThrow(/z not found in env/))

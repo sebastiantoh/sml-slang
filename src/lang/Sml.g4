@@ -114,6 +114,7 @@ pat
 
 dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
+    | 'local' localDecs=decSequence 'in' decs=decSequence 'end'       # LocalDecl
     ;
 
 // TODO: everywhere that uses "dec" in the
