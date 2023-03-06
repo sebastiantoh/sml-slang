@@ -9,6 +9,7 @@ import { StringContext } from "./SmlParser";
 import { BooleanContext } from "./SmlParser";
 import { UnitContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
+import { LocalDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
 import { ApplicationContext } from "./SmlParser";
@@ -153,6 +154,18 @@ export interface SmlListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitValueDecl?: (ctx: ValueDeclContext) => void;
+    /**
+     * Enter a parse tree produced by the `LocalDecl`
+     * labeled alternative in `SmlParser.dec`.
+     * @param ctx the parse tree
+     */
+    enterLocalDecl?: (ctx: LocalDeclContext) => void;
+    /**
+     * Exit a parse tree produced by the `LocalDecl`
+     * labeled alternative in `SmlParser.dec`.
+     * @param ctx the parse tree
+     */
+    exitLocalDecl?: (ctx: LocalDeclContext) => void;
     /**
      * Enter a parse tree produced by the `Constant`
      * labeled alternative in `SmlParser.exp`.

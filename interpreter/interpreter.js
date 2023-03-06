@@ -157,6 +157,31 @@ const exec_microcode = (cmd) => {
             rev_push(A, cmd.valbinds);
             break;
         }
+        case 'LocalDeclaration': {
+            // Each dec will create their own env:
+            // currEnv <- localDec1 <- ... <- localDecN <- dec1 <- ... <- decM
+            // We want to set the parent of dec1 to point to the currEnv
+            // after all the declarations have been completed
+            // {tag: "DecsAfterLocalDecsI", decs, envBeforeLocalDecs=currEnv}
+            // - Will be executed when E=localDecN
+            // - Will push a {tag: "SetEnvParentI", oldParent: localDecN, newParent: currEnv}
+            //   after declarations have been executed
+            //
+            // {tag: "SetEnvParentI", oldParent: localDecN, newParent: currEnv}
+            // - Will be executed when E=decM
+            // - Will traverse up from env=decM until env.parent === oldParent (or localDecN),
+            //   before setting env.parent = newParent (currEnv)
+            // TODO: is there a better way to do this?
+            rev_push(A, [
+                ...cmd.localDecs.decs,
+                {
+                    tag: 'DecsAfterLocalDecsI',
+                    decs: cmd.decs.decs,
+                    envBeforeLocalDecs: E
+                }
+            ]);
+            break;
+        }
         case 'Valbind': {
             // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
             // Each declaration are in their own env frame
@@ -242,6 +267,15 @@ const exec_microcode = (cmd) => {
             E = cmd.env;
             break;
         }
+        case 'SetEnvParentI': {
+            let tmp = E;
+            while (tmp && tmp.parent !== cmd.oldParent) {
+                tmp = tmp.parent;
+            }
+            assert(tmp !== undefined);
+            tmp.parent = cmd.newParent;
+            break;
+        }
         case 'AssignI': {
             const rhs = S.pop();
             // If pat is a constant, then we don't perform env assignment.
@@ -277,6 +311,13 @@ const exec_microcode = (cmd) => {
                 // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
                 throw new Error(`TODO: unimplemented ${cmd.pat}`);
             }
+            break;
+        }
+        case 'DecsAfterLocalDecsI': {
+            rev_push(A, [
+                ...cmd.decs,
+                { tag: 'SetEnvParentI', oldParent: E, newParent: cmd.envBeforeLocalDecs }
+            ]);
             break;
         }
         case 'ApplicationI': {

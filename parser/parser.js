@@ -156,6 +156,13 @@ class NodeGenerator {
             valbinds: ctx.valbind().map((vb) => this.visit(vb))
         };
     }
+    visitLocalDecl(ctx) {
+        return {
+            tag: 'LocalDeclaration',
+            localDecs: this.visit(ctx._localDecs),
+            decs: this.visit(ctx._decs)
+        };
+    }
     visitDecSequence(ctx) {
         return {
             tag: 'DeclarationSequence',

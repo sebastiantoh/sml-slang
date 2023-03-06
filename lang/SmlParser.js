@@ -1,7 +1,7 @@
 "use strict";
 // Generated from src/lang/Sml.g4 by ANTLR 4.9.0-SNAPSHOT
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProgContext = exports.ValbindContext = exports.DecSequenceContext = exports.ValueDeclContext = exports.DecContext = exports.PatVariableContext = exports.PatUnitContext = exports.PatConstantContext = exports.PatContext = exports.MatchesContext = exports.PatmatchContext = exports.FunctionContext = exports.ConditionalContext = exports.DisjunctionContext = exports.ConjunctionContext = exports.LetExpressionContext = exports.ParenthesesContext = exports.InfixApplicationContext = exports.ApplicationContext = exports.ExpVariableContext = exports.ConstantContext = exports.ExpContext = exports.UnitContext = exports.BooleanContext = exports.StringContext = exports.CharacterContext = exports.FloatingPointContext = exports.IntegerContext = exports.ConContext = exports.SmlParser = void 0;
+exports.ProgContext = exports.ValbindContext = exports.DecSequenceContext = exports.LocalDeclContext = exports.ValueDeclContext = exports.DecContext = exports.PatVariableContext = exports.PatUnitContext = exports.PatConstantContext = exports.PatContext = exports.MatchesContext = exports.PatmatchContext = exports.FunctionContext = exports.ConditionalContext = exports.DisjunctionContext = exports.ConjunctionContext = exports.LetExpressionContext = exports.ParenthesesContext = exports.InfixApplicationContext = exports.ApplicationContext = exports.ExpVariableContext = exports.ConstantContext = exports.ExpContext = exports.UnitContext = exports.BooleanContext = exports.StringContext = exports.CharacterContext = exports.FloatingPointContext = exports.IntegerContext = exports.ConContext = exports.SmlParser = void 0;
 const ATN_1 = require("antlr4ts/atn/ATN");
 const ATNDeserializer_1 = require("antlr4ts/atn/ATNDeserializer");
 const FailedPredicateException_1 = require("antlr4ts/FailedPredicateException");
@@ -307,7 +307,7 @@ class SmlParser extends Parser_1.Parser {
                                         this.state = 63;
                                         _localctx._id = this._input.LT(1);
                                         _la = this._input.LA(1);
-                                        if (!((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << SmlParser.PLUS) | (1 << SmlParser.MINUS) | (1 << SmlParser.CARET))) !== 0))) {
+                                        if (!(((((_la - 30)) & ~0x1F) === 0 && ((1 << (_la - 30)) & ((1 << (SmlParser.PLUS - 30)) | (1 << (SmlParser.MINUS - 30)) | (1 << (SmlParser.CARET - 30)))) !== 0))) {
                                             _localctx._id = this._errHandler.recoverInline(this);
                                         }
                                         else {
@@ -359,7 +359,7 @@ class SmlParser extends Parser_1.Parser {
                                         this.state = 69;
                                         _localctx._id = this._input.LT(1);
                                         _la = this._input.LA(1);
-                                        if (!(((((_la - 34)) & ~0x1F) === 0 && ((1 << (_la - 34)) & ((1 << (SmlParser.EQ - 34)) | (1 << (SmlParser.NEQ - 34)) | (1 << (SmlParser.LT - 34)) | (1 << (SmlParser.GT - 34)) | (1 << (SmlParser.LTE - 34)) | (1 << (SmlParser.GTE - 34)))) !== 0))) {
+                                        if (!(((((_la - 35)) & ~0x1F) === 0 && ((1 << (_la - 35)) & ((1 << (SmlParser.EQ - 35)) | (1 << (SmlParser.NEQ - 35)) | (1 << (SmlParser.LT - 35)) | (1 << (SmlParser.GT - 35)) | (1 << (SmlParser.LTE - 35)) | (1 << (SmlParser.GTE - 35)))) !== 0))) {
                                             _localctx._id = this._errHandler.recoverInline(this);
                                         }
                                         else {
@@ -572,29 +572,53 @@ class SmlParser extends Parser_1.Parser {
         this.enterRule(_localctx, 10, SmlParser.RULE_dec);
         let _la;
         try {
-            _localctx = new ValueDeclContext(_localctx);
-            this.enterOuterAlt(_localctx, 1);
-            {
-                this.state = 102;
-                this.match(SmlParser.T__9);
-                this.state = 103;
-                this.valbind();
-                this.state = 108;
-                this._errHandler.sync(this);
-                _la = this._input.LA(1);
-                while (_la === SmlParser.AND) {
+            this.state = 117;
+            this._errHandler.sync(this);
+            switch (this._input.LA(1)) {
+                case SmlParser.T__9:
+                    _localctx = new ValueDeclContext(_localctx);
+                    this.enterOuterAlt(_localctx, 1);
                     {
-                        {
-                            this.state = 104;
-                            this.match(SmlParser.AND);
-                            this.state = 105;
-                            this.valbind();
+                        this.state = 102;
+                        this.match(SmlParser.T__9);
+                        this.state = 103;
+                        this.valbind();
+                        this.state = 108;
+                        this._errHandler.sync(this);
+                        _la = this._input.LA(1);
+                        while (_la === SmlParser.AND) {
+                            {
+                                {
+                                    this.state = 104;
+                                    this.match(SmlParser.AND);
+                                    this.state = 105;
+                                    this.valbind();
+                                }
+                            }
+                            this.state = 110;
+                            this._errHandler.sync(this);
+                            _la = this._input.LA(1);
                         }
                     }
-                    this.state = 110;
-                    this._errHandler.sync(this);
-                    _la = this._input.LA(1);
-                }
+                    break;
+                case SmlParser.T__10:
+                    _localctx = new LocalDeclContext(_localctx);
+                    this.enterOuterAlt(_localctx, 2);
+                    {
+                        this.state = 111;
+                        this.match(SmlParser.T__10);
+                        this.state = 112;
+                        _localctx._localDecs = this.decSequence();
+                        this.state = 113;
+                        this.match(SmlParser.T__1);
+                        this.state = 114;
+                        _localctx._decs = this.decSequence();
+                        this.state = 115;
+                        this.match(SmlParser.T__2);
+                    }
+                    break;
+                default:
+                    throw new NoViableAltException_1.NoViableAltException(this);
             }
         }
         catch (re) {
@@ -620,29 +644,29 @@ class SmlParser extends Parser_1.Parser {
         try {
             this.enterOuterAlt(_localctx, 1);
             {
-                this.state = 115;
+                this.state = 123;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
                 do {
                     {
                         {
-                            this.state = 111;
+                            this.state = 119;
                             this.dec();
-                            this.state = 113;
+                            this.state = 121;
                             this._errHandler.sync(this);
                             _la = this._input.LA(1);
                             if (_la === SmlParser.SEMICOLON) {
                                 {
-                                    this.state = 112;
+                                    this.state = 120;
                                     this.match(SmlParser.SEMICOLON);
                                 }
                             }
                         }
                     }
-                    this.state = 117;
+                    this.state = 125;
                     this._errHandler.sync(this);
                     _la = this._input.LA(1);
-                } while (_la === SmlParser.T__9);
+                } while (_la === SmlParser.T__9 || _la === SmlParser.T__10);
             }
         }
         catch (re) {
@@ -668,20 +692,20 @@ class SmlParser extends Parser_1.Parser {
         try {
             this.enterOuterAlt(_localctx, 1);
             {
-                this.state = 120;
+                this.state = 128;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
                 if (_la === SmlParser.REC) {
                     {
-                        this.state = 119;
+                        this.state = 127;
                         this.match(SmlParser.REC);
                     }
                 }
-                this.state = 122;
+                this.state = 130;
                 this.pat();
-                this.state = 123;
+                this.state = 131;
                 this.match(SmlParser.EQ);
-                this.state = 124;
+                this.state = 132;
                 this.exp(0);
             }
         }
@@ -707,7 +731,7 @@ class SmlParser extends Parser_1.Parser {
         try {
             this.enterOuterAlt(_localctx, 1);
             {
-                this.state = 126;
+                this.state = 134;
                 this.decSequence();
             }
         }
@@ -772,38 +796,39 @@ SmlParser.T__6 = 7;
 SmlParser.T__7 = 8;
 SmlParser.T__8 = 9;
 SmlParser.T__9 = 10;
-SmlParser.WHITESPACE = 11;
-SmlParser.COMMENT = 12;
-SmlParser.INT = 13;
-SmlParser.FLOAT = 14;
-SmlParser.CHAR = 15;
-SmlParser.STRING = 16;
-SmlParser.TRUE = 17;
-SmlParser.FALSE = 18;
-SmlParser.LPAREN = 19;
-SmlParser.RPAREN = 20;
-SmlParser.REC = 21;
-SmlParser.AND = 22;
-SmlParser.SEMICOLON = 23;
-SmlParser.UNIT = 24;
-SmlParser.SLASH = 25;
-SmlParser.DIV = 26;
-SmlParser.MOD = 27;
-SmlParser.STAR = 28;
-SmlParser.PLUS = 29;
-SmlParser.MINUS = 30;
-SmlParser.CARET = 31;
-SmlParser.CONS = 32;
-SmlParser.AT = 33;
-SmlParser.EQ = 34;
-SmlParser.NEQ = 35;
-SmlParser.LT = 36;
-SmlParser.GT = 37;
-SmlParser.LTE = 38;
-SmlParser.GTE = 39;
-SmlParser.ANDALSO = 40;
-SmlParser.ORELSE = 41;
-SmlParser.ID = 42;
+SmlParser.T__10 = 11;
+SmlParser.WHITESPACE = 12;
+SmlParser.COMMENT = 13;
+SmlParser.INT = 14;
+SmlParser.FLOAT = 15;
+SmlParser.CHAR = 16;
+SmlParser.STRING = 17;
+SmlParser.TRUE = 18;
+SmlParser.FALSE = 19;
+SmlParser.LPAREN = 20;
+SmlParser.RPAREN = 21;
+SmlParser.REC = 22;
+SmlParser.AND = 23;
+SmlParser.SEMICOLON = 24;
+SmlParser.UNIT = 25;
+SmlParser.SLASH = 26;
+SmlParser.DIV = 27;
+SmlParser.MOD = 28;
+SmlParser.STAR = 29;
+SmlParser.PLUS = 30;
+SmlParser.MINUS = 31;
+SmlParser.CARET = 32;
+SmlParser.CONS = 33;
+SmlParser.AT = 34;
+SmlParser.EQ = 35;
+SmlParser.NEQ = 36;
+SmlParser.LT = 37;
+SmlParser.GT = 38;
+SmlParser.LTE = 39;
+SmlParser.GTE = 40;
+SmlParser.ANDALSO = 41;
+SmlParser.ORELSE = 42;
+SmlParser.ID = 43;
 SmlParser.RULE_con = 0;
 SmlParser.RULE_exp = 1;
 SmlParser.RULE_patmatch = 2;
@@ -820,21 +845,21 @@ SmlParser.ruleNames = [
 ];
 SmlParser._LITERAL_NAMES = [
     undefined, "'let'", "'in'", "'end'", "'if'", "'then'", "'else'", "'fn'",
-    "'=>'", "'|'", "'val'", undefined, undefined, undefined, undefined, undefined,
-    undefined, "'true'", "'false'", "'('", "')'", "'rec'", "'and'", "';'",
-    "'()'", "'/'", "'div'", "'mod'", "'*'", "'+'", "'-'", "'^'", "'::'", "'@'",
-    "'='", "'<>'", "'<'", "'>'", "'<='", "'>='", "'andalso'", "'orelse'",
+    "'=>'", "'|'", "'val'", "'local'", undefined, undefined, undefined, undefined,
+    undefined, undefined, "'true'", "'false'", "'('", "')'", "'rec'", "'and'",
+    "';'", "'()'", "'/'", "'div'", "'mod'", "'*'", "'+'", "'-'", "'^'", "'::'",
+    "'@'", "'='", "'<>'", "'<'", "'>'", "'<='", "'>='", "'andalso'", "'orelse'",
 ];
 SmlParser._SYMBOLIC_NAMES = [
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-    undefined, undefined, undefined, undefined, "WHITESPACE", "COMMENT", "INT",
-    "FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", "RPAREN", "REC",
-    "AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR", "PLUS", "MINUS",
-    "CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE", "GTE", "ANDALSO",
-    "ORELSE", "ID",
+    undefined, undefined, undefined, undefined, undefined, "WHITESPACE", "COMMENT",
+    "INT", "FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", "RPAREN",
+    "REC", "AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR", "PLUS",
+    "MINUS", "CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE", "GTE",
+    "ANDALSO", "ORELSE", "ID",
 ];
 SmlParser.VOCABULARY = new VocabularyImpl_1.VocabularyImpl(SmlParser._LITERAL_NAMES, SmlParser._SYMBOLIC_NAMES, []);
-SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03,\x83\x04\x02" +
+SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03-\x8B\x04\x02" +
     "\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
     "\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x03\x02\x03\x02\x03\x02\x03\x02\x03" +
     "\x02\x03\x02\x05\x02\x1B\n\x02\x03\x03\x03\x03\x03\x03\x03\x03\x03\x03" +
@@ -846,21 +871,22 @@ SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241
     "\x03\x03\x03\x03\x03\x03\x03\x07\x03S\n\x03\f\x03\x0E\x03V\v\x03\x03\x04" +
     "\x03\x04\x03\x04\x03\x04\x03\x05\x03\x05\x03\x05\x07\x05_\n\x05\f\x05" +
     "\x0E\x05b\v\x05\x03\x06\x03\x06\x03\x06\x05\x06g\n\x06\x03\x07\x03\x07" +
-    "\x03\x07\x03\x07\x07\x07m\n\x07\f\x07\x0E\x07p\v\x07\x03\b\x03\b\x05\b" +
-    "t\n\b\x06\bv\n\b\r\b\x0E\bw\x03\t\x05\t{\n\t\x03\t\x03\t\x03\t\x03\t\x03" +
+    "\x03\x07\x03\x07\x07\x07m\n\x07\f\x07\x0E\x07p\v\x07\x03\x07\x03\x07\x03" +
+    "\x07\x03\x07\x03\x07\x03\x07\x05\x07x\n\x07\x03\b\x03\b\x05\b|\n\b\x06" +
+    "\b~\n\b\r\b\x0E\b\x7F\x03\t\x05\t\x83\n\t\x03\t\x03\t\x03\t\x03\t\x03" +
     "\n\x03\n\x03\n\x02\x02\x03\x04\v\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f" +
-    "\x02\x0E\x02\x10\x02\x12\x02\x02\x07\x03\x02\x13\x14\x03\x02\x1B\x1E\x03" +
-    "\x02\x1F!\x03\x02\"#\x03\x02$)\x02\x93\x02\x1A\x03\x02\x02\x02\x049\x03" +
-    "\x02\x02\x02\x06W\x03\x02\x02\x02\b[\x03\x02\x02\x02\nf\x03\x02\x02\x02" +
-    "\fh\x03\x02\x02\x02\x0Eu\x03\x02\x02\x02\x10z\x03\x02\x02\x02\x12\x80" +
-    "\x03\x02\x02\x02\x14\x1B\x07\x0F\x02\x02\x15\x1B\x07\x10\x02\x02\x16\x1B" +
-    "\x07\x11\x02\x02\x17\x1B\x07\x12\x02\x02\x18\x1B\t\x02\x02\x02\x19\x1B" +
-    "\x07\x1A\x02\x02\x1A\x14\x03\x02\x02\x02\x1A\x15\x03\x02\x02\x02\x1A\x16" +
+    "\x02\x0E\x02\x10\x02\x12\x02\x02\x07\x03\x02\x14\x15\x03\x02\x1C\x1F\x03" +
+    "\x02 \"\x03\x02#$\x03\x02%*\x02\x9C\x02\x1A\x03\x02\x02\x02\x049\x03\x02" +
+    "\x02\x02\x06W\x03\x02\x02\x02\b[\x03\x02\x02\x02\nf\x03\x02\x02\x02\f" +
+    "w\x03\x02\x02\x02\x0E}\x03\x02\x02\x02\x10\x82\x03\x02\x02\x02\x12\x88" +
+    "\x03\x02\x02\x02\x14\x1B\x07\x10\x02\x02\x15\x1B\x07\x11\x02\x02\x16\x1B" +
+    "\x07\x12\x02\x02\x17\x1B\x07\x13\x02\x02\x18\x1B\t\x02\x02\x02\x19\x1B" +
+    "\x07\x1B\x02\x02\x1A\x14\x03\x02\x02\x02\x1A\x15\x03\x02\x02\x02\x1A\x16" +
     "\x03\x02\x02\x02\x1A\x17\x03\x02\x02\x02\x1A\x18\x03\x02\x02\x02\x1A\x19" +
     "\x03\x02\x02\x02\x1B\x03\x03\x02\x02\x02\x1C\x1D\b\x03\x01\x02\x1D:\x05" +
-    "\x02\x02\x02\x1E:\x07,\x02\x02\x1F \x07\x15\x02\x02 !\x05\x04\x03\x02" +
-    "!\"\x07\x16\x02\x02\":\x03\x02\x02\x02#$\x07\x03\x02\x02$%\x05\x0E\b\x02" +
-    "%&\x07\x04\x02\x02&+\x05\x04\x03\x02\'(\x07\x19\x02\x02(*\x05\x04\x03" +
+    "\x02\x02\x02\x1E:\x07-\x02\x02\x1F \x07\x16\x02\x02 !\x05\x04\x03\x02" +
+    "!\"\x07\x17\x02\x02\":\x03\x02\x02\x02#$\x07\x03\x02\x02$%\x05\x0E\b\x02" +
+    "%&\x07\x04\x02\x02&+\x05\x04\x03\x02\'(\x07\x1A\x02\x02(*\x05\x04\x03" +
     "\x02)\'\x03\x02\x02\x02*-\x03\x02\x02\x02+)\x03\x02\x02\x02+,\x03\x02" +
     "\x02\x02,.\x03\x02\x02\x02-+\x03\x02\x02\x02./\x07\x05\x02\x02/:\x03\x02" +
     "\x02\x0201\x07\x06\x02\x0212\x05\x04\x03\x0223\x07\x07\x02\x0234\x05\x04" +
@@ -870,8 +896,8 @@ SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241
     "\x02\x02\x02;<\f\x0E\x02\x02<S\x05\x04\x03\x0F=>\f\r\x02\x02>?\t\x03\x02" +
     "\x02?S\x05\x04\x03\x0E@A\f\f\x02\x02AB\t\x04\x02\x02BS\x05\x04\x03\rC" +
     "D\f\v\x02\x02DE\t\x05\x02\x02ES\x05\x04\x03\vFG\f\n\x02\x02GH\t\x06\x02" +
-    "\x02HS\x05\x04\x03\vIJ\f\t\x02\x02JK\x07,\x02\x02KS\x05\x04\x03\nLM\f" +
-    "\x06\x02\x02MN\x07*\x02\x02NS\x05\x04\x03\x07OP\f\x05\x02\x02PQ\x07+\x02" +
+    "\x02HS\x05\x04\x03\vIJ\f\t\x02\x02JK\x07-\x02\x02KS\x05\x04\x03\nLM\f" +
+    "\x06\x02\x02MN\x07+\x02\x02NS\x05\x04\x03\x07OP\f\x05\x02\x02PQ\x07,\x02" +
     "\x02QS\x05\x04\x03\x06R;\x03\x02\x02\x02R=\x03\x02\x02\x02R@\x03\x02\x02" +
     "\x02RC\x03\x02\x02\x02RF\x03\x02\x02\x02RI\x03\x02\x02\x02RL\x03\x02\x02" +
     "\x02RO\x03\x02\x02\x02SV\x03\x02\x02\x02TR\x03\x02\x02\x02TU\x03\x02\x02" +
@@ -879,16 +905,19 @@ SmlParser._serializedATN = "\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241
     "\x02YZ\x05\x04\x03\x02Z\x07\x03\x02\x02\x02[`\x05\x06\x04\x02\\]\x07\v" +
     "\x02\x02]_\x05\x06\x04\x02^\\\x03\x02\x02\x02_b\x03\x02\x02\x02`^\x03" +
     "\x02\x02\x02`a\x03\x02\x02\x02a\t\x03\x02\x02\x02b`\x03\x02\x02\x02cg" +
-    "\x05\x02\x02\x02dg\x07\x1A\x02\x02eg\x07,\x02\x02fc\x03\x02\x02\x02fd" +
+    "\x05\x02\x02\x02dg\x07\x1B\x02\x02eg\x07-\x02\x02fc\x03\x02\x02\x02fd" +
     "\x03\x02\x02\x02fe\x03\x02\x02\x02g\v\x03\x02\x02\x02hi\x07\f\x02\x02" +
-    "in\x05\x10\t\x02jk\x07\x18\x02\x02km\x05\x10\t\x02lj\x03\x02\x02\x02m" +
-    "p\x03\x02\x02\x02nl\x03\x02\x02\x02no\x03\x02\x02\x02o\r\x03\x02\x02\x02" +
-    "pn\x03\x02\x02\x02qs\x05\f\x07\x02rt\x07\x19\x02\x02sr\x03\x02\x02\x02" +
-    "st\x03\x02\x02\x02tv\x03\x02\x02\x02uq\x03\x02\x02\x02vw\x03\x02\x02\x02" +
-    "wu\x03\x02\x02\x02wx\x03\x02\x02\x02x\x0F\x03\x02\x02\x02y{\x07\x17\x02" +
-    "\x02zy\x03\x02\x02\x02z{\x03\x02\x02\x02{|\x03\x02\x02\x02|}\x05\n\x06" +
-    "\x02}~\x07$\x02\x02~\x7F\x05\x04\x03\x02\x7F\x11\x03\x02\x02\x02\x80\x81" +
-    "\x05\x0E\b\x02\x81\x13\x03\x02\x02\x02\r\x1A+9RT`fnswz";
+    "in\x05\x10\t\x02jk\x07\x19\x02\x02km\x05\x10\t\x02lj\x03\x02\x02\x02m" +
+    "p\x03\x02\x02\x02nl\x03\x02\x02\x02no\x03\x02\x02\x02ox\x03\x02\x02\x02" +
+    "pn\x03\x02\x02\x02qr\x07\r\x02\x02rs\x05\x0E\b\x02st\x07\x04\x02\x02t" +
+    "u\x05\x0E\b\x02uv\x07\x05\x02\x02vx\x03\x02\x02\x02wh\x03\x02\x02\x02" +
+    "wq\x03\x02\x02\x02x\r\x03\x02\x02\x02y{\x05\f\x07\x02z|\x07\x1A\x02\x02" +
+    "{z\x03\x02\x02\x02{|\x03\x02\x02\x02|~\x03\x02\x02\x02}y\x03\x02\x02\x02" +
+    "~\x7F\x03\x02\x02\x02\x7F}\x03\x02\x02\x02\x7F\x80\x03\x02\x02\x02\x80" +
+    "\x0F\x03\x02\x02\x02\x81\x83\x07\x18\x02\x02\x82\x81\x03\x02\x02\x02\x82" +
+    "\x83\x03\x02\x02\x02\x83\x84\x03\x02\x02\x02\x84\x85\x05\n\x06\x02\x85" +
+    "\x86\x07%\x02\x02\x86\x87\x05\x04\x03\x02\x87\x11\x03\x02\x02\x02\x88" +
+    "\x89\x05\x0E\b\x02\x89\x13\x03\x02\x02\x02\x0E\x1A+9RT`fnw{\x7F\x82";
 class ConContext extends ParserRuleContext_1.ParserRuleContext {
     constructor(parent, invokingState) {
         super(parent, invokingState);
@@ -1682,6 +1711,42 @@ class ValueDeclContext extends DecContext {
     }
 }
 exports.ValueDeclContext = ValueDeclContext;
+class LocalDeclContext extends DecContext {
+    decSequence(i) {
+        if (i === undefined) {
+            return this.getRuleContexts(DecSequenceContext);
+        }
+        else {
+            return this.getRuleContext(i, DecSequenceContext);
+        }
+    }
+    constructor(ctx) {
+        super(ctx.parent, ctx.invokingState);
+        this.copyFrom(ctx);
+    }
+    // @Override
+    enterRule(listener) {
+        if (listener.enterLocalDecl) {
+            listener.enterLocalDecl(this);
+        }
+    }
+    // @Override
+    exitRule(listener) {
+        if (listener.exitLocalDecl) {
+            listener.exitLocalDecl(this);
+        }
+    }
+    // @Override
+    accept(visitor) {
+        if (visitor.visitLocalDecl) {
+            return visitor.visitLocalDecl(this);
+        }
+        else {
+            return visitor.visitChildren(this);
+        }
+    }
+}
+exports.LocalDeclContext = LocalDeclContext;
 class DecSequenceContext extends ParserRuleContext_1.ParserRuleContext {
     dec(i) {
         if (i === undefined) {
