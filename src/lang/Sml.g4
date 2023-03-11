@@ -114,6 +114,7 @@ pat
 
 dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
+    | 'fun' funbind (AND funbind)*                                    # FunDecl
     | 'local' localDecs=decSequence 'in' decs=decSequence 'end'       # LocalDecl
     ;
 
@@ -123,5 +124,11 @@ dec
 decSequence: (dec SEMICOLON?)+;
 
 valbind: REC? pat EQ exp;
+
+funbind: funmatches;
+
+funmatches: funmatch ('|' funmatch)*;
+
+funmatch: id=ID pat pat* EQ exp;
 
 prog: decSequence;
