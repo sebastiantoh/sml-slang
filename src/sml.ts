@@ -1,4 +1,4 @@
-import { Value } from './types'
+import { BuiltinFn, Value } from './types'
 
 export const valueToString = (sml_val: Value) => {
   switch (sml_val.type) {
@@ -18,10 +18,14 @@ export const valueToString = (sml_val: Value) => {
       return `#"${sml_val.js_val}"`
     case 'bool':
       return sml_val.js_val.toString()
+    case 'unit':
+      return '()'
     case 'fn':
       // TODO: once we have a typechecker, we can
       // include more info in the string repr, e.g param types and return types
       return 'fn'
+    case 'builtin_fn':
+      return `${sml_val.id}: builtin_fn`
   }
 }
 
@@ -200,3 +204,32 @@ export const builtinBinOperators = {
     throw new Error('invalid types')
   }
 }
+
+export const builtinFns: Array<BuiltinFn> = [
+  {
+    type: 'builtin_fn',
+    id: 'size',
+    apply: (arg: Value) => {
+      if (arg.type === 'string') {
+        return {
+          type: 'int',
+          js_val: arg.js_val.length
+        }
+      }
+      throw new Error('invalid types')
+    }
+  },
+  {
+    type: 'builtin_fn',
+    id: 'not',
+    apply: (arg: Value) => {
+      if (arg.type === 'bool') {
+        return {
+          type: 'bool',
+          js_val: !arg.js_val
+        }
+      }
+      throw new Error('invalid types')
+    }
+  }
+]

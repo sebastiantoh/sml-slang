@@ -10,6 +10,14 @@ let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
 
+const init_env = (): Environment => {
+  const env = { frame: {}, parent: undefined }
+  for (const fn of Sml.builtinFns) {
+    assign_in_env(env, fn.id, fn)
+  }
+  return env
+}
+
 const extend_env = (env: Environment): Environment => {
   return { frame: {}, parent: env }
 }
@@ -94,8 +102,15 @@ const exec_microcode = (cmd: Microcode) => {
       })
       break
     }
+    case 'UnitConstant': {
+      S.push({
+        type: 'unit'
+      })
+      break
+    }
     case 'Application': {
-      throw new Error('TODO')
+      A.push({ tag: 'ApplicationI' }, cmd.arg, cmd.fn)
+      break
     }
     case 'InfixApplication': {
       A.push(
@@ -157,6 +172,32 @@ const exec_microcode = (cmd: Microcode) => {
       rev_push(A, cmd.valbinds)
       break
     }
+    case 'LocalDeclaration': {
+      // Each dec will create their own env:
+      // currEnv <- localDec1 <- ... <- localDecN <- dec1 <- ... <- decM
+      // We want to set the parent of dec1 to point to the currEnv
+      // after all the declarations have been completed
+
+      // {tag: "DecsAfterLocalDecsI", decs, envBeforeLocalDecs=currEnv}
+      // - Will be executed when E=localDecN
+      // - Will push a {tag: "SetEnvParentI", oldParent: localDecN, newParent: currEnv}
+      //   after declarations have been executed
+      //
+      // {tag: "SetEnvParentI", oldParent: localDecN, newParent: currEnv}
+      // - Will be executed when E=decM
+      // - Will traverse up from env=decM until env.parent === oldParent (or localDecN),
+      //   before setting env.parent = newParent (currEnv)
+      // TODO: is there a better way to do this?
+      rev_push(A, [
+        ...cmd.localDecs.decs,
+        {
+          tag: 'DecsAfterLocalDecsI',
+          decs: cmd.decs.decs,
+          envBeforeLocalDecs: E
+        }
+      ])
+      break
+    }
     case 'Valbind': {
       // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
       // Each declaration are in their own env frame
@@ -213,7 +254,9 @@ const exec_microcode = (cmd: Microcode) => {
     case 'BinLogicalOpI': {
       const fst = S.pop()!
 
-      assert(fst.type !== 'fn')
+      if (fst.type !== 'bool') {
+        throw new Error('invalid types')
+      }
 
       // Perform shortcircuiting if possible
       if (cmd.id === 'orelse' && fst.js_val) {
@@ -244,15 +287,43 @@ const exec_microcode = (cmd: Microcode) => {
       E = cmd.env
       break
     }
+    case 'SetEnvParentI': {
+      let tmp: Environment | undefined = E
+      while (tmp && tmp.parent !== cmd.oldParent) {
+        tmp = tmp.parent
+      }
+      assert(tmp !== undefined)
+      tmp.parent = cmd.newParent
+      break
+    }
     case 'AssignI': {
       const rhs = S.pop()!
-      if (
+
+      // If pat is a constant, then we don't perform env assignment.
+      // But we check if the pat and the RHS are valid
+      // Examples of valid constant assignment: 1=1, true=true, ()=()
+      // Examples of non-valid constant assignment: 1=2, true=false
+      if (cmd.pat.tag === 'UnitConstant') {
+        if (rhs.type !== 'unit') {
+          throw new Error(`cannot bind () to ${rhs}. can only bind () to itself`)
+        }
+      } else if (
         cmd.pat.tag === 'IntConstant' ||
         cmd.pat.tag === 'FloatConstant' ||
         cmd.pat.tag === 'CharConstant' ||
-        cmd.pat.tag === 'StringConstant'
+        cmd.pat.tag === 'StringConstant' ||
+        cmd.pat.tag === 'BoolConstant'
       ) {
-        if (rhs.type === 'fn' || cmd.pat.val !== rhs.js_val) {
+        if (
+          (rhs.type !== 'int' &&
+            rhs.type !== 'real' &&
+            rhs.type !== 'char' &&
+            rhs.type !== 'string' &&
+            rhs.type !== 'bool') ||
+          // For constants containing values (non-unit), the values must be equal.
+          // Otherwise, we throw error
+          cmd.pat.val !== rhs.js_val
+        ) {
           throw new Error(
             `cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`
           )
@@ -262,7 +333,66 @@ const exec_microcode = (cmd: Microcode) => {
       } else {
         // TODO: handle more complicated patterns here.
         // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
+        throw new Error(`TODO: unimplemented ${cmd.pat}`)
       }
+      break
+    }
+    case 'DecsAfterLocalDecsI': {
+      rev_push(A, [
+        ...cmd.decs,
+        { tag: 'SetEnvParentI', oldParent: E, newParent: cmd.envBeforeLocalDecs }
+      ])
+      break
+    }
+    case 'ApplicationI': {
+      // TODO: handle tail calls
+      const arg = S.pop()!
+      const fn = S.pop()!
+
+      if (fn.type === 'builtin_fn') {
+        S.push(fn.apply(arg))
+        break
+      }
+
+      assert(fn.type === 'fn')
+
+      A.push({ tag: 'RestoreEnvI', env: E })
+      E = extend_env(fn.env)
+
+      let found_match = false
+      for (const { pat, exp } of fn.matches.matches) {
+        // Find the first pattern that matches the given arg, then
+        // perform relevant bindings, and evaluate the associated expression
+        if (
+          (pat.tag === 'IntConstant' && arg.type === 'int') ||
+          (pat.tag === 'FloatConstant' && arg.type === 'real') ||
+          (pat.tag === 'CharConstant' && arg.type === 'char') ||
+          (pat.tag === 'StringConstant' && arg.type === 'string')
+        ) {
+          const is_match = pat.val === arg.js_val
+          if (is_match) {
+            // Don't need to extend env here since both pat and args are constant
+            A.push(exp)
+            found_match = true
+          }
+        } else if (pat.tag === 'Variable') {
+          // variables match the arg by default
+          assign_in_env(E, pat.id, arg)
+          A.push(exp)
+          found_match = true
+        } else {
+          throw new Error(`TODO: unimplemented ${pat}`)
+        }
+
+        if (found_match) {
+          break
+        }
+      }
+
+      if (!found_match) {
+        throw new Error(`no match found for ${arg}`)
+      }
+
       break
     }
     default: {
@@ -277,8 +407,7 @@ const exec_microcode = (cmd: Microcode) => {
 export function evaluate(node: Node): Value {
   A = [node]
   S = []
-  // TODO: init env
-  E = { frame: {}, parent: undefined }
+  E = init_env()
 
   const step_limit = 1000000
   let i = 0

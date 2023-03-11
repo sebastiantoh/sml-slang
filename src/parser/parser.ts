@@ -23,14 +23,17 @@ import {
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
+  LocalDeclContext,
   MatchesContext,
   ParenthesesContext,
   PatConstantContext,
   PatmatchContext,
+  PatUnitContext,
   PatVariableContext,
   ProgContext,
   SmlParser,
   StringContext,
+  UnitContext,
   ValbindContext,
   ValueDeclContext
 } from '../lang/SmlParser'
@@ -50,12 +53,14 @@ import {
   InfixApplication,
   IntConstant,
   LetExpression,
+  LocalDeclaration,
   Match,
   Matches,
   Node,
   Pattern,
   Program,
   StringConstant,
+  UnitConstant,
   Valbind,
   ValueDeclaration,
   Variable
@@ -99,6 +104,11 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'BoolConstant',
       val: ctx.TRUE() !== undefined ? true : false
+    }
+  }
+  visitUnit(_ctx: UnitContext): UnitConstant {
+    return {
+      tag: 'UnitConstant'
     }
   }
 
@@ -170,7 +180,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   /**
    * Match
    */
-  visitPatMatch(ctx: PatmatchContext): Match {
+  visitPatmatch(ctx: PatmatchContext): Match {
     return {
       tag: 'Match',
       pat: this.visit(ctx.pat()) as Pattern,
@@ -190,6 +200,11 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitPatConstant(ctx: PatConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
   }
+  visitPatUnit(_ctx: PatUnitContext): UnitConstant {
+    return {
+      tag: 'UnitConstant'
+    }
+  }
   visitPatVariable(ctx: PatVariableContext): Variable {
     return {
       tag: 'Variable',
@@ -204,6 +219,13 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'ValueDeclaration',
       valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
+    }
+  }
+  visitLocalDecl(ctx: LocalDeclContext): LocalDeclaration {
+    return {
+      tag: 'LocalDeclaration',
+      localDecs: this.visit(ctx._localDecs) as DeclarationSequence,
+      decs: this.visit(ctx._decs) as DeclarationSequence
     }
   }
   visitDecSequence(ctx: DecSequenceContext): DeclarationSequence {

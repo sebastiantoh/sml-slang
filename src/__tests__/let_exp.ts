@@ -85,30 +85,30 @@ end
 `)
   ).toBe(`6`))
 
-test.skip('shadowed function calling function with same name in body', () =>
+test('shadowed function calling function with same name in body', () =>
   expect(
     parseAndEvaluateExp(`
 let
   val f = fn n => n + 1
   val f = fn n => f (f n)
 in
-  f(3)
-end;
+  f 3
+end
 `)
   ).toBe(`5`))
 
-test.skip('rec function without rec keyword', () =>
+test('rec function without rec keyword', () =>
   expect(() =>
     parseAndEvaluateExp(`
 let
   val f = fn n => if n = 0 then 1 else n * f (n - 1)
 in
-  f(3)
+  f 3
 end
 `)
-  ).toThrow()) // TODO: add more specific error
+  ).toThrow(/f not found in env/))
 
-test.skip('rec function with rec keyword', () =>
+test('rec function with rec keyword', () =>
   expect(
     parseAndEvaluateExp(`
 let
@@ -129,3 +129,112 @@ in
 end
 `)
   ).toThrow(/using rec requires binding a function/))
+
+test('function with multiple matches and function application arg matches with >1 of these patterns - should match with first possible match', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  val add_one_if_two = fn 2 => 3 | x => x
+in
+  add_one_if_two 2
+end
+`)
+  ).toEqual(`3`))
+
+test('function with multiple matches and function application arg only matches with 1 of these patterns', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  val add_one_if_two = fn 2 => 3 | x => x
+in
+  add_one_if_two 10
+end
+`)
+  ).toEqual(`10`))
+
+test('env is properly restored outside scope of function', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  val duplicate_name = 1000
+  val add_one = fn duplicate_name => duplicate_name + 1
+in
+  (add_one 2) + duplicate_name
+end
+`)
+  ).toEqual(`1003`))
+
+test('local declarations are accessible in subsequent declarations', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    val x = x + y
+  end
+in
+  x
+end
+`)
+  ).toBe(`3`))
+
+test('local declaration - accessing variable outside of scope', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    val x = x + y
+  end
+in
+  y
+end
+`)
+  ).toThrow(/y not found in env/))
+
+test('nested local declarations', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    local
+      val z = x + y
+    in
+      val x = x + y + z
+    end
+    val x = x
+  end
+in
+  x
+end
+`)
+  ).toBe(`6`))
+
+test('nested local declarations - accessing variable outside of scope', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  local
+    val x = 1
+    val y = 2
+  in
+    local
+      val z = x + y
+    in
+      val x = x + y + z
+      val k = z
+    end
+    val x = z
+  end
+in
+  x
+end
+`)
+  ).toThrow(/z not found in env/))

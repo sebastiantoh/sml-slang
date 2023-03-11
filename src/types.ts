@@ -2,7 +2,7 @@ import { Matches } from './parser/ast'
 
 // Represents a JS value and annotates it with its SML type
 // Should have a "type" field, denoting the SML type
-export type Value = Int | Real | String | Char | Bool | Fn
+export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn
 
 export interface Int {
   type: 'int'
@@ -29,10 +29,20 @@ export interface Bool {
   js_val: boolean
 }
 
+export interface Unit {
+  type: 'unit'
+}
+
 export interface Fn {
   type: 'fn' // not a real sml type (function should be typed based on args and return value)
   matches: Matches
   env: Environment
+}
+
+export interface BuiltinFn {
+  type: 'builtin_fn'
+  id: string
+  apply: (arg: Value) => Value
 }
 
 type EnvironmentFrame = { [k: string]: Value }

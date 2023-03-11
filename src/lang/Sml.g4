@@ -3,6 +3,7 @@ grammar Sml;
 /** Tokens */
 
 WHITESPACE: [ \r\n\t]+ -> skip;
+COMMENT: '(*' .*? '*)' -> skip;
 
 INT
     : '~'? NUM
@@ -42,6 +43,7 @@ RPAREN: ')';
 REC: 'rec';
 AND: 'and';
 SEMICOLON: ';';
+UNIT: '()';
 
 SLASH: '/';
 DIV: 'div';
@@ -75,12 +77,13 @@ con
     | CHAR             # Character
     | STRING           # String
     | (TRUE | FALSE)   # Boolean
+    | UNIT             # Unit
     ;
 
 exp
     : con                                                             # Constant
     | id=ID                                                           # ExpVariable
-    | fn=exp arg=exp                                                # Application
+    | fn=exp arg=exp                                                  # Application
     // Precedence levels can be found on Page 98 of https://smlfamily.github.io/sml90-defn.pdf
     | op1=exp id=(SLASH | DIV | MOD | STAR) op2=exp                   # InfixApplication
     | op1=exp id=(PLUS | MINUS | CARET) op2=exp                       # InfixApplication
@@ -105,11 +108,13 @@ matches: patmatch ('|' patmatch)*;
 
 pat
     : con                                                             # PatConstant
+    | UNIT                                                            # PatUnit
     | id=ID                                                           # PatVariable
     ;
 
 dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
+    | 'local' localDecs=decSequence 'in' decs=decSequence 'end'       # LocalDecl
     ;
 
 // TODO: everywhere that uses "dec" in the

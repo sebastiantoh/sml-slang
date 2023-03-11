@@ -24,7 +24,13 @@ export type Expression =
   | ConditionalExpression
   | Function
 
-export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant
+export type Constant =
+  | IntConstant
+  | FloatConstant
+  | StringConstant
+  | CharConstant
+  | BoolConstant
+  | UnitConstant
 export interface IntConstant extends BaseNode {
   tag: 'IntConstant'
   val: number
@@ -44,6 +50,9 @@ export interface CharConstant extends BaseNode {
 export interface BoolConstant extends BaseNode {
   tag: 'BoolConstant'
   val: boolean
+}
+export interface UnitConstant extends BaseNode {
+  tag: 'UnitConstant'
 }
 
 export interface Application extends BaseNode {
@@ -116,11 +125,17 @@ export interface DeclarationSequence extends BaseNode {
 }
 // TODO: FunctionDeclaration should not be a separate ast node. Should desugar to val rec fbind ^
 // (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
-export type Declaration = ValueDeclaration
+export type Declaration = ValueDeclaration | LocalDeclaration
 
 export interface ValueDeclaration extends BaseNode {
   tag: 'ValueDeclaration'
   valbinds: Array<Valbind>
+}
+
+export interface LocalDeclaration extends BaseNode {
+  tag: 'LocalDeclaration'
+  localDecs: DeclarationSequence
+  decs: DeclarationSequence
 }
 
 export interface Valbind extends BaseNode {

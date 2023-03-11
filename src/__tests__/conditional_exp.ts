@@ -22,3 +22,6 @@ test('else branch is not evaluated when pred is true', () =>
 
 test('then branch is not evaluated when pred is false', () =>
   expect(parseAndEvaluateExp('if 1=2 then 37 div 0 else 3')).toBe('3'))
+
+test('negated pred evaluating to true', () =>
+  expect(parseAndEvaluateExp('if not (1=2) then "then" else "else"')).toBe(`"then"`))
