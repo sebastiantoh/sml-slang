@@ -172,4 +172,20 @@ in
   x
 end
 `)).toThrow(/z not found in env/));
+test('funbind with multiple params', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  fun add x y = x + y
+in
+  add 2 3
+end
+`)).toBe(`5`));
+test('funbind with multiple params and partial application', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  fun add x y = x + y
+  val add_two = add 2
+  val add_three = add 3
+in
+  add_two (add_three 3)
+end
+`)).toBe(`8`));
 //# sourceMappingURL=let_exp.js.map

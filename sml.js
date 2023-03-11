@@ -43,7 +43,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val / b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     div: (a, b) => {
         if (a.type === 'int' && b.type === 'int') {
@@ -55,7 +55,7 @@ exports.builtinBinOperators = {
                 js_val: Math.floor(a.js_val / b.js_val)
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     mod: (a, b) => {
         if (a.type === 'int' && b.type === 'int') {
@@ -64,7 +64,7 @@ exports.builtinBinOperators = {
                 js_val: ((a.js_val % b.js_val) + b.js_val) % b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '*': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
@@ -73,7 +73,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val * b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '+': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
@@ -82,7 +82,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val + b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '-': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
@@ -91,7 +91,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val - b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '^': (a, b) => {
         if (a.type === 'string' && b.type === 'string') {
@@ -100,7 +100,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val.concat(b.js_val)
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '=': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') ||
@@ -112,7 +112,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val === b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '<>': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') ||
@@ -124,7 +124,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val !== b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '<': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') ||
@@ -136,7 +136,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val < b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '>': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') ||
@@ -148,7 +148,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val > b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '<=': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') ||
@@ -160,7 +160,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val <= b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     '>=': (a, b) => {
         if ((a.type === 'int' && b.type === 'int') ||
@@ -172,7 +172,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val >= b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     andalso: (a, b) => {
         if (a.type === 'bool' && b.type === 'bool') {
@@ -181,7 +181,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val && b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     },
     orelse: (a, b) => {
         if (a.type === 'bool' && b.type === 'bool') {
@@ -190,7 +190,7 @@ exports.builtinBinOperators = {
                 js_val: a.js_val || b.js_val
             };
         }
-        throw new Error('invalid types');
+        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
     }
 };
 exports.builtinFns = [
@@ -204,7 +204,7 @@ exports.builtinFns = [
                     js_val: arg.js_val.length
                 };
             }
-            throw new Error('invalid types');
+            throw new Error(`invalid types - received ${arg.type}`);
         }
     },
     {
@@ -217,7 +217,7 @@ exports.builtinFns = [
                     js_val: !arg.js_val
                 };
             }
-            throw new Error('invalid types');
+            throw new Error(`invalid types - received ${arg.type}`);
         }
     }
 ];

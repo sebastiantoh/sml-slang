@@ -237,7 +237,7 @@ const exec_microcode = (cmd) => {
         case 'BinLogicalOpI': {
             const fst = S.pop();
             if (fst.type !== 'bool') {
-                throw new Error('invalid types');
+                throw new Error(`invalid types - received ${fst.type}`);
             }
             // Perform shortcircuiting if possible
             if (cmd.id === 'orelse' && fst.js_val) {

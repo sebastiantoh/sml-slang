@@ -9,6 +9,7 @@ import { StringContext } from "./SmlParser";
 import { BooleanContext } from "./SmlParser";
 import { UnitContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
+import { FunDeclContext } from "./SmlParser";
 import { LocalDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
@@ -28,6 +29,9 @@ import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { DecSequenceContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
+import { FunbindContext } from "./SmlParser";
+import { FunmatchesContext } from "./SmlParser";
+import { FunmatchContext } from "./SmlParser";
 import { ProgContext } from "./SmlParser";
 /**
  * This interface defines a complete generic visitor for a parse tree produced
@@ -107,6 +111,13 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitValueDecl?: (ctx: ValueDeclContext) => Result;
+    /**
+     * Visit a parse tree produced by the `FunDecl`
+     * labeled alternative in `SmlParser.dec`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFunDecl?: (ctx: FunDeclContext) => Result;
     /**
      * Visit a parse tree produced by the `LocalDecl`
      * labeled alternative in `SmlParser.dec`.
@@ -232,6 +243,24 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitValbind?: (ctx: ValbindContext) => Result;
+    /**
+     * Visit a parse tree produced by `SmlParser.funbind`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFunbind?: (ctx: FunbindContext) => Result;
+    /**
+     * Visit a parse tree produced by `SmlParser.funmatches`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFunmatches?: (ctx: FunmatchesContext) => Result;
+    /**
+     * Visit a parse tree produced by `SmlParser.funmatch`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFunmatch?: (ctx: FunmatchContext) => Result;
     /**
      * Visit a parse tree produced by `SmlParser.prog`.
      * @param ctx the parse tree

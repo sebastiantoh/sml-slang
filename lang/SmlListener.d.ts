@@ -9,6 +9,7 @@ import { StringContext } from "./SmlParser";
 import { BooleanContext } from "./SmlParser";
 import { UnitContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
+import { FunDeclContext } from "./SmlParser";
 import { LocalDeclContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
@@ -28,6 +29,9 @@ import { PatContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { DecSequenceContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
+import { FunbindContext } from "./SmlParser";
+import { FunmatchesContext } from "./SmlParser";
+import { FunmatchContext } from "./SmlParser";
 import { ProgContext } from "./SmlParser";
 /**
  * This interface defines a complete listener for a parse tree produced by
@@ -154,6 +158,18 @@ export interface SmlListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitValueDecl?: (ctx: ValueDeclContext) => void;
+    /**
+     * Enter a parse tree produced by the `FunDecl`
+     * labeled alternative in `SmlParser.dec`.
+     * @param ctx the parse tree
+     */
+    enterFunDecl?: (ctx: FunDeclContext) => void;
+    /**
+     * Exit a parse tree produced by the `FunDecl`
+     * labeled alternative in `SmlParser.dec`.
+     * @param ctx the parse tree
+     */
+    exitFunDecl?: (ctx: FunDeclContext) => void;
     /**
      * Enter a parse tree produced by the `LocalDecl`
      * labeled alternative in `SmlParser.dec`.
@@ -366,6 +382,36 @@ export interface SmlListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitValbind?: (ctx: ValbindContext) => void;
+    /**
+     * Enter a parse tree produced by `SmlParser.funbind`.
+     * @param ctx the parse tree
+     */
+    enterFunbind?: (ctx: FunbindContext) => void;
+    /**
+     * Exit a parse tree produced by `SmlParser.funbind`.
+     * @param ctx the parse tree
+     */
+    exitFunbind?: (ctx: FunbindContext) => void;
+    /**
+     * Enter a parse tree produced by `SmlParser.funmatches`.
+     * @param ctx the parse tree
+     */
+    enterFunmatches?: (ctx: FunmatchesContext) => void;
+    /**
+     * Exit a parse tree produced by `SmlParser.funmatches`.
+     * @param ctx the parse tree
+     */
+    exitFunmatches?: (ctx: FunmatchesContext) => void;
+    /**
+     * Enter a parse tree produced by `SmlParser.funmatch`.
+     * @param ctx the parse tree
+     */
+    enterFunmatch?: (ctx: FunmatchContext) => void;
+    /**
+     * Exit a parse tree produced by `SmlParser.funmatch`.
+     * @param ctx the parse tree
+     */
+    exitFunmatch?: (ctx: FunmatchContext) => void;
     /**
      * Enter a parse tree produced by `SmlParser.prog`.
      * @param ctx the parse tree
