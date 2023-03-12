@@ -188,4 +188,28 @@ in
   add_two (add_three 3)
 end
 `)).toBe(`8`));
+test('tail recursive function', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  fun add x y = x + y
+  fun fact n acc =
+    if n = 0 then
+      acc
+    else
+      fact (n - 1) (acc * n)
+in
+  (add 2 (fact 5 1))
+end
+`)).toBe(`122`));
+test('tail recursive function - env is properly restored', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`
+let
+  fun add x y = x + y
+  fun fact n acc =
+    if n = 0 then
+      acc
+    else
+      fact (n - 1) (acc * n)
+in
+  (fact 5 1) + acc
+end
+`)).toThrow(/acc not found in env/));
 //# sourceMappingURL=let_exp.js.map

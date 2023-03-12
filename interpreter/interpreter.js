@@ -39,6 +39,12 @@ const reverse = (arr) => {
     copy.reverse();
     return copy;
 };
+function peek(stack) {
+    if (stack.length === 0) {
+        return undefined;
+    }
+    return stack[-1];
+}
 const rev_push = (stack, items) => {
     stack.push(...reverse(items));
 };
@@ -57,6 +63,7 @@ const interleave = (microcodes, instruction) => {
 // Without this wrapping, the declaration of a const x in one case, would prevent
 // the declaration of the same const x in another disjoint case
 const exec_microcode = (cmd) => {
+    var _a, _b;
     switch (cmd.tag) {
         /**
          * Node Tags
@@ -327,7 +334,6 @@ const exec_microcode = (cmd) => {
             break;
         }
         case 'ApplicationI': {
-            // TODO: handle tail calls
             const arg = S.pop();
             const fn = S.pop();
             if (fn.type === 'builtin_fn') {
@@ -335,8 +341,25 @@ const exec_microcode = (cmd) => {
                 break;
             }
             assert(fn.type === 'fn');
-            A.push({ tag: 'RestoreEnvI', env: E });
+            if (A.length === 0 || ((_a = peek(A)) === null || _a === void 0 ? void 0 : _a.tag) === 'RestoreEnvI') {
+                // Implies no more agenda items that needs to be evaluated with the current env.
+                // Just push mark, and not RestoreEnvI
+                A.push({ tag: 'MarkEndOfFnBodyI' });
+            }
+            else if (((_b = peek(A)) === null || _b === void 0 ? void 0 : _b.tag) === 'MarkEndOfFnBodyI') {
+                // The current 'ApplicationI' is a tail call since this
+                // ApplicationI is the last thing that has to be evaluated before reaching
+                // the end of the caller function body (the one that pushed the MarkEndOfFnbodyI)
+                // We don't need to:
+                // - push RestoreEnvI since we have nothing else to evaluate under the current env
+                // - push MarkEndOfFnBodyI since it's already on the top of the agenda
+                // i.e. we do nothing in this block
+            }
+            else {
+                A.push({ tag: 'RestoreEnvI', env: E }, { tag: 'MarkEndOfFnBodyI' });
+            }
             E = extend_env(fn.env);
+            // Bind params (if necessary) and evaluate function body
             let found_match = false;
             for (const { pat, exp } of fn.matches.matches) {
                 // Find the first pattern that matches the given arg, then
@@ -347,7 +370,7 @@ const exec_microcode = (cmd) => {
                     (pat.tag === 'StringConstant' && arg.type === 'string')) {
                     const is_match = pat.val === arg.js_val;
                     if (is_match) {
-                        // Don't need to extend env here since both pat and args are constant
+                        // Don't need to assign in env here since both pat and args are constant
                         A.push(exp);
                         found_match = true;
                     }
@@ -368,6 +391,10 @@ const exec_microcode = (cmd) => {
             if (!found_match) {
                 throw new Error(`no match found for ${arg}`);
             }
+            break;
+        }
+        case 'MarkEndOfFnBodyI': {
+            // do nothing
             break;
         }
         default: {
