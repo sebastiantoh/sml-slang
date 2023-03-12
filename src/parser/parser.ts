@@ -19,7 +19,9 @@ import {
   ExpContext,
   ExpVariableContext,
   FloatingPointContext,
+  FunbindContext,
   FunctionContext,
+  FunDeclContext,
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
@@ -221,6 +223,14 @@ class NodeGenerator implements SmlVisitor<Node> {
       valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
     }
   }
+  visitFunDecl(ctx: FunDeclContext): ValueDeclaration {
+    // function declarations are syntatic sugar for value declarations:
+    // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
+    return {
+      tag: 'ValueDeclaration',
+      valbinds: ctx.funbind().map((fb: FunbindContext) => this.visit(fb) as Valbind)
+    }
+  }
   visitLocalDecl(ctx: LocalDeclContext): LocalDeclaration {
     return {
       tag: 'LocalDeclaration',
@@ -244,6 +254,80 @@ class NodeGenerator implements SmlVisitor<Node> {
       is_rec: ctx.REC() !== undefined,
       pat: this.visit(ctx.pat()) as Pattern,
       exp: this.visit(ctx.exp()) as Expression
+    }
+  }
+
+  /**
+   * Funbind
+   */
+  visitFunbind(ctx: FunbindContext): Valbind {
+    // Desugar funbind into valbind
+    // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
+
+    const funMatches = ctx.funmatches().funmatch()
+    const fnName = funMatches[0].ID().text
+    const nParams = funMatches[0].pat().length
+    const matches: Array<Match> = []
+
+    // TODO: delete this specific case once multiple cases have been supported
+    if (funMatches.length === 1) {
+      const funMatch = funMatches[0]
+      const params = funMatch.pat().map(p => this.visit(p) as Pattern)
+      let exp = this.visit(funMatch.exp()) as Expression
+
+      // Exclude first param, iterate in reverse, and reconstruct the full curried function
+      params
+        .slice(1)
+        .reverse()
+        .forEach(p => {
+          const fn = {
+            tag: 'Function',
+            matches: { tag: 'Matches', matches: [{ tag: 'Match', pat: p, exp }] }
+          } as Function
+          exp = fn
+        })
+
+      const match = {
+        tag: 'Match',
+        pat: params[0],
+        exp: exp
+      } as Match
+      matches.push(match)
+    } else {
+      // Each funmatch correspond to a separate case. Each case can contain >= 1 parameter (or patterns)
+      for (const funMatch of funMatches) {
+        const id = funMatch.ID().text
+        const tmpNumParams = funMatch.pat().length
+
+        // across each case, the function name and number of parameters
+        // must be the same
+        if (funMatch.ID().text !== fnName) {
+          /*
+          Example where function names are different:
+          fun f 1 = 2
+            | x 2 = 3
+          */
+          throw new Error(`Different function names in different cases ("${fnName}" vs. "${id}")`)
+        } else if (tmpNumParams !== nParams) {
+          /*
+          Example where number of params are different:
+          fun f 1 = 2
+            | f = 3
+          */
+          throw new Error(`Different number of params in different cases`)
+        }
+
+        throw new Error(
+          "TODO: multiple cases for functions not yet implemented. Implement this once 'case (...) of ...' has been implemeneted"
+        )
+      }
+    }
+
+    return {
+      tag: 'Valbind',
+      is_rec: true,
+      pat: { tag: 'Variable', id: fnName },
+      exp: { tag: 'Function', matches: { tag: 'Matches', matches } }
     }
   }
 

@@ -255,7 +255,7 @@ const exec_microcode = (cmd: Microcode) => {
       const fst = S.pop()!
 
       if (fst.type !== 'bool') {
-        throw new Error('invalid types')
+        throw new Error(`invalid types - received ${fst.type}`)
       }
 
       // Perform shortcircuiting if possible
