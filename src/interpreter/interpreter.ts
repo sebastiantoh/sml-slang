@@ -8,7 +8,7 @@ import { Instruction } from './instructions'
 type Microcode = Node | Instruction
 
 // TODO: integrate this with frontend's output
-export const stdout: Array<String> = []
+export let stdout: Array<String> = []
 let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
@@ -124,6 +124,10 @@ const exec_microcode = (cmd: Microcode) => {
         cmd.operand2,
         cmd.operand1
       )
+      break
+    }
+    case 'ExpSequence': {
+      rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
       break
     }
     case 'LetExpression': {
@@ -411,6 +415,7 @@ export function evaluate(node: Node) {
   A = [node]
   S = []
   E = init_env()
+  stdout = []
 
   const step_limit = 1000000
   let i = 0

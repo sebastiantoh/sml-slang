@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`factorial.sml 1`] = `
+"3628800
+2432902008176640000
+2.652528598121911e+32
+"
+`;

@@ -17,6 +17,7 @@ import {
   DecSequenceContext,
   DisjunctionContext,
   ExpContext,
+  ExpSequenceContext,
   ExpVariableContext,
   FloatingPointContext,
   FunbindContext,
@@ -50,6 +51,7 @@ import {
   Declaration,
   DeclarationSequence,
   Expression,
+  ExpSequence,
   FloatConstant,
   Function,
   InfixApplication,
@@ -136,6 +138,12 @@ class NodeGenerator implements SmlVisitor<Node> {
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
       id: ctx._id.text!
+    }
+  }
+  visitExpSequence(ctx: ExpSequenceContext): ExpSequence {
+    return {
+      tag: 'ExpSequence',
+      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
     }
   }
   visitParentheses(ctx: ParenthesesContext): Expression {

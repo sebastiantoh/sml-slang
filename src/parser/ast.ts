@@ -19,6 +19,7 @@ export type Expression =
   | Constant
   | Application
   | InfixApplication
+  | ExpSequence
   | LetExpression
   | BinaryLogicalOperator
   | ConditionalExpression
@@ -66,6 +67,11 @@ export interface InfixApplication extends BaseNode {
   operand1: Expression
   operand2: Expression
   id: string
+}
+
+export interface ExpSequence extends BaseNode {
+  tag: 'ExpSequence'
+  exps: Array<Expression>
 }
 
 export interface LetExpression extends BaseNode {
