@@ -161,7 +161,10 @@ const exec_microcode = (cmd: Microcode) => {
       S.push({
         type: 'fn',
         matches: cmd.matches,
-        env: E
+        // note: we create a copy of this env since the env may be mutated, e.g:
+        // in a local declaration, the parent of E will be mutated
+        // TODO: deep copy needed?
+        env: { ...E }
       })
       break
     }
