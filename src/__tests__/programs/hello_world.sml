@@ -1,1 +1,1 @@
-val () = print "hello world"
+val () = print ("hello" ^ " world!")

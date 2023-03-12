@@ -1,3 +1,4 @@
+import { stdout } from './interpreter/interpreter'
 import { BuiltinFn, Value } from './types'
 
 export const valueToString = (sml_val: Value) => {
@@ -206,6 +207,16 @@ export const builtinBinOperators = {
 }
 
 export const builtinFns: Array<BuiltinFn> = [
+  {
+    type: 'builtin_fn',
+    id: 'print',
+    apply: (arg: Value) => {
+      stdout.push(valueToString(arg) + '\n')
+      return {
+        type: 'unit'
+      }
+    }
+  },
   {
     type: 'builtin_fn',
     id: 'size',

@@ -1,11 +1,14 @@
 import * as assert from 'assert'
 
-import { Node } from '../parser/ast'
+import { Expression, Node, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { Environment, Value } from '../types'
 import { Instruction } from './instructions'
 
 type Microcode = Node | Instruction
+
+// TODO: integrate this with frontend's output
+export const stdout: Array<String> = []
 let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
@@ -404,7 +407,7 @@ const exec_microcode = (cmd: Microcode) => {
   }
 }
 
-export function evaluate(node: Node): Value {
+export function evaluate(node: Node) {
   A = [node]
   S = []
   E = init_env()
@@ -420,8 +423,20 @@ export function evaluate(node: Node): Value {
   if (i === step_limit) {
     throw new Error(`step limit ${step_limit} exceeded`)
   }
-  if (S.length != 1) {
+}
+
+export function evaluateExp(exp: Expression): Value {
+  evaluate(exp)
+  if (S.length !== 1) {
     throw new Error(`internal error: stash must be singleton but is: ${S}`)
   }
   return S[0]
+}
+
+export function evaluateProg(prog: Program): string {
+  evaluate(prog)
+  if (S.length !== 0) {
+    throw new Error(`internal error: stash must be empty but is: ${S}`)
+  }
+  return stdout.join('')
 }
