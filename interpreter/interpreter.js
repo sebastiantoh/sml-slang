@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.evaluate = void 0;
+exports.evaluateProg = exports.evaluateExp = exports.evaluate = exports.stdout = void 0;
 const assert = require("assert");
 const Sml = require("../sml");
+// TODO: integrate this with frontend's output
+exports.stdout = [];
 let A = [];
 let S = [];
 let E = { frame: {}, parent: undefined };
@@ -109,6 +111,10 @@ const exec_microcode = (cmd) => {
                 tag: 'BinOpI',
                 id: cmd.id
             }, cmd.operand2, cmd.operand1);
+            break;
+        }
+        case 'ExpSequence': {
+            rev_push(A, interleave(cmd.exps, { tag: 'PopI' }));
             break;
         }
         case 'LetExpression': {
@@ -376,6 +382,7 @@ function evaluate(node) {
     A = [node];
     S = [];
     E = init_env();
+    exports.stdout = [];
     const step_limit = 1000000;
     let i = 0;
     while (i < step_limit) {
@@ -388,10 +395,22 @@ function evaluate(node) {
     if (i === step_limit) {
         throw new Error(`step limit ${step_limit} exceeded`);
     }
-    if (S.length != 1) {
+}
+exports.evaluate = evaluate;
+function evaluateExp(exp) {
+    evaluate(exp);
+    if (S.length !== 1) {
         throw new Error(`internal error: stash must be singleton but is: ${S}`);
     }
     return S[0];
 }
-exports.evaluate = evaluate;
+exports.evaluateExp = evaluateExp;
+function evaluateProg(prog) {
+    evaluate(prog);
+    if (S.length !== 0) {
+        throw new Error(`internal error: stash must be empty but is: ${S}`);
+    }
+    return exports.stdout.join('');
+}
+exports.evaluateProg = evaluateProg;
 //# sourceMappingURL=interpreter.js.map

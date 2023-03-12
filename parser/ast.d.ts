@@ -5,7 +5,7 @@ interface BaseNode {
 /**
  * Expressions
  */
-export type Expression = Constant | Application | InfixApplication | LetExpression | BinaryLogicalOperator | ConditionalExpression | Function;
+export type Expression = Constant | Application | InfixApplication | ExpSequence | LetExpression | BinaryLogicalOperator | ConditionalExpression | Function;
 export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant | UnitConstant;
 export interface IntConstant extends BaseNode {
     tag: 'IntConstant';
@@ -40,6 +40,10 @@ export interface InfixApplication extends BaseNode {
     operand1: Expression;
     operand2: Expression;
     id: string;
+}
+export interface ExpSequence extends BaseNode {
+    tag: 'ExpSequence';
+    exps: Array<Expression>;
 }
 export interface LetExpression extends BaseNode {
     tag: 'LetExpression';

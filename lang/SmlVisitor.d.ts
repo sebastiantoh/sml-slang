@@ -16,6 +16,7 @@ import { ExpVariableContext } from "./SmlParser";
 import { ApplicationContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
+import { ExpSequenceContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
 import { ConjunctionContext } from "./SmlParser";
 import { DisjunctionContext } from "./SmlParser";
@@ -160,6 +161,13 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitParentheses?: (ctx: ParenthesesContext) => Result;
+    /**
+     * Visit a parse tree produced by the `ExpSequence`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitExpSequence?: (ctx: ExpSequenceContext) => Result;
     /**
      * Visit a parse tree produced by the `LetExpression`
      * labeled alternative in `SmlParser.exp`.

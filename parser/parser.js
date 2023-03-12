@@ -74,6 +74,12 @@ class NodeGenerator {
             id: ctx._id.text
         };
     }
+    visitExpSequence(ctx) {
+        return {
+            tag: 'ExpSequence',
+            exps: ctx.exp().map((ec) => this.visit(ec))
+        };
+    }
     visitParentheses(ctx) {
         return this.visit(ctx.exp());
     }

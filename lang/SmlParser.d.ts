@@ -209,6 +209,18 @@ export declare class ParenthesesContext extends ExpContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
+export declare class ExpSequenceContext extends ExpContext {
+    LPAREN(): TerminalNode;
+    exp(): ExpContext[];
+    exp(i: number): ExpContext;
+    RPAREN(): TerminalNode;
+    SEMICOLON(): TerminalNode[];
+    SEMICOLON(i: number): TerminalNode;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
 export declare class LetExpressionContext extends ExpContext {
     decSequence(): DecSequenceContext;
     exp(): ExpContext[];

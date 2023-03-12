@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.builtinFns = exports.builtinBinOperators = exports.valueToString = void 0;
+const interpreter_1 = require("./interpreter/interpreter");
 const valueToString = (sml_val) => {
     switch (sml_val.type) {
         case 'int':
@@ -194,6 +195,16 @@ exports.builtinBinOperators = {
     }
 };
 exports.builtinFns = [
+    {
+        type: 'builtin_fn',
+        id: 'print',
+        apply: (arg) => {
+            interpreter_1.stdout.push((0, exports.valueToString)(arg) + '\n');
+            return {
+                type: 'unit'
+            };
+        }
+    },
     {
         type: 'builtin_fn',
         id: 'size',
