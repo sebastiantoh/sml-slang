@@ -46,6 +46,12 @@ const reverse = (arr: Array<any>) => {
   copy.reverse()
   return copy
 }
+function peek<T>(stack: Array<T>): T | undefined {
+  if (stack.length === 0) {
+    return undefined
+  }
+  return stack[-1]
+}
 const rev_push = (stack: Array<any>, items: any[]) => {
   stack.push(...reverse(items))
 }
@@ -352,7 +358,6 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'ApplicationI': {
-      // TODO: handle tail calls
       const arg = S.pop()!
       const fn = S.pop()!
 
@@ -363,9 +368,24 @@ const exec_microcode = (cmd: Microcode) => {
 
       assert(fn.type === 'fn')
 
-      A.push({ tag: 'RestoreEnvI', env: E })
+      if (A.length === 0 || peek(A)?.tag === 'RestoreEnvI') {
+        // Implies no more agenda items that needs to be evaluated with the current env.
+        // Just push mark, and not RestoreEnvI
+        A.push({ tag: 'MarkEndOfFnBodyI' })
+      } else if (peek(A)?.tag === 'MarkEndOfFnBodyI') {
+        // The current 'ApplicationI' is a tail call since this
+        // ApplicationI is the last thing that has to be evaluated before reaching
+        // the end of the caller function body (the one that pushed the MarkEndOfFnbodyI)
+        // We don't need to:
+        // - push RestoreEnvI since we have nothing else to evaluate under the current env
+        // - push MarkEndOfFnBodyI since it's already on the top of the agenda
+        // i.e. we do nothing in this block
+      } else {
+        A.push({ tag: 'RestoreEnvI', env: E }, { tag: 'MarkEndOfFnBodyI' })
+      }
       E = extend_env(fn.env)
 
+      // Bind params (if necessary) and evaluate function body
       let found_match = false
       for (const { pat, exp } of fn.matches.matches) {
         // Find the first pattern that matches the given arg, then
@@ -378,7 +398,7 @@ const exec_microcode = (cmd: Microcode) => {
         ) {
           const is_match = pat.val === arg.js_val
           if (is_match) {
-            // Don't need to extend env here since both pat and args are constant
+            // Don't need to assign in env here since both pat and args are constant
             A.push(exp)
             found_match = true
           }
@@ -400,6 +420,10 @@ const exec_microcode = (cmd: Microcode) => {
         throw new Error(`no match found for ${arg}`)
       }
 
+      break
+    }
+    case 'MarkEndOfFnBodyI': {
+      // do nothing
       break
     }
     default: {
