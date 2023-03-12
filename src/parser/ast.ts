@@ -123,8 +123,7 @@ export interface DeclarationSequence extends BaseNode {
   tag: 'DeclarationSequence'
   decs: Array<Declaration>
 }
-// TODO: FunctionDeclaration should not be a separate ast node. Should desugar to val rec fbind ^
-// (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
+
 export type Declaration = ValueDeclaration | LocalDeclaration
 
 export interface ValueDeclaration extends BaseNode {

@@ -120,8 +120,7 @@ dec
 
 // TODO: everywhere that uses "dec" in the
 // grammar rules online should be replaced with this instead
-// also does this work for dec ; dec? - might need to remove the trailing ;
-decSequence: (dec SEMICOLON?)+;
+decSequence: (dec SEMICOLON?)* dec;
 
 valbind: REC? pat EQ exp;
 
