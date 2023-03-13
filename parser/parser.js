@@ -212,6 +212,8 @@ class NodeGenerator {
     visitFunDecl(ctx) {
         // function declarations are syntatic sugar for value declarations:
         // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
+        // TODO: this desugaring doesn't work for mutually recursive function :'(
+        // For more info: https://stackoverflow.com/questions/63428214/declaring-interdependent-values-and-functions-in-standard-ml
         return {
             tag: 'ValueDeclaration',
             valbinds: ctx.funbind().map((fb) => this.visit(fb)),
