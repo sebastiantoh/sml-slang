@@ -67,7 +67,7 @@ export interface Context<T = any> {
     /** Runtime specific state */
     runtime: {
         isRunning: boolean;
-        environments: Environment[];
+        environments: EnvironmentTemp[];
         value: any;
         nodes: Node[];
     };

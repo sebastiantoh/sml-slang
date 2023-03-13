@@ -5,6 +5,19 @@ exports.parseExp = exports.parseProg = void 0;
 const antlr4ts_1 = require("antlr4ts");
 const SmlLexer_1 = require("../lang/SmlLexer");
 const SmlParser_1 = require("../lang/SmlParser");
+// TODO: move to parser/utils.ts?
+function contextToLocation(ctx) {
+    return {
+        start: {
+            line: ctx.start.line,
+            column: ctx.start.charPositionInLine
+        },
+        end: {
+            line: ctx.stop ? ctx.stop.line : ctx.start.line,
+            column: ctx.stop ? ctx.stop.charPositionInLine : ctx.start.charPositionInLine
+        }
+    };
+}
 class NodeGenerator {
     /**
      * Constants
@@ -57,13 +70,18 @@ class NodeGenerator {
         return this.visit(ctx.con());
     }
     visitExpVariable(ctx) {
-        return { tag: 'Variable', id: ctx._id.text };
+        return {
+            tag: 'Variable',
+            id: ctx._id.text,
+            loc: contextToLocation(ctx)
+        };
     }
     visitApplication(ctx) {
         return {
             tag: 'Application',
             fn: this.visit(ctx._fn),
-            arg: this.visit(ctx._arg)
+            arg: this.visit(ctx._arg),
+            loc: contextToLocation(ctx)
         };
     }
     visitInfixApplication(ctx) {
@@ -71,7 +89,8 @@ class NodeGenerator {
             tag: 'InfixApplication',
             operand1: this.visit(ctx._op1),
             operand2: this.visit(ctx._op2),
-            id: ctx._id.text
+            id: ctx._id.text,
+            loc: contextToLocation(ctx)
         };
     }
     visitExpSequence(ctx) {
@@ -87,7 +106,8 @@ class NodeGenerator {
         return {
             tag: 'LetExpression',
             decSequence: this.visit(ctx.decSequence()),
-            exps: ctx.exp().map((ec) => this.visit(ec))
+            exps: ctx.exp().map((ec) => this.visit(ec)),
+            loc: contextToLocation(ctx)
         };
     }
     visitConjunction(ctx) {
@@ -95,7 +115,8 @@ class NodeGenerator {
             tag: 'BinaryLogicalOperator',
             operand1: this.visit(ctx._op1),
             operand2: this.visit(ctx._op2),
-            id: ctx.ANDALSO().text
+            id: ctx.ANDALSO().text,
+            loc: contextToLocation(ctx)
         };
     }
     visitDisjunction(ctx) {
@@ -103,7 +124,8 @@ class NodeGenerator {
             tag: 'BinaryLogicalOperator',
             operand1: this.visit(ctx._op1),
             operand2: this.visit(ctx._op2),
-            id: ctx.ORELSE().text
+            id: ctx.ORELSE().text,
+            loc: contextToLocation(ctx)
         };
     }
     visitConditional(ctx) {
@@ -111,13 +133,15 @@ class NodeGenerator {
             tag: 'ConditionalExpression',
             pred: this.visit(ctx._pred),
             consequent: this.visit(ctx._cons),
-            alternative: this.visit(ctx._alt)
+            alternative: this.visit(ctx._alt),
+            loc: contextToLocation(ctx)
         };
     }
     visitFunction(ctx) {
         return {
             tag: 'Function',
-            matches: this.visit(ctx.matches())
+            matches: this.visit(ctx.matches()),
+            loc: contextToLocation(ctx)
         };
     }
     /**
@@ -127,13 +151,15 @@ class NodeGenerator {
         return {
             tag: 'Match',
             pat: this.visit(ctx.pat()),
-            exp: this.visit(ctx.exp())
+            exp: this.visit(ctx.exp()),
+            loc: contextToLocation(ctx)
         };
     }
     visitMatches(ctx) {
         return {
             tag: 'Matches',
-            matches: ctx.patmatch().map((m) => this.visit(m))
+            matches: ctx.patmatch().map((m) => this.visit(m)),
+            loc: contextToLocation(ctx)
         };
     }
     /**
@@ -150,7 +176,8 @@ class NodeGenerator {
     visitPatVariable(ctx) {
         return {
             tag: 'Variable',
-            id: ctx._id.text
+            id: ctx._id.text,
+            loc: contextToLocation(ctx)
         };
     }
     /**
@@ -159,7 +186,8 @@ class NodeGenerator {
     visitValueDecl(ctx) {
         return {
             tag: 'ValueDeclaration',
-            valbinds: ctx.valbind().map((vb) => this.visit(vb))
+            valbinds: ctx.valbind().map((vb) => this.visit(vb)),
+            loc: contextToLocation(ctx)
         };
     }
     visitFunDecl(ctx) {
@@ -167,20 +195,23 @@ class NodeGenerator {
         // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
         return {
             tag: 'ValueDeclaration',
-            valbinds: ctx.funbind().map((fb) => this.visit(fb))
+            valbinds: ctx.funbind().map((fb) => this.visit(fb)),
+            loc: contextToLocation(ctx)
         };
     }
     visitLocalDecl(ctx) {
         return {
             tag: 'LocalDeclaration',
             localDecs: this.visit(ctx._localDecs),
-            decs: this.visit(ctx._decs)
+            decs: this.visit(ctx._decs),
+            loc: contextToLocation(ctx)
         };
     }
     visitDecSequence(ctx) {
         return {
             tag: 'DeclarationSequence',
-            decs: ctx.dec().map((d) => this.visit(d))
+            decs: ctx.dec().map((d) => this.visit(d)),
+            loc: contextToLocation(ctx)
         };
     }
     /**
@@ -191,7 +222,8 @@ class NodeGenerator {
             tag: 'Valbind',
             is_rec: ctx.REC() !== undefined,
             pat: this.visit(ctx.pat()),
-            exp: this.visit(ctx.exp())
+            exp: this.visit(ctx.exp()),
+            loc: contextToLocation(ctx)
         };
     }
     /**
@@ -215,6 +247,7 @@ class NodeGenerator {
                 .reverse()
                 .forEach(p => {
                 const fn = {
+                    // TODO: do we want to keep track of the locations of each of these functions?
                     tag: 'Function',
                     matches: { tag: 'Matches', matches: [{ tag: 'Match', pat: p, exp }] }
                 };
@@ -257,7 +290,8 @@ class NodeGenerator {
             tag: 'Valbind',
             is_rec: true,
             pat: { tag: 'Variable', id: fnName },
-            exp: { tag: 'Function', matches: { tag: 'Matches', matches } }
+            exp: { tag: 'Function', matches: { tag: 'Matches', matches } },
+            loc: contextToLocation(ctx)
         };
     }
     /**

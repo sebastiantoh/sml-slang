@@ -1,6 +1,8 @@
+import { SourceLocation } from '../types';
 export type Node = Expression | Match | Matches | Pattern | Declaration | DeclarationSequence | Valbind | Program;
 interface BaseNode {
     tag: string;
+    loc?: SourceLocation;
 }
 /**
  * Expressions
