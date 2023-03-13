@@ -1,7 +1,7 @@
 "use strict";
 // Generated from src/lang/Sml.g4 by ANTLR 4.9.0-SNAPSHOT
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProgContext = exports.FunmatchContext = exports.FunmatchesContext = exports.FunbindContext = exports.ValbindContext = exports.DecSequenceContext = exports.LocalDeclContext = exports.FunDeclContext = exports.ValueDeclContext = exports.DecContext = exports.PatVariableContext = exports.PatUnitContext = exports.PatConstantContext = exports.PatContext = exports.MatchesContext = exports.PatmatchContext = exports.FunctionContext = exports.ConditionalContext = exports.DisjunctionContext = exports.ConjunctionContext = exports.LetExpressionContext = exports.ExpSequenceContext = exports.ParenthesesContext = exports.InfixApplicationContext = exports.ApplicationContext = exports.ExpVariableContext = exports.ConstantContext = exports.ExpContext = exports.UnitContext = exports.BooleanContext = exports.StringContext = exports.CharacterContext = exports.FloatingPointContext = exports.IntegerContext = exports.ConContext = exports.SmlParser = void 0;
+exports.ProgContext = exports.FunmatchContext = exports.FunmatchesContext = exports.FunbindContext = exports.ValbindContext = exports.DecSequenceContext = exports.LocalDeclContext = exports.FunDeclContext = exports.ValueDeclContext = exports.DecContext = exports.PatVariableContext = exports.PatUnitContext = exports.PatConstantContext = exports.PatContext = exports.MatchesContext = exports.PatmatchContext = exports.FunctionContext = exports.ConditionalContext = exports.DisjunctionContext = exports.ConjunctionContext = exports.LetExpressionContext = exports.ExpSequenceContext = exports.ParenthesesContext = exports.InfixApplicationContext = exports.ApplicationContext = exports.ExpVariableContext = exports.ConstantContext = exports.ExpContext = exports.UnitContext = exports.BooleanContext = exports.StringContext = exports.CharacterContext = exports.RealContext = exports.IntegerContext = exports.ConContext = exports.SmlParser = void 0;
 const ATN_1 = require("antlr4ts/atn/ATN");
 const ATNDeserializer_1 = require("antlr4ts/atn/ATNDeserializer");
 const FailedPredicateException_1 = require("antlr4ts/FailedPredicateException");
@@ -50,12 +50,12 @@ class SmlParser extends Parser_1.Parser {
                         this.match(SmlParser.INT);
                     }
                     break;
-                case SmlParser.FLOAT:
-                    _localctx = new FloatingPointContext(_localctx);
+                case SmlParser.REAL:
+                    _localctx = new RealContext(_localctx);
                     this.enterOuterAlt(_localctx, 2);
                     {
                         this.state = 25;
-                        this.match(SmlParser.FLOAT);
+                        this.match(SmlParser.REAL);
                     }
                     break;
                 case SmlParser.CHAR:
@@ -860,7 +860,7 @@ class SmlParser extends Parser_1.Parser {
                 this.state = 177;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-                while (((((_la - 15)) & ~0x1F) === 0 && ((1 << (_la - 15)) & ((1 << (SmlParser.INT - 15)) | (1 << (SmlParser.FLOAT - 15)) | (1 << (SmlParser.CHAR - 15)) | (1 << (SmlParser.STRING - 15)) | (1 << (SmlParser.TRUE - 15)) | (1 << (SmlParser.FALSE - 15)) | (1 << (SmlParser.UNIT - 15)) | (1 << (SmlParser.ID - 15)))) !== 0)) {
+                while (((((_la - 15)) & ~0x1F) === 0 && ((1 << (_la - 15)) & ((1 << (SmlParser.INT - 15)) | (1 << (SmlParser.REAL - 15)) | (1 << (SmlParser.CHAR - 15)) | (1 << (SmlParser.STRING - 15)) | (1 << (SmlParser.TRUE - 15)) | (1 << (SmlParser.FALSE - 15)) | (1 << (SmlParser.UNIT - 15)) | (1 << (SmlParser.ID - 15)))) !== 0)) {
                     {
                         {
                             this.state = 174;
@@ -969,7 +969,7 @@ SmlParser.T__11 = 12;
 SmlParser.WHITESPACE = 13;
 SmlParser.COMMENT = 14;
 SmlParser.INT = 15;
-SmlParser.FLOAT = 16;
+SmlParser.REAL = 16;
 SmlParser.CHAR = 17;
 SmlParser.STRING = 18;
 SmlParser.TRUE = 19;
@@ -1026,7 +1026,7 @@ SmlParser._LITERAL_NAMES = [
 SmlParser._SYMBOLIC_NAMES = [
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
     undefined, undefined, undefined, undefined, undefined, undefined, "WHITESPACE",
-    "COMMENT", "INT", "FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN",
+    "COMMENT", "INT", "REAL", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN",
     "RPAREN", "REC", "AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR",
     "PLUS", "MINUS", "CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE",
     "GTE", "ANDALSO", "ORELSE", "ID",
@@ -1153,35 +1153,35 @@ class IntegerContext extends ConContext {
     }
 }
 exports.IntegerContext = IntegerContext;
-class FloatingPointContext extends ConContext {
-    FLOAT() { return this.getToken(SmlParser.FLOAT, 0); }
+class RealContext extends ConContext {
+    REAL() { return this.getToken(SmlParser.REAL, 0); }
     constructor(ctx) {
         super(ctx.parent, ctx.invokingState);
         this.copyFrom(ctx);
     }
     // @Override
     enterRule(listener) {
-        if (listener.enterFloatingPoint) {
-            listener.enterFloatingPoint(this);
+        if (listener.enterReal) {
+            listener.enterReal(this);
         }
     }
     // @Override
     exitRule(listener) {
-        if (listener.exitFloatingPoint) {
-            listener.exitFloatingPoint(this);
+        if (listener.exitReal) {
+            listener.exitReal(this);
         }
     }
     // @Override
     accept(visitor) {
-        if (visitor.visitFloatingPoint) {
-            return visitor.visitFloatingPoint(this);
+        if (visitor.visitReal) {
+            return visitor.visitReal(this);
         }
         else {
             return visitor.visitChildren(this);
         }
     }
 }
-exports.FloatingPointContext = FloatingPointContext;
+exports.RealContext = RealContext;
 class CharacterContext extends ConContext {
     CHAR() { return this.getToken(SmlParser.CHAR, 0); }
     constructor(ctx) {

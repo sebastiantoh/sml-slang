@@ -27,40 +27,46 @@ class NodeGenerator {
         const val = isNeg ? parseInt(ctx.text.slice(1)) * -1 : parseInt(ctx.text);
         return {
             tag: 'IntConstant',
-            val: val
+            val: val,
+            type: 'int'
         };
     }
-    visitFloatingPoint(ctx) {
+    visitReal(ctx) {
         const isNeg = ctx.text.startsWith('~');
         const val = isNeg ? parseFloat(ctx.text.slice(1)) * -1 : parseFloat(ctx.text);
         return {
-            tag: 'FloatConstant',
-            val: val
+            tag: 'RealConstant',
+            val: val,
+            type: 'real'
         };
     }
     visitCharacter(ctx) {
         return {
             tag: 'CharConstant',
             // remove leading hash and double quote, and also trailing double quotes
-            val: ctx.text.slice(2, ctx.text.length - 1)
+            val: ctx.text.slice(2, ctx.text.length - 1),
+            type: 'char'
         };
     }
     visitString(ctx) {
         return {
             tag: 'StringConstant',
             // remove leading and trailing double quotes
-            val: ctx.text.slice(1, ctx.text.length - 1)
+            val: ctx.text.slice(1, ctx.text.length - 1),
+            type: 'string'
         };
     }
     visitBoolean(ctx) {
         return {
             tag: 'BoolConstant',
-            val: ctx.TRUE() !== undefined ? true : false
+            val: ctx.TRUE() !== undefined ? true : false,
+            type: 'bool'
         };
     }
     visitUnit(_ctx) {
         return {
-            tag: 'UnitConstant'
+            tag: 'UnitConstant',
+            type: 'unit'
         };
     }
     /**
@@ -170,7 +176,8 @@ class NodeGenerator {
     }
     visitPatUnit(_ctx) {
         return {
-            tag: 'UnitConstant'
+            tag: 'UnitConstant',
+            type: 'unit'
         };
     }
     visitPatVariable(ctx) {

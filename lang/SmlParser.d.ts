@@ -25,7 +25,7 @@ export declare class SmlParser extends Parser {
     static readonly WHITESPACE = 13;
     static readonly COMMENT = 14;
     static readonly INT = 15;
-    static readonly FLOAT = 16;
+    static readonly REAL = 16;
     static readonly CHAR = 17;
     static readonly STRING = 18;
     static readonly TRUE = 19;
@@ -107,8 +107,8 @@ export declare class IntegerContext extends ConContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
-export declare class FloatingPointContext extends ConContext {
-    FLOAT(): TerminalNode;
+export declare class RealContext extends ConContext {
+    REAL(): TerminalNode;
     constructor(ctx: ConContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;

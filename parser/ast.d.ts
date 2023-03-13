@@ -8,29 +8,35 @@ interface BaseNode {
  * Expressions
  */
 export type Expression = Constant | Application | InfixApplication | ExpSequence | LetExpression | BinaryLogicalOperator | ConditionalExpression | Function;
-export type Constant = IntConstant | FloatConstant | StringConstant | CharConstant | BoolConstant | UnitConstant;
+export type Constant = IntConstant | RealConstant | StringConstant | CharConstant | BoolConstant | UnitConstant;
 export interface IntConstant extends BaseNode {
     tag: 'IntConstant';
     val: number;
+    type: 'int';
 }
-export interface FloatConstant extends BaseNode {
-    tag: 'FloatConstant';
+export interface RealConstant extends BaseNode {
+    tag: 'RealConstant';
     val: number;
+    type: 'real';
 }
 export interface StringConstant extends BaseNode {
     tag: 'StringConstant';
     val: string;
+    type: 'string';
 }
 export interface CharConstant extends BaseNode {
     tag: 'CharConstant';
     val: string;
+    type: 'char';
 }
 export interface BoolConstant extends BaseNode {
     tag: 'BoolConstant';
     val: boolean;
+    type: 'bool';
 }
 export interface UnitConstant extends BaseNode {
     tag: 'UnitConstant';
+    type: 'unit';
 }
 export interface Application extends BaseNode {
     tag: 'Application';

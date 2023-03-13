@@ -18,7 +18,7 @@ export declare class SmlLexer extends Lexer {
     static readonly WHITESPACE = 13;
     static readonly COMMENT = 14;
     static readonly INT = 15;
-    static readonly FLOAT = 16;
+    static readonly REAL = 16;
     static readonly CHAR = 17;
     static readonly STRING = 18;
     static readonly TRUE = 19;

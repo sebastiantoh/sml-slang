@@ -51,7 +51,7 @@ SmlLexer.T__11 = 12;
 SmlLexer.WHITESPACE = 13;
 SmlLexer.COMMENT = 14;
 SmlLexer.INT = 15;
-SmlLexer.FLOAT = 16;
+SmlLexer.REAL = 16;
 SmlLexer.CHAR = 17;
 SmlLexer.STRING = 18;
 SmlLexer.TRUE = 19;
@@ -90,7 +90,7 @@ SmlLexer.modeNames = [
 ];
 SmlLexer.ruleNames = [
     "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8",
-    "T__9", "T__10", "T__11", "WHITESPACE", "COMMENT", "INT", "FLOAT", "CHAR",
+    "T__9", "T__10", "T__11", "WHITESPACE", "COMMENT", "INT", "REAL", "CHAR",
     "STRING", "DIGIT", "NUM", "LETTER", "ESC", "SAFECODEPOINT", "ASCII", "TRUE",
     "FALSE", "LPAREN", "RPAREN", "REC", "AND", "SEMICOLON", "UNIT", "SLASH",
     "DIV", "MOD", "STAR", "PLUS", "MINUS", "CARET", "CONS", "AT", "EQ", "NEQ",
@@ -107,7 +107,7 @@ SmlLexer._LITERAL_NAMES = [
 SmlLexer._SYMBOLIC_NAMES = [
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
     undefined, undefined, undefined, undefined, undefined, undefined, "WHITESPACE",
-    "COMMENT", "INT", "FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN",
+    "COMMENT", "INT", "REAL", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN",
     "RPAREN", "REC", "AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR",
     "PLUS", "MINUS", "CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE",
     "GTE", "ANDALSO", "ORELSE", "ID",

@@ -75,7 +75,7 @@ const exec_microcode = (cmd) => {
             });
             break;
         }
-        case 'FloatConstant': {
+        case 'RealConstant': {
             S.push({
                 type: 'real',
                 js_val: cmd.val
@@ -304,7 +304,7 @@ const exec_microcode = (cmd) => {
                 }
             }
             else if (cmd.pat.tag === 'IntConstant' ||
-                cmd.pat.tag === 'FloatConstant' ||
+                cmd.pat.tag === 'RealConstant' ||
                 cmd.pat.tag === 'CharConstant' ||
                 cmd.pat.tag === 'StringConstant' ||
                 cmd.pat.tag === 'BoolConstant') {
@@ -368,7 +368,7 @@ const exec_microcode = (cmd) => {
                 // Find the first pattern that matches the given arg, then
                 // perform relevant bindings, and evaluate the associated expression
                 if ((pat.tag === 'IntConstant' && arg.type === 'int') ||
-                    (pat.tag === 'FloatConstant' && arg.type === 'real') ||
+                    (pat.tag === 'RealConstant' && arg.type === 'real') ||
                     (pat.tag === 'CharConstant' && arg.type === 'char') ||
                     (pat.tag === 'StringConstant' && arg.type === 'string')) {
                     const is_match = pat.val === arg.js_val;

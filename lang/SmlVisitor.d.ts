@@ -3,7 +3,7 @@ import { PatConstantContext } from "./SmlParser";
 import { PatUnitContext } from "./SmlParser";
 import { PatVariableContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
-import { FloatingPointContext } from "./SmlParser";
+import { RealContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
 import { BooleanContext } from "./SmlParser";
@@ -71,12 +71,12 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      */
     visitInteger?: (ctx: IntegerContext) => Result;
     /**
-     * Visit a parse tree produced by the `FloatingPoint`
+     * Visit a parse tree produced by the `Real`
      * labeled alternative in `SmlParser.con`.
      * @param ctx the parse tree
      * @return the visitor result
      */
-    visitFloatingPoint?: (ctx: FloatingPointContext) => Result;
+    visitReal?: (ctx: RealContext) => Result;
     /**
      * Visit a parse tree produced by the `Character`
      * labeled alternative in `SmlParser.con`.
