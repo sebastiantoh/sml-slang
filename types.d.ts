@@ -1,4 +1,5 @@
 import { Matches } from './parser/ast';
+import { TypeEnvironment } from './typechecker/environment';
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn;
 export interface Int {
     type: 'int';
@@ -79,6 +80,7 @@ export interface Context<T = any> {
      * context for use in your own built-in functions (like `display(a)`)
      */
     externalContext?: T;
+    typeEnvironments: TypeEnvironment[];
 }
 export interface Position {
     line: number;

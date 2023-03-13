@@ -12,7 +12,8 @@ const createEmptyContext = (externalSymbols, externalContext) => {
         externalContext,
         runtime: createEmptyRuntime(),
         numberOfOuterEnvironments: 1,
-        prelude: null
+        prelude: null,
+        typeEnvironments: []
     };
 };
 // TODO: cleanup this function.
