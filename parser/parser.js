@@ -117,20 +117,30 @@ class NodeGenerator {
         };
     }
     visitConjunction(ctx) {
+        // Rewrite derived form into equivalent form
+        // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
         return {
-            tag: 'BinaryLogicalOperator',
-            operand1: this.visit(ctx._op1),
-            operand2: this.visit(ctx._op2),
-            id: ctx.ANDALSO().text,
+            tag: "ConditionalExpression",
+            pred: this.visit(ctx._op1),
+            consequent: this.visit(ctx._op2),
+            alternative: {
+                tag: "BoolConstant", val: false,
+                type: 'bool'
+            },
             loc: contextToLocation(ctx)
         };
     }
     visitDisjunction(ctx) {
+        // Rewrite derived form into equivalent form
+        // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
         return {
-            tag: 'BinaryLogicalOperator',
-            operand1: this.visit(ctx._op1),
-            operand2: this.visit(ctx._op2),
-            id: ctx.ORELSE().text,
+            tag: "ConditionalExpression",
+            pred: this.visit(ctx._op1),
+            consequent: {
+                tag: "BoolConstant", val: true,
+                type: 'bool'
+            },
+            alternative: this.visit(ctx._op2),
             loc: contextToLocation(ctx)
         };
     }

@@ -130,14 +130,6 @@ const exec_microcode = (cmd) => {
             A.push(cmd.decSequence);
             break;
         }
-        case 'BinaryLogicalOperator': {
-            A.push({
-                tag: 'BinLogicalOpI',
-                id: cmd.id,
-                op2: cmd.operand2
-            }, cmd.operand1);
-            break;
-        }
         case 'ConditionalExpression': {
             A.push({ tag: 'BranchI', consequent: cmd.consequent, alternative: cmd.alternative }, cmd.pred);
             break;
@@ -248,35 +240,6 @@ const exec_microcode = (cmd) => {
             // So we directly look up builtinBinOperators instead of looking up
             // the env
             S.push(Sml.builtinBinOperators[cmd.id](fst, snd));
-            break;
-        }
-        case 'BinLogicalOpI': {
-            const fst = S.pop();
-            if (fst.type !== 'bool') {
-                throw new Error(`invalid types - received ${fst.type}`);
-            }
-            // Perform shortcircuiting if possible
-            if (cmd.id === 'orelse' && fst.js_val) {
-                S.push({
-                    type: 'bool',
-                    js_val: true
-                });
-            }
-            else if (cmd.id === 'andalso' && !fst.js_val) {
-                S.push({
-                    type: 'bool',
-                    js_val: false
-                });
-            }
-            else {
-                // no shortcircuiting possible, so we push first operand back on stack
-                // then evaluate normally as if it's a binary op
-                S.push(fst);
-                A.push({
-                    tag: 'BinOpI',
-                    id: cmd.id
-                }, cmd.op2);
-            }
             break;
         }
         case 'RestoreEnvI': {
