@@ -41,6 +41,7 @@ import {
   ValueDeclContext
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
+import { SourceLocation } from '../types'
 import {
   Application,
   BinaryLogicalOperator,
@@ -69,6 +70,22 @@ import {
   ValueDeclaration,
   Variable
 } from './ast'
+
+// TODO: move to parser/utils.ts?
+function contextToLocation(ctx: ParserRuleContext): SourceLocation {
+  return {
+    start: {
+      line: ctx.start.line,
+      column: ctx.start.charPositionInLine,
+    },
+    end: {
+      line: ctx.stop ? ctx.stop.line : ctx.start.line,
+      column: ctx.stop
+        ? ctx.stop.charPositionInLine
+        : ctx.start.charPositionInLine,
+    },
+  };
+}
 
 class NodeGenerator implements SmlVisitor<Node> {
   /**
@@ -123,13 +140,18 @@ class NodeGenerator implements SmlVisitor<Node> {
     return this.visit(ctx.con()) as Constant
   }
   visitExpVariable(ctx: ExpVariableContext): Variable {
-    return { tag: 'Variable', id: ctx._id.text! }
+    return {
+      tag: 'Variable',
+      id: ctx._id.text!,
+      loc: contextToLocation(ctx)
+    }
   }
   visitApplication(ctx: ApplicationContext): Application {
     return {
       tag: 'Application',
       fn: this.visit(ctx._fn) as Expression,
-      arg: this.visit(ctx._arg) as Expression
+      arg: this.visit(ctx._arg) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
@@ -137,7 +159,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'InfixApplication',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx._id.text!
+      id: ctx._id.text!,
+      loc: contextToLocation(ctx)
     }
   }
   visitExpSequence(ctx: ExpSequenceContext): ExpSequence {
@@ -153,7 +176,8 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'LetExpression',
       decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
-      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression),
+      loc: contextToLocation(ctx)
     }
   }
   visitConjunction(ctx: ConjunctionContext): BinaryLogicalOperator {
@@ -161,7 +185,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'BinaryLogicalOperator',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ANDALSO().text as 'andalso'
+      id: ctx.ANDALSO().text as 'andalso',
+      loc: contextToLocation(ctx)
     }
   }
   visitDisjunction(ctx: DisjunctionContext): BinaryLogicalOperator {
@@ -169,7 +194,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'BinaryLogicalOperator',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ORELSE().text as 'orelse'
+      id: ctx.ORELSE().text as 'orelse',
+      loc: contextToLocation(ctx)
     }
   }
   visitConditional(ctx: ConditionalContext): ConditionalExpression {
@@ -177,13 +203,15 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'ConditionalExpression',
       pred: this.visit(ctx._pred) as Expression,
       consequent: this.visit(ctx._cons) as Expression,
-      alternative: this.visit(ctx._alt) as Expression
+      alternative: this.visit(ctx._alt) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
   visitFunction(ctx: FunctionContext): Function {
     return {
       tag: 'Function',
-      matches: this.visit(ctx.matches()) as Matches
+      matches: this.visit(ctx.matches()) as Matches,
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -194,13 +222,15 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'Match',
       pat: this.visit(ctx.pat()) as Pattern,
-      exp: this.visit(ctx.exp()) as Expression
+      exp: this.visit(ctx.exp()) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
   visitMatches(ctx: MatchesContext): Matches {
     return {
       tag: 'Matches',
-      matches: ctx.patmatch().map((m: PatmatchContext) => this.visit(m) as Match)
+      matches: ctx.patmatch().map((m: PatmatchContext) => this.visit(m) as Match),
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -218,7 +248,8 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitPatVariable(ctx: PatVariableContext): Variable {
     return {
       tag: 'Variable',
-      id: ctx._id.text!
+      id: ctx._id.text!,
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -228,7 +259,8 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitValueDecl(ctx: ValueDeclContext): ValueDeclaration {
     return {
       tag: 'ValueDeclaration',
-      valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
+      valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind),
+      loc: contextToLocation(ctx)
     }
   }
   visitFunDecl(ctx: FunDeclContext): ValueDeclaration {
@@ -236,20 +268,23 @@ class NodeGenerator implements SmlVisitor<Node> {
     // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
     return {
       tag: 'ValueDeclaration',
-      valbinds: ctx.funbind().map((fb: FunbindContext) => this.visit(fb) as Valbind)
+      valbinds: ctx.funbind().map((fb: FunbindContext) => this.visit(fb) as Valbind),
+      loc: contextToLocation(ctx)
     }
   }
   visitLocalDecl(ctx: LocalDeclContext): LocalDeclaration {
     return {
       tag: 'LocalDeclaration',
       localDecs: this.visit(ctx._localDecs) as DeclarationSequence,
-      decs: this.visit(ctx._decs) as DeclarationSequence
+      decs: this.visit(ctx._decs) as DeclarationSequence,
+      loc: contextToLocation(ctx)
     }
   }
   visitDecSequence(ctx: DecSequenceContext): DeclarationSequence {
     return {
       tag: 'DeclarationSequence',
-      decs: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration)
+      decs: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration),
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -261,7 +296,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'Valbind',
       is_rec: ctx.REC() !== undefined,
       pat: this.visit(ctx.pat()) as Pattern,
-      exp: this.visit(ctx.exp()) as Expression
+      exp: this.visit(ctx.exp()) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -289,6 +325,7 @@ class NodeGenerator implements SmlVisitor<Node> {
         .reverse()
         .forEach(p => {
           const fn = {
+            // TODO: do we want to keep track of the locations of each of these functions?
             tag: 'Function',
             matches: { tag: 'Matches', matches: [{ tag: 'Match', pat: p, exp }] }
           } as Function
@@ -335,7 +372,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'Valbind',
       is_rec: true,
       pat: { tag: 'Variable', id: fnName },
-      exp: { tag: 'Function', matches: { tag: 'Matches', matches } }
+      exp: { tag: 'Function', matches: { tag: 'Matches', matches } },
+      loc: contextToLocation(ctx)
     }
   }
 
