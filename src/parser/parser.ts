@@ -76,15 +76,13 @@ function contextToLocation(ctx: ParserRuleContext): SourceLocation {
   return {
     start: {
       line: ctx.start.line,
-      column: ctx.start.charPositionInLine,
+      column: ctx.start.charPositionInLine
     },
     end: {
       line: ctx.stop ? ctx.stop.line : ctx.start.line,
-      column: ctx.stop
-        ? ctx.stop.charPositionInLine
-        : ctx.start.charPositionInLine,
-    },
-  };
+      column: ctx.stop ? ctx.stop.charPositionInLine : ctx.start.charPositionInLine
+    }
+  }
 }
 
 class NodeGenerator implements SmlVisitor<Node> {
