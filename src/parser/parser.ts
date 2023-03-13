@@ -187,11 +187,12 @@ class NodeGenerator implements SmlVisitor<Node> {
     // Rewrite derived form into equivalent form
     // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
     return {
-      tag: "ConditionalExpression",
+      tag: 'ConditionalExpression',
       pred: this.visit(ctx._op1) as Expression,
       consequent: this.visit(ctx._op2) as Expression,
       alternative: {
-        tag: "BoolConstant", val: false,
+        tag: 'BoolConstant',
+        val: false,
         type: 'bool'
       },
       loc: contextToLocation(ctx)
@@ -201,10 +202,11 @@ class NodeGenerator implements SmlVisitor<Node> {
     // Rewrite derived form into equivalent form
     // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
     return {
-      tag: "ConditionalExpression",
+      tag: 'ConditionalExpression',
       pred: this.visit(ctx._op1) as Expression,
       consequent: {
-        tag: "BoolConstant", val: true,
+        tag: 'BoolConstant',
+        val: true,
         type: 'bool'
       },
       alternative: this.visit(ctx._op2) as Expression,
