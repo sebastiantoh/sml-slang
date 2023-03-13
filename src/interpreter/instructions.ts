@@ -11,6 +11,7 @@ export type Instruction =
   | AssignI
   | DecsAfterLocalDecsI
   | ApplicationI
+  | MarkEndOfFnBodyI
 
 interface PopI {
   tag: 'PopI'
@@ -58,4 +59,8 @@ interface DecsAfterLocalDecsI {
 // need to store arity
 interface ApplicationI {
   tag: 'ApplicationI'
+}
+
+interface MarkEndOfFnBodyI {
+  tag: 'MarkEndOfFnBodyI'
 }

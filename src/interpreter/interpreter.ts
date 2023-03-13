@@ -1,11 +1,14 @@
 import * as assert from 'assert'
 
-import { Node } from '../parser/ast'
+import { Expression, Node, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { Environment, Value } from '../types'
 import { Instruction } from './instructions'
 
 type Microcode = Node | Instruction
+
+// TODO: integrate this with frontend's output
+export let stdout: Array<String> = []
 let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
@@ -42,6 +45,12 @@ const reverse = (arr: Array<any>) => {
   const copy = arr.slice()
   copy.reverse()
   return copy
+}
+function peek<T>(stack: Array<T>): T | undefined {
+  if (stack.length === 0) {
+    return undefined
+  }
+  return stack[-1]
 }
 const rev_push = (stack: Array<any>, items: any[]) => {
   stack.push(...reverse(items))
@@ -123,6 +132,10 @@ const exec_microcode = (cmd: Microcode) => {
       )
       break
     }
+    case 'ExpSequence': {
+      rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
+      break
+    }
     case 'LetExpression': {
       A.push({ tag: 'RestoreEnvI', env: E })
       rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
@@ -148,7 +161,10 @@ const exec_microcode = (cmd: Microcode) => {
       S.push({
         type: 'fn',
         matches: cmd.matches,
-        env: E
+        // note: we create a copy of this env since the env may be mutated, e.g:
+        // in a local declaration, the parent of E will be mutated
+        // TODO: deep copy needed?
+        env: { ...E }
       })
       break
     }
@@ -345,7 +361,6 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'ApplicationI': {
-      // TODO: handle tail calls
       const arg = S.pop()!
       const fn = S.pop()!
 
@@ -356,9 +371,24 @@ const exec_microcode = (cmd: Microcode) => {
 
       assert(fn.type === 'fn')
 
-      A.push({ tag: 'RestoreEnvI', env: E })
+      if (A.length === 0 || peek(A)?.tag === 'RestoreEnvI') {
+        // Implies no more agenda items that needs to be evaluated with the current env.
+        // Just push mark, and not RestoreEnvI
+        A.push({ tag: 'MarkEndOfFnBodyI' })
+      } else if (peek(A)?.tag === 'MarkEndOfFnBodyI') {
+        // The current 'ApplicationI' is a tail call since this
+        // ApplicationI is the last thing that has to be evaluated before reaching
+        // the end of the caller function body (the one that pushed the MarkEndOfFnbodyI)
+        // We don't need to:
+        // - push RestoreEnvI since we have nothing else to evaluate under the current env
+        // - push MarkEndOfFnBodyI since it's already on the top of the agenda
+        // i.e. we do nothing in this block
+      } else {
+        A.push({ tag: 'RestoreEnvI', env: E }, { tag: 'MarkEndOfFnBodyI' })
+      }
       E = extend_env(fn.env)
 
+      // Bind params (if necessary) and evaluate function body
       let found_match = false
       for (const { pat, exp } of fn.matches.matches) {
         // Find the first pattern that matches the given arg, then
@@ -371,7 +401,7 @@ const exec_microcode = (cmd: Microcode) => {
         ) {
           const is_match = pat.val === arg.js_val
           if (is_match) {
-            // Don't need to extend env here since both pat and args are constant
+            // Don't need to assign in env here since both pat and args are constant
             A.push(exp)
             found_match = true
           }
@@ -395,6 +425,10 @@ const exec_microcode = (cmd: Microcode) => {
 
       break
     }
+    case 'MarkEndOfFnBodyI': {
+      // do nothing
+      break
+    }
     default: {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore: The following line will throw a compile error if all the
@@ -404,10 +438,11 @@ const exec_microcode = (cmd: Microcode) => {
   }
 }
 
-export function evaluate(node: Node): Value {
+export function evaluate(node: Node) {
   A = [node]
   S = []
   E = init_env()
+  stdout = []
 
   const step_limit = 1000000
   let i = 0
@@ -420,8 +455,20 @@ export function evaluate(node: Node): Value {
   if (i === step_limit) {
     throw new Error(`step limit ${step_limit} exceeded`)
   }
-  if (S.length != 1) {
+}
+
+export function evaluateExp(exp: Expression): Value {
+  evaluate(exp)
+  if (S.length !== 1) {
     throw new Error(`internal error: stash must be singleton but is: ${S}`)
   }
   return S[0]
+}
+
+export function evaluateProg(prog: Program): string {
+  evaluate(prog)
+  if (S.length !== 0) {
+    throw new Error(`internal error: stash must be empty but is: ${S}`)
+  }
+  return stdout.join('')
 }

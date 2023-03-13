@@ -1,3 +1,5 @@
+import { parseAndEvaluateProg } from './utils'
+
 const path = require('path')
 const fs = require('fs')
 
@@ -5,15 +7,14 @@ const fs = require('fs')
 require('jest-specific-snapshot')
 
 const programsDir = 'src/__tests__/programs'
-const programNames = fs.readdirSync(programsDir)
+const programNames = fs
+  .readdirSync(programsDir)
+  .filter((f: string) => path.extname(f).toLowerCase() === '.sml')
 
 programNames.forEach((filename: string) => {
   const filepath = path.join(programsDir, filename)
   const sourceCode = fs.readFileSync(filepath, { encoding: 'utf8', flag: 'r' })
-  test.skip(filename, () =>
-    expect(
-      // TODO: parse and eval sourceCode, then renable test cases
-      sourceCode
-    ).toMatchSpecificSnapshot(`programs/${filename}.out`)
+  test(filename, () =>
+    expect(parseAndEvaluateProg(sourceCode)).toMatchSpecificSnapshot(`programs/${filename}.out`)
   )
 })
