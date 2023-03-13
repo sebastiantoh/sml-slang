@@ -33,7 +33,7 @@ export type Expression =
 
 export type Constant =
   | IntConstant
-  | FloatConstant
+  | RealConstant
   | StringConstant
   | CharConstant
   | BoolConstant
@@ -43,10 +43,10 @@ export interface IntConstant extends BaseNode {
   val: number
   type: 'int'
 }
-export interface FloatConstant extends BaseNode {
-  tag: 'FloatConstant'
+export interface RealConstant extends BaseNode {
+  tag: 'RealConstant'
   val: number
-  type: 'float'
+  type: 'real'
 }
 export interface StringConstant extends BaseNode {
   tag: 'StringConstant'

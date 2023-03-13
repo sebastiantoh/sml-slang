@@ -7,7 +7,7 @@ import { PatConstantContext } from "./SmlParser";
 import { PatUnitContext } from "./SmlParser";
 import { PatVariableContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
-import { FloatingPointContext } from "./SmlParser";
+import { RealContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
 import { StringContext } from "./SmlParser";
 import { BooleanContext } from "./SmlParser";
@@ -98,17 +98,17 @@ export interface SmlListener extends ParseTreeListener {
 	exitInteger?: (ctx: IntegerContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `FloatingPoint`
+	 * Enter a parse tree produced by the `Real`
 	 * labeled alternative in `SmlParser.con`.
 	 * @param ctx the parse tree
 	 */
-	enterFloatingPoint?: (ctx: FloatingPointContext) => void;
+	enterReal?: (ctx: RealContext) => void;
 	/**
-	 * Exit a parse tree produced by the `FloatingPoint`
+	 * Exit a parse tree produced by the `Real`
 	 * labeled alternative in `SmlParser.con`.
 	 * @param ctx the parse tree
 	 */
-	exitFloatingPoint?: (ctx: FloatingPointContext) => void;
+	exitReal?: (ctx: RealContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `Character`

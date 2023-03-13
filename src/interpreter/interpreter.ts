@@ -83,7 +83,7 @@ const exec_microcode = (cmd: Microcode) => {
       })
       break
     }
-    case 'FloatConstant': {
+    case 'RealConstant': {
       S.push({
         type: 'real',
         js_val: cmd.val
@@ -325,7 +325,7 @@ const exec_microcode = (cmd: Microcode) => {
         }
       } else if (
         cmd.pat.tag === 'IntConstant' ||
-        cmd.pat.tag === 'FloatConstant' ||
+        cmd.pat.tag === 'RealConstant' ||
         cmd.pat.tag === 'CharConstant' ||
         cmd.pat.tag === 'StringConstant' ||
         cmd.pat.tag === 'BoolConstant'
@@ -395,7 +395,7 @@ const exec_microcode = (cmd: Microcode) => {
         // perform relevant bindings, and evaluate the associated expression
         if (
           (pat.tag === 'IntConstant' && arg.type === 'int') ||
-          (pat.tag === 'FloatConstant' && arg.type === 'real') ||
+          (pat.tag === 'RealConstant' && arg.type === 'real') ||
           (pat.tag === 'CharConstant' && arg.type === 'char') ||
           (pat.tag === 'StringConstant' && arg.type === 'string')
         ) {

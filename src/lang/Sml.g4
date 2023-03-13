@@ -10,7 +10,7 @@ INT
     ;
 
 // Not supporting scientific notation for now since the tilde complicates thing
-FLOAT
+REAL
     : '~'? NUM '.' NUM
     ;
 
@@ -73,7 +73,7 @@ ID
 
 con
     : INT              # Integer
-    | FLOAT            # FloatingPoint
+    | REAL             # Real
     | CHAR             # Character
     | STRING           # String
     | (TRUE | FALSE)   # Boolean

@@ -31,7 +31,7 @@ export class SmlLexer extends Lexer {
 	public static readonly WHITESPACE = 13;
 	public static readonly COMMENT = 14;
 	public static readonly INT = 15;
-	public static readonly FLOAT = 16;
+	public static readonly REAL = 16;
 	public static readonly CHAR = 17;
 	public static readonly STRING = 18;
 	public static readonly TRUE = 19;
@@ -73,7 +73,7 @@ export class SmlLexer extends Lexer {
 
 	public static readonly ruleNames: string[] = [
 		"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8", 
-		"T__9", "T__10", "T__11", "WHITESPACE", "COMMENT", "INT", "FLOAT", "CHAR", 
+		"T__9", "T__10", "T__11", "WHITESPACE", "COMMENT", "INT", "REAL", "CHAR", 
 		"STRING", "DIGIT", "NUM", "LETTER", "ESC", "SAFECODEPOINT", "ASCII", "TRUE", 
 		"FALSE", "LPAREN", "RPAREN", "REC", "AND", "SEMICOLON", "UNIT", "SLASH", 
 		"DIV", "MOD", "STAR", "PLUS", "MINUS", "CARET", "CONS", "AT", "EQ", "NEQ", 
@@ -91,7 +91,7 @@ export class SmlLexer extends Lexer {
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		undefined, undefined, undefined, undefined, undefined, undefined, "WHITESPACE", 
-		"COMMENT", "INT", "FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", 
+		"COMMENT", "INT", "REAL", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", 
 		"RPAREN", "REC", "AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR", 
 		"PLUS", "MINUS", "CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE", 
 		"GTE", "ANDALSO", "ORELSE", "ID",

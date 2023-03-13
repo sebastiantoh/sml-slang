@@ -43,7 +43,7 @@ export class SmlParser extends Parser {
 	public static readonly WHITESPACE = 13;
 	public static readonly COMMENT = 14;
 	public static readonly INT = 15;
-	public static readonly FLOAT = 16;
+	public static readonly REAL = 16;
 	public static readonly CHAR = 17;
 	public static readonly STRING = 18;
 	public static readonly TRUE = 19;
@@ -101,7 +101,7 @@ export class SmlParser extends Parser {
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		undefined, undefined, undefined, undefined, undefined, undefined, "WHITESPACE", 
-		"COMMENT", "INT", "FLOAT", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", 
+		"COMMENT", "INT", "REAL", "CHAR", "STRING", "TRUE", "FALSE", "LPAREN", 
 		"RPAREN", "REC", "AND", "SEMICOLON", "UNIT", "SLASH", "DIV", "MOD", "STAR", 
 		"PLUS", "MINUS", "CARET", "CONS", "AT", "EQ", "NEQ", "LT", "GT", "LTE", 
 		"GTE", "ANDALSO", "ORELSE", "ID",
@@ -149,12 +149,12 @@ export class SmlParser extends Parser {
 				this.match(SmlParser.INT);
 				}
 				break;
-			case SmlParser.FLOAT:
-				_localctx = new FloatingPointContext(_localctx);
+			case SmlParser.REAL:
+				_localctx = new RealContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
 				this.state = 25;
-				this.match(SmlParser.FLOAT);
+				this.match(SmlParser.REAL);
 				}
 				break;
 			case SmlParser.CHAR:
@@ -971,7 +971,7 @@ export class SmlParser extends Parser {
 			this.state = 177;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while (((((_la - 15)) & ~0x1F) === 0 && ((1 << (_la - 15)) & ((1 << (SmlParser.INT - 15)) | (1 << (SmlParser.FLOAT - 15)) | (1 << (SmlParser.CHAR - 15)) | (1 << (SmlParser.STRING - 15)) | (1 << (SmlParser.TRUE - 15)) | (1 << (SmlParser.FALSE - 15)) | (1 << (SmlParser.UNIT - 15)) | (1 << (SmlParser.ID - 15)))) !== 0)) {
+			while (((((_la - 15)) & ~0x1F) === 0 && ((1 << (_la - 15)) & ((1 << (SmlParser.INT - 15)) | (1 << (SmlParser.REAL - 15)) | (1 << (SmlParser.CHAR - 15)) | (1 << (SmlParser.STRING - 15)) | (1 << (SmlParser.TRUE - 15)) | (1 << (SmlParser.FALSE - 15)) | (1 << (SmlParser.UNIT - 15)) | (1 << (SmlParser.ID - 15)))) !== 0)) {
 				{
 				{
 				this.state = 174;
@@ -1194,28 +1194,28 @@ export class IntegerContext extends ConContext {
 		}
 	}
 }
-export class FloatingPointContext extends ConContext {
-	public FLOAT(): TerminalNode { return this.getToken(SmlParser.FLOAT, 0); }
+export class RealContext extends ConContext {
+	public REAL(): TerminalNode { return this.getToken(SmlParser.REAL, 0); }
 	constructor(ctx: ConContext) {
 		super(ctx.parent, ctx.invokingState);
 		this.copyFrom(ctx);
 	}
 	// @Override
 	public enterRule(listener: SmlListener): void {
-		if (listener.enterFloatingPoint) {
-			listener.enterFloatingPoint(this);
+		if (listener.enterReal) {
+			listener.enterReal(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: SmlListener): void {
-		if (listener.exitFloatingPoint) {
-			listener.exitFloatingPoint(this);
+		if (listener.exitReal) {
+			listener.exitReal(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: SmlVisitor<Result>): Result {
-		if (visitor.visitFloatingPoint) {
-			return visitor.visitFloatingPoint(this);
+		if (visitor.visitReal) {
+			return visitor.visitReal(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
