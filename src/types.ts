@@ -4,6 +4,10 @@ import { Matches } from './parser/ast'
 // Should have a "type" field, denoting the SML type
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn
 
+// TODO: eventually these types can be removed?
+// ast typechecking wld have ensure type safety alr
+// so shd be fine to remove all types here and all
+// type assertions in the interpreter
 export interface Int {
   type: 'int'
   js_val: number

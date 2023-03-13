@@ -41,25 +41,31 @@ export type Constant =
 export interface IntConstant extends BaseNode {
   tag: 'IntConstant'
   val: number
+  type: 'int'
 }
 export interface FloatConstant extends BaseNode {
   tag: 'FloatConstant'
   val: number
+  type: 'float'
 }
 export interface StringConstant extends BaseNode {
   tag: 'StringConstant'
   val: string
+  type: 'string'
 }
 export interface CharConstant extends BaseNode {
   tag: 'CharConstant'
   val: string
+  type: 'char'
 }
 export interface BoolConstant extends BaseNode {
   tag: 'BoolConstant'
   val: boolean
+  type: 'bool'
 }
 export interface UnitConstant extends BaseNode {
   tag: 'UnitConstant'
+  type: 'unit'
 }
 
 export interface Application extends BaseNode {
