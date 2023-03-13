@@ -1,3 +1,4 @@
+import { createInitialTypeEnvironments } from './typechecker/environment'
 import { Context } from './types'
 
 const createEmptyRuntime = (): Context['runtime'] => ({
@@ -14,7 +15,7 @@ const createEmptyContext = <T>(externalSymbols: string[], externalContext?: T): 
     runtime: createEmptyRuntime(),
     numberOfOuterEnvironments: 1,
     prelude: null,
-    typeEnvironments: []
+    typeEnvironments: createInitialTypeEnvironments()
   }
 }
 
