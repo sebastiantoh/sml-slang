@@ -13,7 +13,8 @@ const createEmptyContext = <T>(externalSymbols: string[], externalContext?: T): 
     externalContext,
     runtime: createEmptyRuntime(),
     numberOfOuterEnvironments: 1,
-    prelude: null
+    prelude: null,
+    typeEnvironments: []
   }
 }
 

@@ -1,4 +1,5 @@
 import { Matches } from './parser/ast'
+import { TypeEnvironment } from './typechecker/environment'
 
 // Represents a JS value and annotates it with its SML type
 // Should have a "type" field, denoting the SML type
@@ -111,8 +112,7 @@ export interface Context<T = any> {
    */
   externalContext?: T
 
-  // typeEnvironments: TypeEnvironment[];
-  // contractEnvironments: ContractEnvironment[];
+  typeEnvironments: TypeEnvironment[]
 }
 
 export interface Position {
