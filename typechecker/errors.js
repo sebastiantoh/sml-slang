@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TypeError = void 0;
+exports.TypeMismatchError = exports.TypeError = void 0;
 const types_1 = require("../types");
+const utils_1 = require("./utils");
 const UNKNOWN_LOCATION = {
     start: {
         line: -1,
@@ -30,4 +31,19 @@ class TypeError {
     }
 }
 exports.TypeError = TypeError;
+class TypeMismatchError extends TypeError {
+    constructor(node, expected, got) {
+        super(node);
+        this.node = node;
+        this.expected = expected;
+        this.got = got;
+    }
+    explain() {
+        return `This expression has type ${(0, utils_1.stringifyType)(this.got)} but an expression was expected of type ${(0, utils_1.stringifyType)(this.expected)}`;
+    }
+    elaborate() {
+        return this.explain();
+    }
+}
+exports.TypeMismatchError = TypeMismatchError;
 //# sourceMappingURL=errors.js.map
