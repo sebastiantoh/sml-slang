@@ -5,7 +5,6 @@ export type Instruction =
   | PopI
   | BranchI
   | BinOpI
-  | BinLogicalOpI
   | RestoreEnvI
   | SetEnvParentI
   | AssignI
@@ -26,12 +25,6 @@ interface BranchI {
 interface BinOpI {
   tag: 'BinOpI'
   id: string
-}
-
-interface BinLogicalOpI {
-  tag: 'BinLogicalOpI'
-  id: string
-  op2: Expression // evaluated only if needed (i.e. no shortcircuiting)
 }
 
 interface RestoreEnvI {

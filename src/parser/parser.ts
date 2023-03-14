@@ -44,7 +44,6 @@ import { SmlVisitor } from '../lang/SmlVisitor'
 import { SourceLocation } from '../types'
 import {
   Application,
-  BinaryLogicalOperator,
   BoolConstant,
   CharConstant,
   ConditionalExpression,
@@ -184,21 +183,33 @@ class NodeGenerator implements SmlVisitor<Node> {
       loc: contextToLocation(ctx)
     }
   }
-  visitConjunction(ctx: ConjunctionContext): BinaryLogicalOperator {
+  visitConjunction(ctx: ConjunctionContext): ConditionalExpression {
+    // Rewrite derived form into equivalent form
+    // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
     return {
-      tag: 'BinaryLogicalOperator',
-      operand1: this.visit(ctx._op1) as Expression,
-      operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ANDALSO().text as 'andalso',
+      tag: 'ConditionalExpression',
+      pred: this.visit(ctx._op1) as Expression,
+      consequent: this.visit(ctx._op2) as Expression,
+      alternative: {
+        tag: 'BoolConstant',
+        val: false,
+        type: 'bool'
+      },
       loc: contextToLocation(ctx)
     }
   }
-  visitDisjunction(ctx: DisjunctionContext): BinaryLogicalOperator {
+  visitDisjunction(ctx: DisjunctionContext): ConditionalExpression {
+    // Rewrite derived form into equivalent form
+    // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
     return {
-      tag: 'BinaryLogicalOperator',
-      operand1: this.visit(ctx._op1) as Expression,
-      operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ORELSE().text as 'orelse',
+      tag: 'ConditionalExpression',
+      pred: this.visit(ctx._op1) as Expression,
+      consequent: {
+        tag: 'BoolConstant',
+        val: true,
+        type: 'bool'
+      },
+      alternative: this.visit(ctx._op2) as Expression,
       loc: contextToLocation(ctx)
     }
   }
@@ -271,6 +282,8 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitFunDecl(ctx: FunDeclContext): ValueDeclaration {
     // function declarations are syntatic sugar for value declarations:
     // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
+    // TODO: this desugaring doesn't work for mutually recursive function :'(
+    // For more info: https://stackoverflow.com/questions/63428214/declaring-interdependent-values-and-functions-in-standard-ml
     return {
       tag: 'ValueDeclaration',
       valbinds: ctx.funbind().map((fb: FunbindContext) => this.visit(fb) as Valbind),
