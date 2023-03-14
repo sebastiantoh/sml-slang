@@ -80,7 +80,7 @@ const primitiveFuncs = [
 ];
 function createInitialTypeEnvironments() {
     // initial type env only contains inbuilt funcs
-    return [{ types: new Map(primitiveFuncs) }];
+    return { frame: Object.fromEntries(primitiveFuncs) };
 }
 exports.createInitialTypeEnvironments = createInitialTypeEnvironments;
 //# sourceMappingURL=environment.js.map

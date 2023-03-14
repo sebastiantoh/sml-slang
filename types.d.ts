@@ -80,7 +80,7 @@ export interface Context<T = any> {
      * context for use in your own built-in functions (like `display(a)`)
      */
     externalContext?: T;
-    typeEnvironments: TypeEnvironment[];
+    typeEnvironments: TypeEnvironment;
 }
 export interface Position {
     line: number;
