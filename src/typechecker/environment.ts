@@ -1,8 +1,11 @@
 import { Type } from './types'
 import { BOOL_TY, CHAR_TY, INT_TY, makeMatchType, REAL_TY, STR_TY } from './utils'
 
+type TypeEnvironmentFrame = { [k: string]: Type | Type[] }
+
 export interface TypeEnvironment {
-  types: Map<string, Type | Type[]>
+  frame: TypeEnvironmentFrame
+  parent?: TypeEnvironment
 }
 
 const primitiveFuncs: [string, Type | Type[]][] = [
@@ -82,7 +85,7 @@ const primitiveFuncs: [string, Type | Type[]][] = [
   ['orelse', makeMatchType(BOOL_TY, BOOL_TY, BOOL_TY)]
 ]
 
-export function createInitialTypeEnvironments(): TypeEnvironment[] {
+export function createInitialTypeEnvironments(): TypeEnvironment {
   // initial type env only contains inbuilt funcs
-  return [{ types: new Map(primitiveFuncs) }]
+  return { frame: Object.fromEntries(primitiveFuncs) }
 }

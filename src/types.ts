@@ -112,7 +112,7 @@ export interface Context<T = any> {
    */
   externalContext?: T
 
-  typeEnvironments: TypeEnvironment[]
+  typeEnvironments: TypeEnvironment
 }
 
 export interface Position {
