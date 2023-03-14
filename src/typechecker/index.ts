@@ -1,7 +1,6 @@
 import { Node } from '../parser/ast'
 import { Type } from './types'
-
-const UNIT_TYPE: Type = 'unit'
+import { UNIT_TY } from './utils'
 
 export function typeCheck(node: Node): Type {
   switch (node.tag) {
@@ -14,5 +13,5 @@ export function typeCheck(node: Node): Type {
     case 'UnitConstant':
       return node.type
   }
-  return UNIT_TYPE
+  return UNIT_TY
 }

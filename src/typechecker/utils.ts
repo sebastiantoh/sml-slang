@@ -1,4 +1,18 @@
-import { FunctionType, Type } from './types'
+import { FunctionType, PrimitiveType, Type } from './types'
+
+export const INT_TY: PrimitiveType = 'int'
+export const REAL_TY: PrimitiveType = 'real'
+export const STR_TY: PrimitiveType = 'string'
+export const CHAR_TY: PrimitiveType = 'char'
+export const BOOL_TY: PrimitiveType = 'bool'
+export const UNIT_TY: PrimitiveType = 'unit'
+
+/* isType helpers */
+export function isBool(type: Type): boolean {
+  return type === BOOL_TY;
+}
+
+/* FunctionType helpers */
 
 // given types t0 t1 t2 .... tN, create a function type of
 // form: fun t0 -> fun t1 -> fun t2 -> ... -> tN

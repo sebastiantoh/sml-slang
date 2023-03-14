@@ -1,15 +1,10 @@
 import { PrimitiveType, Type } from './types'
-import { makeFunctionType } from './utils'
+import { BOOL_TY, INT_TY, makeFunctionType, REAL_TY, STR_TY } from './utils'
+
 
 export interface TypeEnvironment {
   types: Map<string, Type | Type[]>
 }
-
-const INT_TY: PrimitiveType = 'int'
-const REAL_TY: PrimitiveType = 'real'
-const STR_TY: PrimitiveType = 'string'
-const CHAR_TY: PrimitiveType = 'char'
-const BOOL_TY: PrimitiveType = 'bool'
 
 const primitiveFuncs: [string, Type | Type[]][] = [
   ['/', makeFunctionType(REAL_TY, REAL_TY, REAL_TY)],
