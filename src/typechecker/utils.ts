@@ -7,7 +7,7 @@ export const CHAR_TY: PrimitiveType = 'char'
 export const BOOL_TY: PrimitiveType = 'bool'
 export const UNIT_TY: PrimitiveType = 'unit'
 
-/* isType helpers */
+/* Checking Type helpers */
 
 export function isInt(type: Type): boolean {
   return type === INT_TY
@@ -42,6 +42,15 @@ export function isFunctionType(type: Type): type is FunctionType {
     (type as FunctionType).parameterType !== undefined &&
     (type as FunctionType).returnType !== undefined
   )
+}
+
+export function isSameType(fst: Type, snd: Type): boolean {
+  if (isFunctionType(fst) && isFunctionType(snd)) {
+    const isSameParamType = isSameType(fst.parameterType, snd.parameterType)
+    const isSameReturnType = isSameType(fst.returnType, snd.returnType)
+    return isSameParamType && isSameReturnType
+  }
+  return isPrimitiveType(fst) && isPrimitiveType(snd) && fst === snd
 }
 
 /* FunctionType helpers */
