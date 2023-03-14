@@ -1,4 +1,4 @@
-import { FunctionType, PrimitiveType, Type } from './types'
+import { MatchType, PrimitiveType, Type } from './types'
 
 export const INT_TY: PrimitiveType = 'int'
 export const REAL_TY: PrimitiveType = 'real'
@@ -37,15 +37,14 @@ export function isPrimitiveType(type: Type): type is PrimitiveType {
   return [type].some(isInt || isReal || isStr || isChar || isBool || isUnit)
 }
 
-export function isFunctionType(type: Type): type is FunctionType {
+export function isMatchType(type: Type): type is MatchType {
   return (
-    (type as FunctionType).parameterType !== undefined &&
-    (type as FunctionType).returnType !== undefined
+    (type as MatchType).parameterType !== undefined && (type as MatchType).returnType !== undefined
   )
 }
 
 export function isSameType(fst: Type, snd: Type): boolean {
-  if (isFunctionType(fst) && isFunctionType(snd)) {
+  if (isMatchType(fst) && isMatchType(snd)) {
     const isSameParamType = isSameType(fst.parameterType, snd.parameterType)
     const isSameReturnType = isSameType(fst.returnType, snd.returnType)
     return isSameParamType && isSameReturnType
@@ -57,15 +56,15 @@ export function isSameType(fst: Type, snd: Type): boolean {
 
 // given types t0 t1 t2 .... tN, create a function type of
 // form: fun t0 -> fun t1 -> fun t2 -> ... -> tN
-export function makeFunctionType(...types: Type[]): FunctionType {
+export function makeMatchType(...types: Type[]): MatchType {
   const parameterTypes = types.slice(0, -1)
   const returnType = types[types.length - 1]
-  return curryFuncionTypes(parameterTypes, returnType)
+  return curryMatchTypes(parameterTypes, returnType)
 }
 
-// convert function type of format: fun x0 x1 x2 .... -> xN
-// to: fun x0 -> fun x1 -> fun x2 -> ..... -> xN
-export function curryFuncionTypes(paramTypes: Type[], returnType: Type): FunctionType {
+// convert match type of format: x0 x1 x2 .... -> xN
+// to: x0 -> x1 -> x2 -> ..... -> xN
+export function curryMatchTypes(paramTypes: Type[], returnType: Type): MatchType {
   let tmpType = returnType
   for (let i = paramTypes.length - 1; i >= 0; i--) {
     tmpType = {
@@ -73,7 +72,7 @@ export function curryFuncionTypes(paramTypes: Type[], returnType: Type): Functio
       returnType: tmpType
     }
   }
-  return tmpType as FunctionType
+  return tmpType as MatchType
 }
 
 /* Prettifiers */
@@ -86,7 +85,7 @@ export function stringifyType(type: Type | Type[]): string {
     return type.toString()
   }
   let parameterType = stringifyType(type.parameterType)
-  if (isFunctionType(type.parameterType)) {
+  if (isMatchType(type.parameterType)) {
     parameterType = `(${parameterType})`
   }
   return `${parameterType} -> ${stringifyType(type.returnType)}`

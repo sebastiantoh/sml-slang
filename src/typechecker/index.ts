@@ -5,7 +5,7 @@ import { UNIT_TY } from './utils'
 
 export function typeCheck(node: Node): Type {
   switch (node.tag) {
-    /* Constants */
+    /* Constant */
     case 'IntConstant':
     case 'RealConstant':
     case 'StringConstant':
@@ -13,9 +13,20 @@ export function typeCheck(node: Node): Type {
     case 'BoolConstant':
     case 'UnitConstant':
       return node.type
-    /* Expressions */
+    /* Application */
+    /* InfixApplication */
+    /* ExpSequence */
+    /* LetExpression */
+    /* ConditionalExpression */
     case 'ConditionalExpression':
       return typeCheckConditional(node)
+    /* Function */
+    /* Match */
+    case 'Match':
+      return {
+        parameterType: typeCheck(node.pat),
+        returnType: typeCheck(node.exp)
+      }
   }
   return UNIT_TY
 }
