@@ -1,4 +1,4 @@
-import { PrimitiveType, Type } from './types'
+import { Type } from './types'
 import { BOOL_TY, INT_TY, makeFunctionType, REAL_TY, STR_TY } from './utils'
 
 export interface TypeEnvironment {

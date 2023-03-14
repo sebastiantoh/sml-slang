@@ -33,14 +33,14 @@ export class TypeError implements SourceError {
 
 export class TypeMismatchError extends TypeError {
   constructor(public node: Node, public expected: string, public got: string) {
-    super(node);
+    super(node)
   }
 
   public explain(): string {
-    return `This expression has type ${this.got} but an expression was expected of type ${this.expected}`;
+    return `This expression has type ${this.got} but an expression was expected of type ${this.expected}`
   }
 
   public elaborate(): string {
-    return this.explain();
+    return this.explain()
   }
 }

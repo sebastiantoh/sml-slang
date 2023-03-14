@@ -8,8 +8,40 @@ export const BOOL_TY: PrimitiveType = 'bool'
 export const UNIT_TY: PrimitiveType = 'unit'
 
 /* isType helpers */
+
+export function isInt(type: Type): boolean {
+  return type === INT_TY
+}
+
+export function isReal(type: Type): boolean {
+  return type === REAL_TY
+}
+
+export function isStr(type: Type): boolean {
+  return type === STR_TY
+}
+
+export function isChar(type: Type): boolean {
+  return type === CHAR_TY
+}
+
 export function isBool(type: Type): boolean {
   return type === BOOL_TY
+}
+
+export function isUnit(type: Type): boolean {
+  return type === UNIT_TY
+}
+
+export function isPrimitiveType(type: Type): type is PrimitiveType {
+  return [type].some(isInt || isReal || isStr || isChar || isBool || isUnit)
+}
+
+export function isFunctionType(type: Type): type is FunctionType {
+  return (
+    (type as FunctionType).parameterType !== undefined &&
+    (type as FunctionType).returnType !== undefined
+  )
 }
 
 /* FunctionType helpers */
@@ -33,4 +65,20 @@ export function curryFuncionTypes(paramTypes: Type[], returnType: Type): Functio
     }
   }
   return tmpType as FunctionType
+}
+
+/* Prettifiers */
+
+export function stringifyType(type: Type | Type[]): string {
+  if (Array.isArray(type)) {
+    return type.map(stringifyType).join(' or ')
+  }
+  if (isPrimitiveType(type)) {
+    return type.toString()
+  }
+  let parameterType = stringifyType(type.parameterType)
+  if (isFunctionType(type.parameterType)) {
+    parameterType = `(${parameterType})`
+  }
+  return `${parameterType} -> ${stringifyType(type.returnType)}`
 }
