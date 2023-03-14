@@ -1,5 +1,7 @@
 import { Node } from '../parser/ast'
 import { ErrorSeverity, ErrorType, SourceError, SourceLocation } from '../types'
+import { Type } from './types'
+import { stringifyType } from './utils'
 
 const UNKNOWN_LOCATION: SourceLocation = {
   start: {
@@ -32,12 +34,14 @@ export class TypeError implements SourceError {
 }
 
 export class TypeMismatchError extends TypeError {
-  constructor(public node: Node, public expected: string, public got: string) {
+  constructor(public node: Node, public expected: Type | Type[], public got: Type | Type[]) {
     super(node)
   }
 
   public explain(): string {
-    return `This expression has type ${this.got} but an expression was expected of type ${this.expected}`
+    return `This expression has type ${stringifyType(
+      this.got
+    )} but an expression was expected of type ${stringifyType(this.expected)}`
   }
 
   public elaborate(): string {
