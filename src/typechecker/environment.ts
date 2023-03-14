@@ -1,7 +1,6 @@
 import { PrimitiveType, Type } from './types'
 import { BOOL_TY, INT_TY, makeFunctionType, REAL_TY, STR_TY } from './utils'
 
-
 export interface TypeEnvironment {
   types: Map<string, Type | Type[]>
 }

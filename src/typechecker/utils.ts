@@ -9,7 +9,7 @@ export const UNIT_TY: PrimitiveType = 'unit'
 
 /* isType helpers */
 export function isBool(type: Type): boolean {
-  return type === BOOL_TY;
+  return type === BOOL_TY
 }
 
 /* FunctionType helpers */
