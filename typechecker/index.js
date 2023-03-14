@@ -5,7 +5,7 @@ const expressions_1 = require("./expressions");
 const utils_1 = require("./utils");
 function typeCheck(node) {
     switch (node.tag) {
-        /* Constants */
+        /* Constant */
         case 'IntConstant':
         case 'RealConstant':
         case 'StringConstant':
@@ -13,9 +13,20 @@ function typeCheck(node) {
         case 'BoolConstant':
         case 'UnitConstant':
             return node.type;
-        /* Expressions */
+        /* Application */
+        /* InfixApplication */
+        /* ExpSequence */
+        /* LetExpression */
+        /* ConditionalExpression */
         case 'ConditionalExpression':
             return (0, expressions_1.typeCheckConditional)(node);
+        /* Function */
+        /* Match */
+        case 'Match':
+            return {
+                parameterType: typeCheck(node.pat),
+                returnType: typeCheck(node.exp)
+            };
     }
     return utils_1.UNIT_TY;
 }

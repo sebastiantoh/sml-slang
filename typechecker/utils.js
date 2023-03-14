@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stringifyType = exports.curryFuncionTypes = exports.makeFunctionType = exports.isSameType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
+exports.stringifyType = exports.curryMatchTypes = exports.makeMatchType = exports.isSameType = exports.isMatchType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
 exports.INT_TY = 'int';
 exports.REAL_TY = 'real';
 exports.STR_TY = 'string';
@@ -36,13 +36,12 @@ function isPrimitiveType(type) {
     return [type].some(isInt || isReal || isStr || isChar || isBool || isUnit);
 }
 exports.isPrimitiveType = isPrimitiveType;
-function isFunctionType(type) {
-    return (type.parameterType !== undefined &&
-        type.returnType !== undefined);
+function isMatchType(type) {
+    return (type.parameterType !== undefined && type.returnType !== undefined);
 }
-exports.isFunctionType = isFunctionType;
+exports.isMatchType = isMatchType;
 function isSameType(fst, snd) {
-    if (isFunctionType(fst) && isFunctionType(snd)) {
+    if (isMatchType(fst) && isMatchType(snd)) {
         const isSameParamType = isSameType(fst.parameterType, snd.parameterType);
         const isSameReturnType = isSameType(fst.returnType, snd.returnType);
         return isSameParamType && isSameReturnType;
@@ -53,15 +52,15 @@ exports.isSameType = isSameType;
 /* FunctionType helpers */
 // given types t0 t1 t2 .... tN, create a function type of
 // form: fun t0 -> fun t1 -> fun t2 -> ... -> tN
-function makeFunctionType(...types) {
+function makeMatchType(...types) {
     const parameterTypes = types.slice(0, -1);
     const returnType = types[types.length - 1];
-    return curryFuncionTypes(parameterTypes, returnType);
+    return curryMatchTypes(parameterTypes, returnType);
 }
-exports.makeFunctionType = makeFunctionType;
-// convert function type of format: fun x0 x1 x2 .... -> xN
-// to: fun x0 -> fun x1 -> fun x2 -> ..... -> xN
-function curryFuncionTypes(paramTypes, returnType) {
+exports.makeMatchType = makeMatchType;
+// convert match type of format: x0 x1 x2 .... -> xN
+// to: x0 -> x1 -> x2 -> ..... -> xN
+function curryMatchTypes(paramTypes, returnType) {
     let tmpType = returnType;
     for (let i = paramTypes.length - 1; i >= 0; i--) {
         tmpType = {
@@ -71,7 +70,7 @@ function curryFuncionTypes(paramTypes, returnType) {
     }
     return tmpType;
 }
-exports.curryFuncionTypes = curryFuncionTypes;
+exports.curryMatchTypes = curryMatchTypes;
 /* Prettifiers */
 function stringifyType(type) {
     if (Array.isArray(type)) {
@@ -81,7 +80,7 @@ function stringifyType(type) {
         return type.toString();
     }
     let parameterType = stringifyType(type.parameterType);
-    if (isFunctionType(type.parameterType)) {
+    if (isMatchType(type.parameterType)) {
         parameterType = `(${parameterType})`;
     }
     return `${parameterType} -> ${stringifyType(type.returnType)}`;
