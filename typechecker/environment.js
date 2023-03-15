@@ -74,9 +74,7 @@ const primitiveFuncs = [
             (0, utils_1.makeMatchType)(utils_1.STR_TY, utils_1.STR_TY, utils_1.BOOL_TY),
             (0, utils_1.makeMatchType)(utils_1.CHAR_TY, utils_1.CHAR_TY, utils_1.BOOL_TY)
         ]
-    ],
-    ['andalso', (0, utils_1.makeMatchType)(utils_1.BOOL_TY, utils_1.BOOL_TY, utils_1.BOOL_TY)],
-    ['orelse', (0, utils_1.makeMatchType)(utils_1.BOOL_TY, utils_1.BOOL_TY, utils_1.BOOL_TY)]
+    ]
 ];
 function createInitialTypeEnvironments() {
     // initial type env only contains inbuilt funcs

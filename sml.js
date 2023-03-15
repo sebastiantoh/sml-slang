@@ -107,7 +107,9 @@ exports.builtinBinOperators = {
         if ((a.tag === 'int' && b.tag === 'int') ||
             (a.tag === 'real' && b.tag === 'real') ||
             (a.tag === 'string' && b.tag === 'string') ||
-            (a.tag === 'char' && b.tag === 'char')) {
+            (a.tag === 'char' && b.tag === 'char')
+        // TODO: add more tags, e.g. lists
+        ) {
             return {
                 tag: 'bool',
                 js_val: a.js_val === b.js_val
@@ -119,7 +121,9 @@ exports.builtinBinOperators = {
         if ((a.tag === 'int' && b.tag === 'int') ||
             (a.tag === 'real' && b.tag === 'real') ||
             (a.tag === 'string' && b.tag === 'string') ||
-            (a.tag === 'char' && b.tag === 'char')) {
+            (a.tag === 'char' && b.tag === 'char')
+        // TODO: add more tags, e.g. lists
+        ) {
             return {
                 tag: 'bool',
                 js_val: a.js_val !== b.js_val
@@ -171,24 +175,6 @@ exports.builtinBinOperators = {
             return {
                 tag: 'bool',
                 js_val: a.js_val >= b.js_val
-            };
-        }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
-    },
-    andalso: (a, b) => {
-        if (a.tag === 'bool' && b.tag === 'bool') {
-            return {
-                tag: 'bool',
-                js_val: a.js_val && b.js_val
-            };
-        }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
-    },
-    orelse: (a, b) => {
-        if (a.tag === 'bool' && b.tag === 'bool') {
-            return {
-                tag: 'bool',
-                js_val: a.js_val || b.js_val
             };
         }
         throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);

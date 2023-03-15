@@ -53,13 +53,5 @@ export declare const builtinBinOperators: {
         tag: string;
         js_val: boolean;
     };
-    andalso: (a: Value, b: Value) => {
-        tag: string;
-        js_val: boolean;
-    };
-    orelse: (a: Value, b: Value) => {
-        tag: string;
-        js_val: boolean;
-    };
 };
 export declare const builtinFns: Array<BuiltinFn>;
