@@ -108,6 +108,7 @@ export const builtinBinOperators = {
       (a.tag === 'real' && b.tag === 'real') ||
       (a.tag === 'string' && b.tag === 'string') ||
       (a.tag === 'char' && b.tag === 'char')
+      // TODO: add more tags, e.g. lists
     ) {
       return {
         tag: 'bool',
@@ -122,6 +123,7 @@ export const builtinBinOperators = {
       (a.tag === 'real' && b.tag === 'real') ||
       (a.tag === 'string' && b.tag === 'string') ||
       (a.tag === 'char' && b.tag === 'char')
+      // TODO: add more tags, e.g. lists
     ) {
       return {
         tag: 'bool',
@@ -182,24 +184,6 @@ export const builtinBinOperators = {
       return {
         tag: 'bool',
         js_val: a.js_val >= b.js_val
-      }
-    }
-    throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
-  },
-  andalso: (a: Value, b: Value) => {
-    if (a.tag === 'bool' && b.tag === 'bool') {
-      return {
-        tag: 'bool',
-        js_val: a.js_val && b.js_val
-      }
-    }
-    throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
-  },
-  orelse: (a: Value, b: Value) => {
-    if (a.tag === 'bool' && b.tag === 'bool') {
-      return {
-        tag: 'bool',
-        js_val: a.js_val || b.js_val
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)

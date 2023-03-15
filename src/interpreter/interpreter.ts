@@ -236,8 +236,8 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'BranchI': {
-      const pred_res = S.pop()
-      assert(pred_res !== undefined && pred_res!.tag === 'bool')
+      const pred_res = S.pop()!
+      assert(pred_res.tag === 'bool')
 
       if (pred_res.js_val) {
         A.push(cmd.consequent)

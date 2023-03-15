@@ -80,9 +80,7 @@ const primitiveFuncs: [string, Type | Type[]][] = [
       makeMatchType(STR_TY, STR_TY, BOOL_TY),
       makeMatchType(CHAR_TY, CHAR_TY, BOOL_TY)
     ]
-  ],
-  ['andalso', makeMatchType(BOOL_TY, BOOL_TY, BOOL_TY)],
-  ['orelse', makeMatchType(BOOL_TY, BOOL_TY, BOOL_TY)]
+  ]
 ]
 
 export function createInitialTypeEnvironments(): TypeEnvironment {
