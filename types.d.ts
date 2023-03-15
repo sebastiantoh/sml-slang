@@ -2,35 +2,35 @@ import { Matches } from './parser/ast';
 import { TypeEnvironment } from './typechecker/environment';
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn;
 export interface Int {
-    type: 'int';
+    tag: 'int';
     js_val: number;
 }
 export interface Real {
-    type: 'real';
+    tag: 'real';
     js_val: number;
 }
 export interface String {
-    type: 'string';
+    tag: 'string';
     js_val: string;
 }
 export interface Char {
-    type: 'char';
+    tag: 'char';
     js_val: string;
 }
 export interface Bool {
-    type: 'bool';
+    tag: 'bool';
     js_val: boolean;
 }
 export interface Unit {
-    type: 'unit';
+    tag: 'unit';
 }
 export interface Fn {
-    type: 'fn';
+    tag: 'fn';
     matches: Matches;
     env: Environment;
 }
 export interface BuiltinFn {
-    type: 'builtin_fn';
+    tag: 'builtin_fn';
     id: string;
     apply: (arg: Value) => Value;
 }

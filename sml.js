@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.builtinFns = exports.builtinBinOperators = exports.valueToString = void 0;
 const interpreter_1 = require("./interpreter/interpreter");
 const valueToString = (sml_val) => {
-    switch (sml_val.type) {
+    switch (sml_val.tag) {
         case 'int':
             if (sml_val.js_val < 0) {
                 return `~${Math.abs(sml_val.js_val)}`;
@@ -35,200 +35,200 @@ exports.valueToString = valueToString;
 // Page 98 of https://smlfamily.github.io/sml90-defn.pdf
 exports.builtinBinOperators = {
     '/': (a, b) => {
-        if (a.type === 'real' && b.type === 'real') {
+        if (a.tag === 'real' && b.tag === 'real') {
             if (b.js_val === 0) {
                 throw new Error('division by zero');
             }
             return {
-                type: 'real',
+                tag: 'real',
                 js_val: a.js_val / b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     div: (a, b) => {
-        if (a.type === 'int' && b.type === 'int') {
+        if (a.tag === 'int' && b.tag === 'int') {
             if (b.js_val === 0) {
                 throw new Error('division by zero');
             }
             return {
-                type: 'int',
+                tag: 'int',
                 js_val: Math.floor(a.js_val / b.js_val)
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     mod: (a, b) => {
-        if (a.type === 'int' && b.type === 'int') {
+        if (a.tag === 'int' && b.tag === 'int') {
             return {
-                type: 'int',
+                tag: 'int',
                 js_val: ((a.js_val % b.js_val) + b.js_val) % b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '*': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
+        if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
             return {
-                type: a.type,
+                tag: a.tag,
                 js_val: a.js_val * b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '+': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
+        if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
             return {
-                type: a.type,
+                tag: a.tag,
                 js_val: a.js_val + b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '-': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') || (a.type === 'real' && b.type === 'real')) {
+        if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
             return {
-                type: a.type,
+                tag: a.tag,
                 js_val: a.js_val - b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '^': (a, b) => {
-        if (a.type === 'string' && b.type === 'string') {
+        if (a.tag === 'string' && b.tag === 'string') {
             return {
-                type: 'string',
+                tag: 'string',
                 js_val: a.js_val.concat(b.js_val)
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '=': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') ||
-            (a.type === 'real' && b.type === 'real') ||
-            (a.type === 'string' && b.type === 'string') ||
-            (a.type === 'char' && b.type === 'char')) {
+        if ((a.tag === 'int' && b.tag === 'int') ||
+            (a.tag === 'real' && b.tag === 'real') ||
+            (a.tag === 'string' && b.tag === 'string') ||
+            (a.tag === 'char' && b.tag === 'char')) {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val === b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '<>': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') ||
-            (a.type === 'real' && b.type === 'real') ||
-            (a.type === 'string' && b.type === 'string') ||
-            (a.type === 'char' && b.type === 'char')) {
+        if ((a.tag === 'int' && b.tag === 'int') ||
+            (a.tag === 'real' && b.tag === 'real') ||
+            (a.tag === 'string' && b.tag === 'string') ||
+            (a.tag === 'char' && b.tag === 'char')) {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val !== b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '<': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') ||
-            (a.type === 'real' && b.type === 'real') ||
-            (a.type === 'string' && b.type === 'string') ||
-            (a.type === 'char' && b.type === 'char')) {
+        if ((a.tag === 'int' && b.tag === 'int') ||
+            (a.tag === 'real' && b.tag === 'real') ||
+            (a.tag === 'string' && b.tag === 'string') ||
+            (a.tag === 'char' && b.tag === 'char')) {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val < b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '>': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') ||
-            (a.type === 'real' && b.type === 'real') ||
-            (a.type === 'string' && b.type === 'string') ||
-            (a.type === 'char' && b.type === 'char')) {
+        if ((a.tag === 'int' && b.tag === 'int') ||
+            (a.tag === 'real' && b.tag === 'real') ||
+            (a.tag === 'string' && b.tag === 'string') ||
+            (a.tag === 'char' && b.tag === 'char')) {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val > b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '<=': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') ||
-            (a.type === 'real' && b.type === 'real') ||
-            (a.type === 'string' && b.type === 'string') ||
-            (a.type === 'char' && b.type === 'char')) {
+        if ((a.tag === 'int' && b.tag === 'int') ||
+            (a.tag === 'real' && b.tag === 'real') ||
+            (a.tag === 'string' && b.tag === 'string') ||
+            (a.tag === 'char' && b.tag === 'char')) {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val <= b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '>=': (a, b) => {
-        if ((a.type === 'int' && b.type === 'int') ||
-            (a.type === 'real' && b.type === 'real') ||
-            (a.type === 'string' && b.type === 'string') ||
-            (a.type === 'char' && b.type === 'char')) {
+        if ((a.tag === 'int' && b.tag === 'int') ||
+            (a.tag === 'real' && b.tag === 'real') ||
+            (a.tag === 'string' && b.tag === 'string') ||
+            (a.tag === 'char' && b.tag === 'char')) {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val >= b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     andalso: (a, b) => {
-        if (a.type === 'bool' && b.type === 'bool') {
+        if (a.tag === 'bool' && b.tag === 'bool') {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val && b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     orelse: (a, b) => {
-        if (a.type === 'bool' && b.type === 'bool') {
+        if (a.tag === 'bool' && b.tag === 'bool') {
             return {
-                type: 'bool',
+                tag: 'bool',
                 js_val: a.js_val || b.js_val
             };
         }
-        throw new Error(`invalid types - received ${a.type} and ${b.type}`);
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     }
 };
 exports.builtinFns = [
     {
-        type: 'builtin_fn',
+        tag: 'builtin_fn',
         id: 'print',
         apply: (arg) => {
             interpreter_1.stdout.push((0, exports.valueToString)(arg) + '\n');
             return {
-                type: 'unit'
+                tag: 'unit'
             };
         }
     },
     {
-        type: 'builtin_fn',
+        tag: 'builtin_fn',
         id: 'size',
         apply: (arg) => {
-            if (arg.type === 'string') {
+            if (arg.tag === 'string') {
                 return {
-                    type: 'int',
+                    tag: 'int',
                     js_val: arg.js_val.length
                 };
             }
-            throw new Error(`invalid types - received ${arg.type}`);
+            throw new Error(`invalid types - received ${arg.tag}`);
         }
     },
     {
-        type: 'builtin_fn',
+        tag: 'builtin_fn',
         id: 'not',
         apply: (arg) => {
-            if (arg.type === 'bool') {
+            if (arg.tag === 'bool') {
                 return {
-                    type: 'bool',
+                    tag: 'bool',
                     js_val: !arg.js_val
                 };
             }
-            throw new Error(`invalid types - received ${arg.type}`);
+            throw new Error(`invalid types - received ${arg.tag}`);
         }
     }
 ];
