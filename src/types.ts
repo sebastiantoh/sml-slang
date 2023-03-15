@@ -1,8 +1,6 @@
 import { Matches } from './parser/ast'
 import { TypeEnvironment } from './typechecker/environment'
 
-// Represents a JS value and annotates it with its SML type
-// Should have a "type" field, denoting the SML type
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn
 
 // TODO: eventually these types can be removed?
@@ -10,42 +8,42 @@ export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn
 // so shd be fine to remove all types here and all
 // type assertions in the interpreter
 export interface Int {
-  type: 'int'
+  tag: 'int'
   js_val: number
 }
 
 export interface Real {
-  type: 'real'
+  tag: 'real'
   js_val: number
 }
 
 export interface String {
-  type: 'string'
+  tag: 'string'
   js_val: string
 }
 
 export interface Char {
-  type: 'char'
+  tag: 'char'
   js_val: string
 }
 
 export interface Bool {
-  type: 'bool'
+  tag: 'bool'
   js_val: boolean
 }
 
 export interface Unit {
-  type: 'unit'
+  tag: 'unit'
 }
 
 export interface Fn {
-  type: 'fn' // not a real sml type (function should be typed based on args and return value)
+  tag: 'fn'
   matches: Matches
   env: Environment
 }
 
 export interface BuiltinFn {
-  type: 'builtin_fn'
+  tag: 'builtin_fn'
   id: string
   apply: (arg: Value) => Value
 }
