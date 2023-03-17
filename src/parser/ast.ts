@@ -1,3 +1,5 @@
+import { SourceLocation } from '../types'
+
 export type Node =
   | Expression
   | Match
@@ -10,6 +12,10 @@ export type Node =
 
 interface BaseNode {
   tag: string
+  // TODO: shd this be compulsory?
+  // imo maybe dont need cause we only need to know where some things are?
+  // like we dont rly care where the constants are?
+  loc?: SourceLocation
 }
 
 /**
@@ -19,14 +25,14 @@ export type Expression =
   | Constant
   | Application
   | InfixApplication
+  | ExpSequence
   | LetExpression
-  | BinaryLogicalOperator
   | ConditionalExpression
   | Function
 
 export type Constant =
   | IntConstant
-  | FloatConstant
+  | RealConstant
   | StringConstant
   | CharConstant
   | BoolConstant
@@ -34,25 +40,31 @@ export type Constant =
 export interface IntConstant extends BaseNode {
   tag: 'IntConstant'
   val: number
+  type: 'int'
 }
-export interface FloatConstant extends BaseNode {
-  tag: 'FloatConstant'
+export interface RealConstant extends BaseNode {
+  tag: 'RealConstant'
   val: number
+  type: 'real'
 }
 export interface StringConstant extends BaseNode {
   tag: 'StringConstant'
   val: string
+  type: 'string'
 }
 export interface CharConstant extends BaseNode {
   tag: 'CharConstant'
   val: string
+  type: 'char'
 }
 export interface BoolConstant extends BaseNode {
   tag: 'BoolConstant'
   val: boolean
+  type: 'bool'
 }
 export interface UnitConstant extends BaseNode {
   tag: 'UnitConstant'
+  type: 'unit'
 }
 
 export interface Application extends BaseNode {
@@ -68,17 +80,15 @@ export interface InfixApplication extends BaseNode {
   id: string
 }
 
+export interface ExpSequence extends BaseNode {
+  tag: 'ExpSequence'
+  exps: Array<Expression>
+}
+
 export interface LetExpression extends BaseNode {
   tag: 'LetExpression'
   decSequence: DeclarationSequence
   exps: Array<Expression>
-}
-
-export interface BinaryLogicalOperator extends BaseNode {
-  tag: 'BinaryLogicalOperator'
-  operand1: Expression
-  operand2: Expression
-  id: 'andalso' | 'orelse'
 }
 
 export interface ConditionalExpression extends BaseNode {
@@ -123,8 +133,7 @@ export interface DeclarationSequence extends BaseNode {
   tag: 'DeclarationSequence'
   decs: Array<Declaration>
 }
-// TODO: FunctionDeclaration should not be a separate ast node. Should desugar to val rec fbind ^
-// (see page 90 of https://smlfamily.github.io/sml90-defn.pdf)
+
 export type Declaration = ValueDeclaration | LocalDeclaration
 
 export interface ValueDeclaration extends BaseNode {

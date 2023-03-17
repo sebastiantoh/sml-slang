@@ -17,9 +17,11 @@ import {
   DecSequenceContext,
   DisjunctionContext,
   ExpContext,
+  ExpSequenceContext,
   ExpVariableContext,
-  FloatingPointContext,
+  FunbindContext,
   FunctionContext,
+  FunDeclContext,
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
@@ -31,6 +33,7 @@ import {
   PatUnitContext,
   PatVariableContext,
   ProgContext,
+  RealContext,
   SmlParser,
   StringContext,
   UnitContext,
@@ -38,9 +41,9 @@ import {
   ValueDeclContext
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
+import { SourceLocation } from '../types'
 import {
   Application,
-  BinaryLogicalOperator,
   BoolConstant,
   CharConstant,
   ConditionalExpression,
@@ -48,7 +51,7 @@ import {
   Declaration,
   DeclarationSequence,
   Expression,
-  FloatConstant,
+  ExpSequence,
   Function,
   InfixApplication,
   IntConstant,
@@ -59,12 +62,27 @@ import {
   Node,
   Pattern,
   Program,
+  RealConstant,
   StringConstant,
   UnitConstant,
   Valbind,
   ValueDeclaration,
   Variable
 } from './ast'
+
+// TODO: move to parser/utils.ts?
+function contextToLocation(ctx: ParserRuleContext): SourceLocation {
+  return {
+    start: {
+      line: ctx.start.line,
+      column: ctx.start.charPositionInLine
+    },
+    end: {
+      line: ctx.stop ? ctx.stop.line : ctx.start.line,
+      column: ctx.stop ? ctx.stop.charPositionInLine : ctx.start.charPositionInLine
+    }
+  }
+}
 
 class NodeGenerator implements SmlVisitor<Node> {
   /**
@@ -75,40 +93,46 @@ class NodeGenerator implements SmlVisitor<Node> {
     const val = isNeg ? parseInt(ctx.text.slice(1)) * -1 : parseInt(ctx.text)
     return {
       tag: 'IntConstant',
-      val: val
+      val: val,
+      type: 'int'
     }
   }
-  visitFloatingPoint(ctx: FloatingPointContext): FloatConstant {
+  visitReal(ctx: RealContext): RealConstant {
     const isNeg = ctx.text.startsWith('~')
     const val = isNeg ? parseFloat(ctx.text.slice(1)) * -1 : parseFloat(ctx.text)
     return {
-      tag: 'FloatConstant',
-      val: val
+      tag: 'RealConstant',
+      val: val,
+      type: 'real'
     }
   }
   visitCharacter(ctx: CharacterContext): CharConstant {
     return {
       tag: 'CharConstant',
       // remove leading hash and double quote, and also trailing double quotes
-      val: ctx.text.slice(2, ctx.text.length - 1)
+      val: ctx.text.slice(2, ctx.text.length - 1),
+      type: 'char'
     }
   }
   visitString(ctx: StringContext): StringConstant {
     return {
       tag: 'StringConstant',
       // remove leading and trailing double quotes
-      val: ctx.text.slice(1, ctx.text.length - 1)
+      val: ctx.text.slice(1, ctx.text.length - 1),
+      type: 'string'
     }
   }
   visitBoolean(ctx: BooleanContext): BoolConstant {
     return {
       tag: 'BoolConstant',
-      val: ctx.TRUE() !== undefined ? true : false
+      val: ctx.TRUE() !== undefined ? true : false,
+      type: 'bool'
     }
   }
   visitUnit(_ctx: UnitContext): UnitConstant {
     return {
-      tag: 'UnitConstant'
+      tag: 'UnitConstant',
+      type: 'unit'
     }
   }
 
@@ -119,13 +143,18 @@ class NodeGenerator implements SmlVisitor<Node> {
     return this.visit(ctx.con()) as Constant
   }
   visitExpVariable(ctx: ExpVariableContext): Variable {
-    return { tag: 'Variable', id: ctx._id.text! }
+    return {
+      tag: 'Variable',
+      id: ctx._id.text!,
+      loc: contextToLocation(ctx)
+    }
   }
   visitApplication(ctx: ApplicationContext): Application {
     return {
       tag: 'Application',
       fn: this.visit(ctx._fn) as Expression,
-      arg: this.visit(ctx._arg) as Expression
+      arg: this.visit(ctx._arg) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
   visitInfixApplication(ctx: InfixApplicationContext): InfixApplication {
@@ -133,7 +162,14 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'InfixApplication',
       operand1: this.visit(ctx._op1) as Expression,
       operand2: this.visit(ctx._op2) as Expression,
-      id: ctx._id.text!
+      id: ctx._id.text!,
+      loc: contextToLocation(ctx)
+    }
+  }
+  visitExpSequence(ctx: ExpSequenceContext): ExpSequence {
+    return {
+      tag: 'ExpSequence',
+      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
     }
   }
   visitParentheses(ctx: ParenthesesContext): Expression {
@@ -143,23 +179,38 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'LetExpression',
       decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
-      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression),
+      loc: contextToLocation(ctx)
     }
   }
-  visitConjunction(ctx: ConjunctionContext): BinaryLogicalOperator {
+  visitConjunction(ctx: ConjunctionContext): ConditionalExpression {
+    // Rewrite derived form into equivalent form
+    // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
     return {
-      tag: 'BinaryLogicalOperator',
-      operand1: this.visit(ctx._op1) as Expression,
-      operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ANDALSO().text as 'andalso'
+      tag: 'ConditionalExpression',
+      pred: this.visit(ctx._op1) as Expression,
+      consequent: this.visit(ctx._op2) as Expression,
+      alternative: {
+        tag: 'BoolConstant',
+        val: false,
+        type: 'bool'
+      },
+      loc: contextToLocation(ctx)
     }
   }
-  visitDisjunction(ctx: DisjunctionContext): BinaryLogicalOperator {
+  visitDisjunction(ctx: DisjunctionContext): ConditionalExpression {
+    // Rewrite derived form into equivalent form
+    // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)
     return {
-      tag: 'BinaryLogicalOperator',
-      operand1: this.visit(ctx._op1) as Expression,
-      operand2: this.visit(ctx._op2) as Expression,
-      id: ctx.ORELSE().text as 'orelse'
+      tag: 'ConditionalExpression',
+      pred: this.visit(ctx._op1) as Expression,
+      consequent: {
+        tag: 'BoolConstant',
+        val: true,
+        type: 'bool'
+      },
+      alternative: this.visit(ctx._op2) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
   visitConditional(ctx: ConditionalContext): ConditionalExpression {
@@ -167,13 +218,15 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'ConditionalExpression',
       pred: this.visit(ctx._pred) as Expression,
       consequent: this.visit(ctx._cons) as Expression,
-      alternative: this.visit(ctx._alt) as Expression
+      alternative: this.visit(ctx._alt) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
   visitFunction(ctx: FunctionContext): Function {
     return {
       tag: 'Function',
-      matches: this.visit(ctx.matches()) as Matches
+      matches: this.visit(ctx.matches()) as Matches,
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -184,13 +237,15 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'Match',
       pat: this.visit(ctx.pat()) as Pattern,
-      exp: this.visit(ctx.exp()) as Expression
+      exp: this.visit(ctx.exp()) as Expression,
+      loc: contextToLocation(ctx)
     }
   }
   visitMatches(ctx: MatchesContext): Matches {
     return {
       tag: 'Matches',
-      matches: ctx.patmatch().map((m: PatmatchContext) => this.visit(m) as Match)
+      matches: ctx.patmatch().map((m: PatmatchContext) => this.visit(m) as Match),
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -202,13 +257,15 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitPatUnit(_ctx: PatUnitContext): UnitConstant {
     return {
-      tag: 'UnitConstant'
+      tag: 'UnitConstant',
+      type: 'unit'
     }
   }
   visitPatVariable(ctx: PatVariableContext): Variable {
     return {
       tag: 'Variable',
-      id: ctx._id.text!
+      id: ctx._id.text!,
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -218,20 +275,34 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitValueDecl(ctx: ValueDeclContext): ValueDeclaration {
     return {
       tag: 'ValueDeclaration',
-      valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind)
+      valbinds: ctx.valbind().map((vb: ValbindContext) => this.visit(vb) as Valbind),
+      loc: contextToLocation(ctx)
+    }
+  }
+  visitFunDecl(ctx: FunDeclContext): ValueDeclaration {
+    // function declarations are syntatic sugar for value declarations:
+    // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
+    // TODO: this desugaring doesn't work for mutually recursive function :'(
+    // For more info: https://stackoverflow.com/questions/63428214/declaring-interdependent-values-and-functions-in-standard-ml
+    return {
+      tag: 'ValueDeclaration',
+      valbinds: ctx.funbind().map((fb: FunbindContext) => this.visit(fb) as Valbind),
+      loc: contextToLocation(ctx)
     }
   }
   visitLocalDecl(ctx: LocalDeclContext): LocalDeclaration {
     return {
       tag: 'LocalDeclaration',
       localDecs: this.visit(ctx._localDecs) as DeclarationSequence,
-      decs: this.visit(ctx._decs) as DeclarationSequence
+      decs: this.visit(ctx._decs) as DeclarationSequence,
+      loc: contextToLocation(ctx)
     }
   }
   visitDecSequence(ctx: DecSequenceContext): DeclarationSequence {
     return {
       tag: 'DeclarationSequence',
-      decs: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration)
+      decs: ctx.dec().map((d: DecContext) => this.visit(d) as Declaration),
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -243,7 +314,84 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'Valbind',
       is_rec: ctx.REC() !== undefined,
       pat: this.visit(ctx.pat()) as Pattern,
-      exp: this.visit(ctx.exp()) as Expression
+      exp: this.visit(ctx.exp()) as Expression,
+      loc: contextToLocation(ctx)
+    }
+  }
+
+  /**
+   * Funbind
+   */
+  visitFunbind(ctx: FunbindContext): Valbind {
+    // Desugar funbind into valbind
+    // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
+
+    const funMatches = ctx.funmatches().funmatch()
+    const fnName = funMatches[0].ID().text
+    const nParams = funMatches[0].pat().length
+    const matches: Array<Match> = []
+
+    // TODO: delete this specific case once multiple cases have been supported
+    if (funMatches.length === 1) {
+      const funMatch = funMatches[0]
+      const params = funMatch.pat().map(p => this.visit(p) as Pattern)
+      let exp = this.visit(funMatch.exp()) as Expression
+
+      // Exclude first param, iterate in reverse, and reconstruct the full curried function
+      params
+        .slice(1)
+        .reverse()
+        .forEach(p => {
+          const fn = {
+            // TODO: do we want to keep track of the locations of each of these functions?
+            tag: 'Function',
+            matches: { tag: 'Matches', matches: [{ tag: 'Match', pat: p, exp }] }
+          } as Function
+          exp = fn
+        })
+
+      const match = {
+        tag: 'Match',
+        pat: params[0],
+        exp: exp
+      } as Match
+      matches.push(match)
+    } else {
+      // Each funmatch correspond to a separate case. Each case can contain >= 1 parameter (or patterns)
+      for (const funMatch of funMatches) {
+        const id = funMatch.ID().text
+        const tmpNumParams = funMatch.pat().length
+
+        // across each case, the function name and number of parameters
+        // must be the same
+        if (funMatch.ID().text !== fnName) {
+          /*
+          Example where function names are different:
+          fun f 1 = 2
+            | x 2 = 3
+          */
+          throw new Error(`Different function names in different cases ("${fnName}" vs. "${id}")`)
+        } else if (tmpNumParams !== nParams) {
+          /*
+          Example where number of params are different:
+          fun f 1 = 2
+            | f = 3
+          */
+          throw new Error(`Different number of params in different cases`)
+        }
+
+        throw new Error(
+          "TODO: multiple cases for functions not yet implemented. Implement this once 'case (...) of ...' has been implemeneted"
+        )
+      }
+    }
+
+    return {
+      tag: 'Valbind',
+      is_rec: true,
+      pat: { tag: 'Variable', id: fnName },
+      exp: { tag: 'Function', matches: { tag: 'Matches', matches } },
+      loc: contextToLocation(ctx)
     }
   }
 

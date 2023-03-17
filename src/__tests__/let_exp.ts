@@ -238,3 +238,59 @@ in
 end
 `)
   ).toThrow(/z not found in env/))
+
+test('funbind with multiple params', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  fun add x y = x + y
+in
+  add 2 3
+end
+`)
+  ).toBe(`5`))
+
+test('funbind with multiple params and partial application', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  fun add x y = x + y
+  val add_two = add 2
+  val add_three = add 3
+in
+  add_two (add_three 3)
+end
+`)
+  ).toBe(`8`))
+
+test('tail recursive function', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  fun add x y = x + y
+  fun fact n acc =
+    if n = 0 then
+      acc
+    else
+      fact (n - 1) (acc * n)
+in
+  (add 2 (fact 5 1))
+end
+`)
+  ).toBe(`122`))
+
+test('tail recursive function - env is properly restored', () =>
+  expect(() =>
+    parseAndEvaluateExp(`
+let
+  fun add x y = x + y
+  fun fact n acc =
+    if n = 0 then
+      acc
+    else
+      fact (n - 1) (acc * n)
+in
+  (fact 5 1) + acc
+end
+`)
+  ).toThrow(/acc not found in env/))

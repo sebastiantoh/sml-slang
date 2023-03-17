@@ -10,7 +10,7 @@ INT
     ;
 
 // Not supporting scientific notation for now since the tilde complicates thing
-FLOAT
+REAL
     : '~'? NUM '.' NUM
     ;
 
@@ -73,7 +73,7 @@ ID
 
 con
     : INT              # Integer
-    | FLOAT            # FloatingPoint
+    | REAL             # Real
     | CHAR             # Character
     | STRING           # String
     | (TRUE | FALSE)   # Boolean
@@ -91,6 +91,7 @@ exp
     | op1=exp id=(EQ | NEQ | LT | GT | LTE | GTE) op2=exp             # InfixApplication
     | op1=exp id=ID op2=exp                                           # InfixApplication
     | LPAREN exp RPAREN                                               # Parentheses
+    | LPAREN exp (SEMICOLON exp)+ RPAREN                              # ExpSequence
     | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
     | op1=exp ANDALSO op2=exp                                         # Conjunction
     | op1=exp ORELSE op2=exp                                          # Disjunction
@@ -114,14 +115,20 @@ pat
 
 dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
+    | 'fun' funbind (AND funbind)*                                    # FunDecl
     | 'local' localDecs=decSequence 'in' decs=decSequence 'end'       # LocalDecl
     ;
 
 // TODO: everywhere that uses "dec" in the
 // grammar rules online should be replaced with this instead
-// also does this work for dec ; dec? - might need to remove the trailing ;
-decSequence: (dec SEMICOLON?)+;
+decSequence: (dec SEMICOLON?)* dec;
 
 valbind: REC? pat EQ exp;
+
+funbind: funmatches;
+
+funmatches: funmatch ('|' funmatch)*;
+
+funmatch: id=ID pat pat* EQ exp;
 
 prog: decSequence;

@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`is_prime.sml 1`] = `
+"true
+true
+false
+true
+false
+true
+"
+`;
