@@ -1,7 +1,7 @@
 import { stdout } from './interpreter/interpreter'
 import { BuiltinFn, Value } from './types'
 
-export const valueToString = (sml_val: Value) => {
+export const valueToString = (sml_val: Value): string => {
   switch (sml_val.tag) {
     case 'int':
       if (sml_val.js_val < 0) {
@@ -21,6 +21,9 @@ export const valueToString = (sml_val: Value) => {
       return sml_val.js_val.toString()
     case 'unit':
       return '()'
+    // TODO: implement list to string
+    case 'list':
+      return `[${sml_val.js_val.map(e => valueToString(e)).toString()}]`
     case 'fn':
       // TODO: once we have a typechecker, we can
       // include more info in the string repr, e.g param types and return types

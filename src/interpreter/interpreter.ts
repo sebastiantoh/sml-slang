@@ -117,6 +117,16 @@ const exec_microcode = (cmd: Microcode) => {
       })
       break
     }
+    case 'List': {
+      // TODO: confirm if this is clean implementation
+      let vals = cmd.elements.map(e => evaluateExp(e))
+      S.pop()
+      S.push({
+        tag: 'list',
+        js_val: vals
+      })
+      break 
+    }
     case 'Application': {
       A.push({ tag: 'ApplicationI' }, cmd.arg, cmd.fn)
       break

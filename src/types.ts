@@ -1,7 +1,7 @@
 import { Matches } from './parser/ast'
 import { TypeEnvironment } from './typechecker/environment'
 
-export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn
+export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List
 
 // TODO: eventually these types can be removed?
 // ast typechecking wld have ensure type safety alr
@@ -34,6 +34,11 @@ export interface Bool {
 
 export interface Unit {
   tag: 'unit'
+}
+
+export interface List {
+  tag: 'list'
+  js_val: Value[]
 }
 
 export interface Fn {
