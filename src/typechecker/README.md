@@ -87,22 +87,6 @@ env |- let dec in e1; e2; ...; en end: t -| C
 e.g.
 - `let val x = 2 in x + 2; "hi"; true end;` returns `bool`
 
-### Conjunction
-```
-env |- e1 andalso e2 : 't -| t1 = bool, t2 = bool, 't = bool
-    if fresh 't
-    and env |- e1 : t1 -| C1
-    and env |- e2 : t2 -| C2
-```
-
-### Disjunction
-```
-env |- e1 orelse e2 : 't -| t1 = bool, t2 = bool, 't = bool
-    if fresh 't
-    and env |- e1 : t1 -| C1
-    and env |- e2 : t2 -| C2
-```
-
 ### Conditional
 ```
 env |- if e1 then e2 else e3 : 't -| C1, C2, C3, t1 = bool, 't = t2, 't = t3
@@ -230,7 +214,7 @@ e.g.
 -----------------------------------------------------------------------------------
 
 ## Declarations
-For declarations, it suffices to extend the type environement (there is no type to return). We define a function `extend_env(env, dec)` that returns an environment extended with the declarations in `dec`.
+For declarations, it suffices to extend the type environment (there is no type to return). We define a function `extend_env(env, dec)` that returns an environment extended with the declarations in `dec`.
 
 ### Value
 If patterns are of type 'a (type variable):
