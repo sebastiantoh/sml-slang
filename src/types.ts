@@ -1,51 +1,54 @@
 import { Matches } from './parser/ast'
 import { TypeEnvironment } from './typechecker/environment'
 
-// Represents a JS value and annotates it with its SML type
-// Should have a "type" field, denoting the SML type
-export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn
+export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List
 
 // TODO: eventually these types can be removed?
 // ast typechecking wld have ensure type safety alr
 // so shd be fine to remove all types here and all
 // type assertions in the interpreter
 export interface Int {
-  type: 'int'
-  js_val: number
+  tag: 'int'
+  js_val: Readonly<number>
 }
 
 export interface Real {
-  type: 'real'
-  js_val: number
+  tag: 'real'
+  js_val: Readonly<number>
 }
 
 export interface String {
-  type: 'string'
-  js_val: string
+  tag: 'string'
+  js_val: Readonly<string>
 }
 
 export interface Char {
-  type: 'char'
-  js_val: string
+  tag: 'char'
+  js_val: Readonly<string>
 }
 
 export interface Bool {
-  type: 'bool'
-  js_val: boolean
+  tag: 'bool'
+  js_val: Readonly<boolean>
 }
 
 export interface Unit {
-  type: 'unit'
+  tag: 'unit'
+}
+
+export interface List {
+  tag: 'list'
+  js_val: Readonly<Value[]>
 }
 
 export interface Fn {
-  type: 'fn' // not a real sml type (function should be typed based on args and return value)
+  tag: 'fn'
   matches: Matches
   env: Environment
 }
 
 export interface BuiltinFn {
-  type: 'builtin_fn'
+  tag: 'builtin_fn'
   id: string
   apply: (arg: Value) => Value
 }

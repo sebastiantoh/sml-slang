@@ -48,5 +48,6 @@
       "./src/__tests__/utils.ts",
       "./dist"
     ]
-  }
+  },
+  "packageManager": "yarn@3.4.1"
 }

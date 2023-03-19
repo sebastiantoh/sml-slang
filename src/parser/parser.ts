@@ -25,6 +25,7 @@ import {
   InfixApplicationContext,
   IntegerContext,
   LetExpressionContext,
+  ListContext,
   LocalDeclContext,
   MatchesContext,
   ParenthesesContext,
@@ -56,6 +57,7 @@ import {
   InfixApplication,
   IntConstant,
   LetExpression,
+  ListLiteral,
   LocalDeclaration,
   Match,
   Matches,
@@ -227,6 +229,14 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'Function',
       matches: this.visit(ctx.matches()) as Matches,
       loc: contextToLocation(ctx)
+    }
+  }
+  visitList(ctx: ListContext): ListLiteral {
+    const elements = ctx.exp()
+    return {
+      tag: 'ListLiteral',
+      elements: elements.map(e => this.visit(e)) as Expression[],
+      arity: elements.length
     }
   }
 

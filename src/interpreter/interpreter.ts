@@ -78,43 +78,47 @@ const exec_microcode = (cmd: Microcode) => {
      */
     case 'IntConstant': {
       S.push({
-        type: 'int',
+        tag: 'int',
         js_val: cmd.val
       })
       break
     }
     case 'RealConstant': {
       S.push({
-        type: 'real',
+        tag: 'real',
         js_val: cmd.val
       })
       break
     }
     case 'CharConstant': {
       S.push({
-        type: 'char',
+        tag: 'char',
         js_val: cmd.val
       })
       break
     }
     case 'StringConstant': {
       S.push({
-        type: 'string',
+        tag: 'string',
         js_val: cmd.val
       })
       break
     }
     case 'BoolConstant': {
       S.push({
-        type: 'bool',
+        tag: 'bool',
         js_val: cmd.val
       })
       break
     }
     case 'UnitConstant': {
       S.push({
-        type: 'unit'
+        tag: 'unit'
       })
+      break
+    }
+    case 'ListLiteral': {
+      A.push({ tag: 'ListI', arity: cmd.arity }, ...reverse(cmd.elements))
       break
     }
     case 'Application': {
@@ -148,7 +152,7 @@ const exec_microcode = (cmd: Microcode) => {
     }
     case 'Function': {
       S.push({
-        type: 'fn',
+        tag: 'fn',
         matches: cmd.matches,
         // note: we create a copy of this env since the env may be mutated, e.g:
         // in a local declaration, the parent of E will be mutated
@@ -236,8 +240,8 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'BranchI': {
-      const pred_res = S.pop()
-      assert(pred_res !== undefined && pred_res!.type === 'bool')
+      const pred_res = S.pop()!
+      assert(pred_res.tag === 'bool')
 
       if (pred_res.js_val) {
         A.push(cmd.consequent)
@@ -277,7 +281,7 @@ const exec_microcode = (cmd: Microcode) => {
       // Examples of valid constant assignment: 1=1, true=true, ()=()
       // Examples of non-valid constant assignment: 1=2, true=false
       if (cmd.pat.tag === 'UnitConstant') {
-        if (rhs.type !== 'unit') {
+        if (rhs.tag !== 'unit') {
           throw new Error(`cannot bind () to ${rhs}. can only bind () to itself`)
         }
       } else if (
@@ -288,11 +292,11 @@ const exec_microcode = (cmd: Microcode) => {
         cmd.pat.tag === 'BoolConstant'
       ) {
         if (
-          (rhs.type !== 'int' &&
-            rhs.type !== 'real' &&
-            rhs.type !== 'char' &&
-            rhs.type !== 'string' &&
-            rhs.type !== 'bool') ||
+          (rhs.tag !== 'int' &&
+            rhs.tag !== 'real' &&
+            rhs.tag !== 'char' &&
+            rhs.tag !== 'string' &&
+            rhs.tag !== 'bool') ||
           // For constants containing values (non-unit), the values must be equal.
           // Otherwise, we throw error
           cmd.pat.val !== rhs.js_val
@@ -317,16 +321,23 @@ const exec_microcode = (cmd: Microcode) => {
       ])
       break
     }
+    case 'ListI': {
+      const arity = cmd.arity
+      const lst = S.slice(-arity - 1, S.length)
+      S = S.slice(0, -arity)
+      S.push({ tag: 'list', js_val: lst })
+      break
+    }
     case 'ApplicationI': {
       const arg = S.pop()!
       const fn = S.pop()!
 
-      if (fn.type === 'builtin_fn') {
+      if (fn.tag === 'builtin_fn') {
         S.push(fn.apply(arg))
         break
       }
 
-      assert(fn.type === 'fn')
+      assert(fn.tag === 'fn')
 
       if (A.length === 0 || peek(A)?.tag === 'RestoreEnvI') {
         // Implies no more agenda items that needs to be evaluated with the current env.
@@ -351,10 +362,10 @@ const exec_microcode = (cmd: Microcode) => {
         // Find the first pattern that matches the given arg, then
         // perform relevant bindings, and evaluate the associated expression
         if (
-          (pat.tag === 'IntConstant' && arg.type === 'int') ||
-          (pat.tag === 'RealConstant' && arg.type === 'real') ||
-          (pat.tag === 'CharConstant' && arg.type === 'char') ||
-          (pat.tag === 'StringConstant' && arg.type === 'string')
+          (pat.tag === 'IntConstant' && arg.tag === 'int') ||
+          (pat.tag === 'RealConstant' && arg.tag === 'real') ||
+          (pat.tag === 'CharConstant' && arg.tag === 'char') ||
+          (pat.tag === 'StringConstant' && arg.tag === 'string')
         ) {
           const is_match = pat.val === arg.js_val
           if (is_match) {
