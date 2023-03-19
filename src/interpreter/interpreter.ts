@@ -1,4 +1,5 @@
 import * as assert from 'assert'
+import { take, takeRight } from 'lodash'
 
 import { Expression, Node, Program } from '../parser/ast'
 import * as Sml from '../sml'
@@ -323,8 +324,8 @@ const exec_microcode = (cmd: Microcode) => {
     }
     case 'ListI': {
       const arity = cmd.arity
-      const lst = S.slice(-arity - 1, S.length)
-      S = S.slice(0, -arity)
+      const lst = takeRight(S, arity)
+      S = take(S, S.length - arity)
       S.push({ tag: 'list', js_val: lst })
       break
     }

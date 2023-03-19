@@ -94,13 +94,13 @@ exp
     | op1=exp id=(EQ | NEQ | LT | GT | LTE | GTE) op2=exp             # InfixApplication
     | op1=exp id=ID op2=exp                                           # InfixApplication
     | LPAREN exp RPAREN                                               # Parentheses
+    | LSQUARE (exp (COMMA exp)*)? RSQUARE                             # List
     | LPAREN exp (SEMICOLON exp)+ RPAREN                              # ExpSequence
     | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
     | op1=exp ANDALSO op2=exp                                         # Conjunction
     | op1=exp ORELSE op2=exp                                          # Disjunction
     | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
     | 'fn' matches                                                    # Function
-    | LSQUARE (exp (COMMA exp)*)? RSQUARE                             # List
     ;
 
 
