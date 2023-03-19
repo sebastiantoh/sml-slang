@@ -38,7 +38,7 @@ export interface Unit {
 
 export interface List {
   tag: 'list'
-  js_val: Value[]
+  js_val: Readonly<Value[]>
 }
 
 export interface Fn {
