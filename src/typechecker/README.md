@@ -118,7 +118,7 @@ Pattern type is one of: primitive, type variable, list.
 
 First go through patterns and check if we have a type that works for all (so no conflicts like 2 diff types of primitives etc.)
 
-The logic for unifying types of patterns (type of 't) can be simply:
+The logic for (generic) unifying types of patterns (type of 't) can be simply:
     any list defined?
         any primitives (p) defined in any of the lists?
             are there 2 different primitives defined? type error!
@@ -171,10 +171,24 @@ e.g.
 ## Patterns
 
 ### Constant
-Same as above rules for expression
+```
+env |- i : int -| {}
+env |- r : real -| {}
+env |- s : string -| {}
+env |- c : char -| {}
+env |- b : bool -| {}
+env |- u : unit -| {}
+```
 
 ### Wildcard
-TODO
+TODO: check if its sufficient to consider the wildcard to be a type variable
+```
+env |- _ : 't -| {}
+    if fresh 't
+```
+e.g.
+- `fun f 1 = 2 | f 3 = 3 | f _ = 4` has a pattern of type `int`
+- `f _ = 4` has a pattern of type `'a . 'a`
 
 ### Variable
 ```
@@ -184,6 +198,29 @@ env |- v : 't -| {}
 
 ### Infix Construction
 TODO
+
+### List
+Go through patterns and check we can unify it to a specific type.
+
+The logic for (specific) unifying types of patterns (type of 't) can be simply:
+    get types t1, t2,..., tn of patterns p1, p2,..., pn
+    any primitive (p) defined?
+        are there 2 different primitive types or list types defined? type error!
+        type is p list
+    any type variable ('a) defined?
+        are there any list types defined? type error!
+        type is 'a list
+    any conflicting list types (t)? type error!
+    type is t list
+
+```
+env |- [p1, p2,..., pn] : 't list -| {}
+    if fresh 't, where 't = is the most specific unification of all types of p1, p2, ... pn (if exists)
+```
+e.g.
+- `fun f [x,y] = [2,3] | f [1] = [3]` has a pattern of type `int list`
+- `fun f [x,y] = [2,3]` has a pattern of type `'a . 'a list`
+- `fun f [[2,3],y] = [2,3]` has a pattern of type `int list list`
 
 -----------------------------------------------------------------------------------
 ## Declarations
