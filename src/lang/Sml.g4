@@ -40,9 +40,12 @@ FALSE: 'false';
 
 LPAREN: '(';
 RPAREN: ')';
+LSQUARE: '[';
+RSQUARE: ']';
 REC: 'rec';
 AND: 'and';
 SEMICOLON: ';';
+COMMA: ',';
 UNIT: '()';
 
 SLASH: '/';
@@ -97,6 +100,7 @@ exp
     | op1=exp ORELSE op2=exp                                          # Disjunction
     | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
     | 'fn' matches                                                    # Function
+    | LSQUARE (exp (COMMA exp)*)? RSQUARE                             # List
     ;
 
 

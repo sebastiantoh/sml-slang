@@ -29,6 +29,7 @@ export type Expression =
   | LetExpression
   | ConditionalExpression
   | Function
+  | ListLiteral
 
 export type Constant =
   | IntConstant
@@ -101,6 +102,12 @@ export interface ConditionalExpression extends BaseNode {
 export interface Function extends BaseNode {
   tag: 'Function'
   matches: Matches
+}
+
+export interface ListLiteral extends BaseNode {
+  tag: 'ListLiteral'
+  elements: Expression[]
+  arity: number
 }
 
 /**
