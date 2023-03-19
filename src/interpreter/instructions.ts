@@ -11,6 +11,7 @@ export type Instruction =
   | DecsAfterLocalDecsI
   | ApplicationI
   | MarkEndOfFnBodyI
+  | ListI
 
 interface PopI {
   tag: 'PopI'
@@ -56,4 +57,9 @@ interface ApplicationI {
 
 interface MarkEndOfFnBodyI {
   tag: 'MarkEndOfFnBodyI'
+}
+
+interface ListI {
+  tag: 'ListI'
+  arity: number
 }

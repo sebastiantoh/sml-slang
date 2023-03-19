@@ -117,14 +117,8 @@ const exec_microcode = (cmd: Microcode) => {
       })
       break
     }
-    case 'List': {
-      // TODO: confirm if this is clean implementation
-      let vals = cmd.elements.map(e => evaluateExp(e))
-      S.pop()
-      S.push({
-        tag: 'list',
-        js_val: vals
-      })
+    case 'ListLiteral': {
+      A.push({ tag: 'ListI', arity: cmd.arity }, ...reverse(cmd.elements))
       break 
     }
     case 'Application': {
@@ -325,6 +319,13 @@ const exec_microcode = (cmd: Microcode) => {
         ...cmd.decs,
         { tag: 'SetEnvParentI', oldParent: E, newParent: cmd.envBeforeLocalDecs }
       ])
+      break
+    }
+    case 'ListI': {
+      const arity = cmd.arity
+      const lst = S.slice(- arity - 1, S.length)
+      S = S.slice(0, - arity)
+      S.push({ tag: 'list', js_val: lst})
       break
     }
     case 'ApplicationI': {

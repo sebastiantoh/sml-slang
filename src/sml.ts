@@ -21,7 +21,6 @@ export const valueToString = (sml_val: Value): string => {
       return sml_val.js_val.toString()
     case 'unit':
       return '()'
-    // TODO: implement list to string
     case 'list':
       return `[${sml_val.js_val.map(e => valueToString(e)).toString()}]`
     case 'fn':
