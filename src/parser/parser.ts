@@ -232,7 +232,7 @@ class NodeGenerator implements SmlVisitor<Node> {
     }
   }
   visitList(ctx: ListContext): ListLiteral {
-    let elements = ctx.exp()
+    const elements = ctx.exp()
     return {
       tag: 'ListLiteral',
       elements: elements.map(e => this.visit(e)) as Expression[],

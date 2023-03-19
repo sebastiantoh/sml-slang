@@ -119,7 +119,7 @@ const exec_microcode = (cmd: Microcode) => {
     }
     case 'ListLiteral': {
       A.push({ tag: 'ListI', arity: cmd.arity }, ...reverse(cmd.elements))
-      break 
+      break
     }
     case 'Application': {
       A.push({ tag: 'ApplicationI' }, cmd.arg, cmd.fn)
@@ -323,9 +323,9 @@ const exec_microcode = (cmd: Microcode) => {
     }
     case 'ListI': {
       const arity = cmd.arity
-      const lst = S.slice(- arity - 1, S.length)
-      S = S.slice(0, - arity)
-      S.push({ tag: 'list', js_val: lst})
+      const lst = S.slice(-arity - 1, S.length)
+      S = S.slice(0, -arity)
+      S.push({ tag: 'list', js_val: lst })
       break
     }
     case 'ApplicationI': {
