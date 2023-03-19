@@ -106,6 +106,26 @@ export const builtinBinOperators = {
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
   },
+  '::': (a: Value, b: Value) => {
+    if (b.tag === 'list') {
+      return {
+        tag: 'list',
+        // type checker should have ensured that a has proper type
+        js_val: [a, ...b.js_val]
+      }
+    }
+    throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
+  },
+  '@': (a: Value, b: Value) => {
+    if (a.tag === 'list' && b.tag === 'list') {
+      return {
+        tag: 'list',
+        // type checker should have ensured that a has proper type
+        js_val: [...a.js_val, ...b.js_val]
+      }
+    }
+    throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
+  },
   '=': (a: Value, b: Value) => {
     if (
       (a.tag === 'int' && b.tag === 'int') ||
