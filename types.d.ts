@@ -3,23 +3,23 @@ import { TypeEnvironment } from './typechecker/environment';
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List;
 export interface Int {
     tag: 'int';
-    js_val: number;
+    js_val: Readonly<number>;
 }
 export interface Real {
     tag: 'real';
-    js_val: number;
+    js_val: Readonly<number>;
 }
 export interface String {
     tag: 'string';
-    js_val: string;
+    js_val: Readonly<string>;
 }
 export interface Char {
     tag: 'char';
-    js_val: string;
+    js_val: Readonly<string>;
 }
 export interface Bool {
     tag: 'bool';
-    js_val: boolean;
+    js_val: Readonly<boolean>;
 }
 export interface Unit {
     tag: 'unit';
