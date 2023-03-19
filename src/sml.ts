@@ -1,3 +1,5 @@
+import { isEqual } from 'lodash'
+
 import { stdout } from './interpreter/interpreter'
 import { BuiltinFn, Value } from './types'
 
@@ -109,30 +111,29 @@ export const builtinBinOperators = {
       (a.tag === 'int' && b.tag === 'int') ||
       (a.tag === 'real' && b.tag === 'real') ||
       (a.tag === 'string' && b.tag === 'string') ||
-      (a.tag === 'char' && b.tag === 'char')
+      (a.tag === 'char' && b.tag === 'char') ||
+      (a.tag === 'list' && b.tag === 'list')
       // TODO: add more tags, e.g. lists
     ) {
       return {
         tag: 'bool',
-        js_val: a.js_val === b.js_val
+        // isEqual supports list (structural) equality, which javascript's builtin == or === does not
+        js_val: isEqual(a.js_val, b.js_val)
+      }
+    } else if (a.tag === 'unit' && b.tag === 'unit') {
+      return {
+        tag: 'bool',
+        js_val: true
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
   },
   '<>': (a: Value, b: Value) => {
-    if (
-      (a.tag === 'int' && b.tag === 'int') ||
-      (a.tag === 'real' && b.tag === 'real') ||
-      (a.tag === 'string' && b.tag === 'string') ||
-      (a.tag === 'char' && b.tag === 'char')
-      // TODO: add more tags, e.g. lists
-    ) {
-      return {
-        tag: 'bool',
-        js_val: a.js_val !== b.js_val
-      }
+    const isEq = builtinBinOperators['='](a, b)
+    return {
+      tag: 'bool',
+      js_val: !isEq.js_val
     }
-    throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
   },
   '<': (a: Value, b: Value) => {
     if (
