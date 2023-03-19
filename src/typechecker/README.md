@@ -56,6 +56,7 @@ mod : int -> int -> int
 >= : 'a . 'a -> 'a -> 'a
 andalso : bool -> bool -> bool
 orelse : bool -> bool -> bool
+print : 'a . 'a -> unit
 ```
 
 NOTE: Previously we had the following:
@@ -78,13 +79,15 @@ env |- [e1, e2, ... en] : 't list -| C1, C2, .. Cn, 't = t1, 't = t2, ... 't = t
 ```
 
 ### Local Declaration
-extend_env(env, dec) takes in an env and a set of declarations and extends it with the generalizations of the types defined (see Declarations#Value for more info)
+extend_env(env, dec) takes in an env and a set of declarations and extends it with the generalizations of the types defined (see Declarations below for more info)
 ```
 env |- let dec in e1; e2; ...; en end: t -| C
     extend_env(env, dec) |- en : t -| C
 ```
 e.g.
 - `let val x = 2 in x + 2; "hi"; true end;` returns `bool`
+
+extend_env(env, dec)
 
 ### Conjunction
 ```
@@ -199,6 +202,9 @@ env |- v : 't -| {}
 ### Infix Construction
 TODO
 
+e.g.
+- `fun f (hd::tl) = [1,2,3]` returns?
+
 ### List
 Go through patterns and check we can unify it to a specific type.
 
@@ -223,33 +229,54 @@ e.g.
 - `fun f [[2,3],y] = [2,3]` has a pattern of type `int list list`
 
 -----------------------------------------------------------------------------------
+
 ## Declarations
+For declarations, it suffices to extend the type environement (there is no type to return). We define a function `extend_env(env, dec)` that returns an environment extended with the declarations in `dec`.
 
 ### Value
-Note: there can be multiple x1 = e1 bindings, generalize for all.
+If patterns are of type 'a (type variable):
+```
+extend_env(env, val p1 = e1 and p2 = e2 .... and pn = en) -> generalize(Cn, generalize(...., generalize(C2, generalize(C1, env, p1 : t1), p2 : t2), ...), pn : tn)
+    if env |- e1 : t1 -| C1
+    and env |- e2 : t2 -| C2
+    ...
+    and env |- en : tn -| Cn
+```
 
-Also by right the x is a pattern, so we need to typecheck x first.
+If patterns are of type p (primitive), it suffices to test that expression is of the same type (no extension of env needed):
+```
+extend_env(env, val p1 = e1 and p2 = e2 .... and pn = en) -> env
+    if env |- e1 : t1 -| C1
+    and env |- e2 : t2 -| C2
+    ...
+    and env |- en : tn -| Cn 
 
-If variable, we can continue as per normal. Else if its constant, we need to check that t1 is of the same type.
+    assert(p1 = t1, p2 = t2,..., pn = tn)
+```
 
 TODO: handle infix construction and list (just a matter of evaluating e1s type and assigning the types to the vars in the pattern)
+
+### Sequence
 ```
-env |- let val x = e1 in e2 end: t2 -| C1, C2
-  if env |- e1 : t1 -| C1
-  and generalize(C1, env, x : t1) |- e2 : t2 -| C2
+extend_env(env, dec1 ; dec2 ; ... ; decn) -> extend_env(extend_env(......extend_env(extend_env(env, dec1), dec2), ....., decn-1), decn)
 ```
 
-
-// update this
+### Local
 ```
-env |- val x = e1 in e2 : t2 -| C1, C2
-  if env |- e1 : t1 -| C1
-  and generalize(C1, env, x : t1) |- e2 : t2 -| C2
+extend_env(env, local dec1 in dec2 end) -> extend_env(extend_env(env, dec1), dec2)
 ```
 
-## Anonymous Function (fun match)
+-----------------------------------------------------------------------------------
+
+## Programs
+
+### Core Declaration
 ```
-env |- fun x => e : 't1 -> t2 -| C
-    if fresh 't1
-    and env, x : 't1 |- e : t2 -| C
+extend_env(env, prog) -> extend_env(env, dec1 ; dec2 ; ... ; decn) -> extend_env(extend_env(......extend_env(extend_env(env, dec1), dec2), ....., decn-1), decn)
+```
+
+### Sequence
+TODO: do the programs affect each others env?
+```
+extend_env(env, prog1 ; prog2 ; ... ; progn) -> extend_env(env, prog1) ; extend_env(env, prog1) ; .... ; extend_env(env, progn)
 ```
