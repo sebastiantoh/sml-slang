@@ -29,6 +29,14 @@ export declare const builtinBinOperators: {
         tag: string;
         js_val: string;
     };
+    '::': (a: Value, b: Value) => {
+        tag: string;
+        js_val: Value[];
+    };
+    '@': (a: Value, b: Value) => {
+        tag: string;
+        js_val: Value[];
+    };
     '=': (a: Value, b: Value) => {
         tag: string;
         js_val: boolean;

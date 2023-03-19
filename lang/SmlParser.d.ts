@@ -212,6 +212,18 @@ export declare class ParenthesesContext extends ExpContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
+export declare class ListContext extends ExpContext {
+    LSQUARE(): TerminalNode;
+    RSQUARE(): TerminalNode;
+    exp(): ExpContext[];
+    exp(i: number): ExpContext;
+    COMMA(): TerminalNode[];
+    COMMA(i: number): TerminalNode;
+    constructor(ctx: ExpContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
 export declare class ExpSequenceContext extends ExpContext {
     LPAREN(): TerminalNode;
     exp(): ExpContext[];
@@ -270,18 +282,6 @@ export declare class ConditionalContext extends ExpContext {
 }
 export declare class FunctionContext extends ExpContext {
     matches(): MatchesContext;
-    constructor(ctx: ExpContext);
-    enterRule(listener: SmlListener): void;
-    exitRule(listener: SmlListener): void;
-    accept<Result>(visitor: SmlVisitor<Result>): Result;
-}
-export declare class ListContext extends ExpContext {
-    LSQUARE(): TerminalNode;
-    RSQUARE(): TerminalNode;
-    exp(): ExpContext[];
-    exp(i: number): ExpContext;
-    COMMA(): TerminalNode[];
-    COMMA(i: number): TerminalNode;
     constructor(ctx: ExpContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;

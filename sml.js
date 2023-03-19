@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.builtinFns = exports.builtinBinOperators = exports.valueToString = void 0;
+const lodash_1 = require("lodash");
 const interpreter_1 = require("./interpreter/interpreter");
 const valueToString = (sml_val) => {
     switch (sml_val.tag) {
@@ -105,33 +106,54 @@ exports.builtinBinOperators = {
         }
         throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
+    '::': (a, b) => {
+        if (b.tag === 'list') {
+            return {
+                tag: 'list',
+                // type checker should have ensured that a has proper type
+                js_val: [a, ...b.js_val]
+            };
+        }
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+    },
+    '@': (a, b) => {
+        if (a.tag === 'list' && b.tag === 'list') {
+            return {
+                tag: 'list',
+                // type checker should have ensured that a has proper type
+                js_val: [...a.js_val, ...b.js_val]
+            };
+        }
+        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+    },
     '=': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') ||
             (a.tag === 'real' && b.tag === 'real') ||
             (a.tag === 'string' && b.tag === 'string') ||
-            (a.tag === 'char' && b.tag === 'char')
+            (a.tag === 'char' && b.tag === 'char') ||
+            (a.tag === 'list' && b.tag === 'list')
         // TODO: add more tags, e.g. lists
         ) {
             return {
                 tag: 'bool',
-                js_val: a.js_val === b.js_val
+                // isEqual supports list (structural) equality, which javascript's builtin == or === does not
+                js_val: (0, lodash_1.isEqual)(a.js_val, b.js_val)
+            };
+        }
+        else if (a.tag === 'unit' && b.tag === 'unit') {
+            return {
+                tag: 'bool',
+                js_val: true
             };
         }
         throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
     },
     '<>': (a, b) => {
-        if ((a.tag === 'int' && b.tag === 'int') ||
-            (a.tag === 'real' && b.tag === 'real') ||
-            (a.tag === 'string' && b.tag === 'string') ||
-            (a.tag === 'char' && b.tag === 'char')
-        // TODO: add more tags, e.g. lists
-        ) {
-            return {
-                tag: 'bool',
-                js_val: a.js_val !== b.js_val
-            };
-        }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        const isEq = exports.builtinBinOperators['='](a, b);
+        return {
+            tag: 'bool',
+            js_val: !isEq.js_val
+        };
     },
     '<': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') ||

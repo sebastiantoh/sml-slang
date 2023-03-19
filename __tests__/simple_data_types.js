@@ -96,4 +96,5 @@ test('real numbers: nonzero / zero', () => expect(() => (0, utils_1.parseAndEval
  * Unit
  */
 test('unit: evaluate to themselves', () => expect((0, utils_1.parseAndEvaluateExp)('()')).toBe('()'));
+test('unit: unit = unit', () => expect((0, utils_1.parseAndEvaluateExp)('() = ()')).toBe('true'));
 //# sourceMappingURL=simple_data_types.js.map

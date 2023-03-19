@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.evaluateProg = exports.evaluateExp = exports.evaluate = exports.stdout = void 0;
 const assert = require("assert");
+const lodash_1 = require("lodash");
 const Sml = require("../sml");
 // TODO: integrate this with frontend's output
 exports.stdout = [];
@@ -305,8 +306,8 @@ const exec_microcode = (cmd) => {
         }
         case 'ListI': {
             const arity = cmd.arity;
-            const lst = S.slice(-arity - 1, S.length);
-            S = S.slice(0, -arity);
+            const lst = (0, lodash_1.takeRight)(S, arity);
+            S = (0, lodash_1.take)(S, S.length - arity);
             S.push({ tag: 'list', js_val: lst });
             break;
         }

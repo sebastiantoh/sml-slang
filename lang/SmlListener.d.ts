@@ -16,13 +16,13 @@ import { ExpVariableContext } from "./SmlParser";
 import { ApplicationContext } from "./SmlParser";
 import { InfixApplicationContext } from "./SmlParser";
 import { ParenthesesContext } from "./SmlParser";
+import { ListContext } from "./SmlParser";
 import { ExpSequenceContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
 import { ConjunctionContext } from "./SmlParser";
 import { DisjunctionContext } from "./SmlParser";
 import { ConditionalContext } from "./SmlParser";
 import { FunctionContext } from "./SmlParser";
-import { ListContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
 import { PatmatchContext } from "./SmlParser";
@@ -245,6 +245,18 @@ export interface SmlListener extends ParseTreeListener {
      */
     exitParentheses?: (ctx: ParenthesesContext) => void;
     /**
+     * Enter a parse tree produced by the `List`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     */
+    enterList?: (ctx: ListContext) => void;
+    /**
+     * Exit a parse tree produced by the `List`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     */
+    exitList?: (ctx: ListContext) => void;
+    /**
      * Enter a parse tree produced by the `ExpSequence`
      * labeled alternative in `SmlParser.exp`.
      * @param ctx the parse tree
@@ -316,18 +328,6 @@ export interface SmlListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitFunction?: (ctx: FunctionContext) => void;
-    /**
-     * Enter a parse tree produced by the `List`
-     * labeled alternative in `SmlParser.exp`.
-     * @param ctx the parse tree
-     */
-    enterList?: (ctx: ListContext) => void;
-    /**
-     * Exit a parse tree produced by the `List`
-     * labeled alternative in `SmlParser.exp`.
-     * @param ctx the parse tree
-     */
-    exitList?: (ctx: ListContext) => void;
     /**
      * Enter a parse tree produced by `SmlParser.con`.
      * @param ctx the parse tree
