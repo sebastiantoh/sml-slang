@@ -162,6 +162,14 @@ class NodeGenerator {
             loc: contextToLocation(ctx)
         };
     }
+    visitList(ctx) {
+        const elements = ctx.exp();
+        return {
+            tag: 'ListLiteral',
+            elements: elements.map(e => this.visit(e)),
+            arity: elements.length
+        };
+    }
     /**
      * Match
      */

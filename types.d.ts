@@ -1,6 +1,6 @@
 import { Matches } from './parser/ast';
 import { TypeEnvironment } from './typechecker/environment';
-export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn;
+export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List;
 export interface Int {
     tag: 'int';
     js_val: number;
@@ -23,6 +23,10 @@ export interface Bool {
 }
 export interface Unit {
     tag: 'unit';
+}
+export interface List {
+    tag: 'list';
+    js_val: Value[];
 }
 export interface Fn {
     tag: 'fn';

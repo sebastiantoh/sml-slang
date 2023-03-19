@@ -22,6 +22,8 @@ const valueToString = (sml_val) => {
             return sml_val.js_val.toString();
         case 'unit':
             return '()';
+        case 'list':
+            return `[${sml_val.js_val.map(e => (0, exports.valueToString)(e)).toString()}]`;
         case 'fn':
             // TODO: once we have a typechecker, we can
             // include more info in the string repr, e.g param types and return types

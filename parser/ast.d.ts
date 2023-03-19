@@ -7,7 +7,7 @@ interface BaseNode {
 /**
  * Expressions
  */
-export type Expression = Constant | Application | InfixApplication | ExpSequence | LetExpression | ConditionalExpression | Function;
+export type Expression = Constant | Application | InfixApplication | ExpSequence | LetExpression | ConditionalExpression | Function | ListLiteral;
 export type Constant = IntConstant | RealConstant | StringConstant | CharConstant | BoolConstant | UnitConstant;
 export interface IntConstant extends BaseNode {
     tag: 'IntConstant';
@@ -67,6 +67,11 @@ export interface ConditionalExpression extends BaseNode {
 export interface Function extends BaseNode {
     tag: 'Function';
     matches: Matches;
+}
+export interface ListLiteral extends BaseNode {
+    tag: 'ListLiteral';
+    elements: Expression[];
+    arity: number;
 }
 /**
  * Match

@@ -1,6 +1,6 @@
 import { Declaration, Expression, Pattern } from '../parser/ast';
 import { Environment } from '../types';
-export type Instruction = PopI | BranchI | BinOpI | RestoreEnvI | SetEnvParentI | AssignI | DecsAfterLocalDecsI | ApplicationI | MarkEndOfFnBodyI;
+export type Instruction = PopI | BranchI | BinOpI | RestoreEnvI | SetEnvParentI | AssignI | DecsAfterLocalDecsI | ApplicationI | MarkEndOfFnBodyI | ListI;
 interface PopI {
     tag: 'PopI';
 }
@@ -36,5 +36,9 @@ interface ApplicationI {
 }
 interface MarkEndOfFnBodyI {
     tag: 'MarkEndOfFnBodyI';
+}
+interface ListI {
+    tag: 'ListI';
+    arity: number;
 }
 export {};
