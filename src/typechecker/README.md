@@ -87,8 +87,6 @@ env |- let dec in e1; e2; ...; en end: t -| C
 e.g.
 - `let val x = 2 in x + 2; "hi"; true end;` returns `bool`
 
-extend_env(env, dec)
-
 ### Conjunction
 ```
 env |- e1 andalso e2 : 't -| t1 = bool, t2 = bool, 't = bool
@@ -122,6 +120,7 @@ Pattern type is one of: primitive, type variable, list.
 First go through patterns and check if we have a type that works for all (so no conflicts like 2 diff types of primitives etc.)
 
 The logic for (generic) unifying types of patterns (type of 't) can be simply:
+```
     any list defined?
         any primitives (p) defined in any of the lists?
             are there 2 different primitives defined? type error!
@@ -134,12 +133,7 @@ The logic for (generic) unifying types of patterns (type of 't) can be simply:
         type is 't
     are there 2 different patterns typing to 2 different primitives? type error!
     else 't = p
-
-e.g.
-- `fun f x = x | f y = y` has a pattern of type `'a . 'a`
-- `fun f x = x | f 3 = 3` has a pattern of type `int`
-- `fun f [] = 1 | f [x] = 2 | f x = 3` has a pattern of type `'a . 'a list`
-
+```
 ```
 env |- p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| C1, C2, ..., Cn, t1 = t2, t1 = t3, ..., t1 = tn
     if fresh 't, where 't = is the most generic unification of all types of p1, p2, ... pn (if exists)
@@ -149,6 +143,10 @@ env |- p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| C1, C2, ..., Cn, t1 = 
     ...
     and env |- en : tn -| Cn
 ```
+e.g.
+- `fun f x = x | f y = y` has a pattern of type `'a . 'a`
+- `fun f x = x | f 3 = 3` has a pattern of type `int`
+- `fun f [] = 1 | f [x] = 2 | f x = 3` has a pattern of type `'a . 'a list`
 
 ### Case Analysis
 ```
@@ -209,6 +207,7 @@ e.g.
 Go through patterns and check we can unify it to a specific type.
 
 The logic for (specific) unifying types of patterns (type of 't) can be simply:
+```
     get types t1, t2,..., tn of patterns p1, p2,..., pn
     any primitive (p) defined?
         are there 2 different primitive types or list types defined? type error!
@@ -218,7 +217,7 @@ The logic for (specific) unifying types of patterns (type of 't) can be simply:
         type is 'a list
     any conflicting list types (t)? type error!
     type is t list
-
+```
 ```
 env |- [p1, p2,..., pn] : 't list -| {}
     if fresh 't, where 't = is the most specific unification of all types of p1, p2, ... pn (if exists)
