@@ -47,6 +47,7 @@ AND: 'and';
 SEMICOLON: ';';
 COMMA: ',';
 UNIT: '()';
+UNDERSCORE: '_';
 
 SLASH: '/';
 DIV: 'div';
@@ -97,13 +98,13 @@ exp
     | LSQUARE (exp (COMMA exp)*)? RSQUARE                             # List
     | LPAREN exp (SEMICOLON exp)+ RPAREN                              # ExpSequence
     | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
+    // TODO: add type annotation
     | op1=exp ANDALSO op2=exp                                         # Conjunction
     | op1=exp ORELSE op2=exp                                          # Disjunction
     | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
     | 'case' exp 'of' matches                                         # CaseAnalysis
     | 'fn' matches                                                    # Function
     ;
-
 
 // Note: this is named patmatch instead of match because
 // Antlr's parser has a match function internally, which
@@ -114,8 +115,13 @@ matches: patmatch ('|' patmatch)*;
 
 pat
     : con                                                             # PatConstant
+    | UNDERSCORE                                                      # PatWildcard
     | UNIT                                                            # PatUnit
     | id=ID                                                           # PatVariable
+    // TODO: add infix constructioon
+    // TODO: add parentheses
+    // TODO: add list
+    // TODO: add type annotation
     ;
 
 dec

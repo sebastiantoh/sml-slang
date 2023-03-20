@@ -34,6 +34,7 @@ import {
   PatmatchContext,
   PatUnitContext,
   PatVariableContext,
+  PatWildcardContext,
   ProgContext,
   RealContext,
   SmlParser,
@@ -70,7 +71,8 @@ import {
   UnitConstant,
   Valbind,
   ValueDeclaration,
-  Variable
+  Variable,
+  Wildcard
 } from './ast'
 
 // TODO: move to parser/utils.ts?
@@ -279,6 +281,11 @@ class NodeGenerator implements SmlVisitor<Node> {
    */
   visitPatConstant(ctx: PatConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
+  }
+  visitPatWildcard(ctx: PatWildcardContext): Wildcard {
+    return {
+      tag: 'Wildcard'
+    }
   }
   visitPatUnit(_ctx: PatUnitContext): UnitConstant {
     return {

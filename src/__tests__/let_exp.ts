@@ -328,3 +328,20 @@ in
 end
 `)
   ).toBe(`true`))
+
+test('case analysis exp with wildcard', () =>
+  expect(
+    parseAndEvaluateExp(`
+let
+  val x = 123
+  val is_between_one_to_three =
+    case x of
+      1 => true
+    | 2 => true
+    | 3 => true
+    | _ => false
+in
+  is_between_one_to_three
+end
+`)
+  ).toBe(`false`))

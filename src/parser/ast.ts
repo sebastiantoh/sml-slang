@@ -126,8 +126,11 @@ export interface Matches extends BaseNode {
 /**
  * Patterns
  */
-export type Pattern = Constant | Variable
+export type Pattern = Constant | Wildcard | Variable
 
+export interface Wildcard extends BaseNode {
+  tag: 'Wildcard'
+}
 export interface Variable extends BaseNode {
   tag: 'Variable'
   id: string

@@ -4,6 +4,7 @@
 import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { PatConstantContext } from "./SmlParser";
+import { PatWildcardContext } from "./SmlParser";
 import { PatUnitContext } from "./SmlParser";
 import { PatVariableContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
@@ -59,6 +60,19 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitPatConstant?: (ctx: PatConstantContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PatWildcard`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	enterPatWildcard?: (ctx: PatWildcardContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PatWildcard`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 */
+	exitPatWildcard?: (ctx: PatWildcardContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `PatUnit`
