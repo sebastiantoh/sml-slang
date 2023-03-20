@@ -41,24 +41,25 @@ export declare class SmlParser extends Parser {
     static readonly SEMICOLON = 29;
     static readonly COMMA = 30;
     static readonly UNIT = 31;
-    static readonly SLASH = 32;
-    static readonly DIV = 33;
-    static readonly MOD = 34;
-    static readonly STAR = 35;
-    static readonly PLUS = 36;
-    static readonly MINUS = 37;
-    static readonly CARET = 38;
-    static readonly CONS = 39;
-    static readonly AT = 40;
-    static readonly EQ = 41;
-    static readonly NEQ = 42;
-    static readonly LT = 43;
-    static readonly GT = 44;
-    static readonly LTE = 45;
-    static readonly GTE = 46;
-    static readonly ANDALSO = 47;
-    static readonly ORELSE = 48;
-    static readonly ID = 49;
+    static readonly UNDERSCORE = 32;
+    static readonly SLASH = 33;
+    static readonly DIV = 34;
+    static readonly MOD = 35;
+    static readonly STAR = 36;
+    static readonly PLUS = 37;
+    static readonly MINUS = 38;
+    static readonly CARET = 39;
+    static readonly CONS = 40;
+    static readonly AT = 41;
+    static readonly EQ = 42;
+    static readonly NEQ = 43;
+    static readonly LT = 44;
+    static readonly GT = 45;
+    static readonly LTE = 46;
+    static readonly GTE = 47;
+    static readonly ANDALSO = 48;
+    static readonly ORELSE = 49;
+    static readonly ID = 50;
     static readonly RULE_con = 0;
     static readonly RULE_exp = 1;
     static readonly RULE_patmatch = 2;
@@ -322,6 +323,13 @@ export declare class PatContext extends ParserRuleContext {
 }
 export declare class PatConstantContext extends PatContext {
     con(): ConContext;
+    constructor(ctx: PatContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class PatWildcardContext extends PatContext {
+    UNDERSCORE(): TerminalNode;
     constructor(ctx: PatContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;

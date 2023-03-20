@@ -1,5 +1,6 @@
 import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 import { PatConstantContext } from "./SmlParser";
+import { PatWildcardContext } from "./SmlParser";
 import { PatUnitContext } from "./SmlParser";
 import { PatVariableContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
@@ -51,6 +52,13 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitPatConstant?: (ctx: PatConstantContext) => Result;
+    /**
+     * Visit a parse tree produced by the `PatWildcard`
+     * labeled alternative in `SmlParser.pat`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitPatWildcard?: (ctx: PatWildcardContext) => Result;
     /**
      * Visit a parse tree produced by the `PatUnit`
      * labeled alternative in `SmlParser.pat`.

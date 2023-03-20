@@ -208,6 +208,11 @@ class NodeGenerator {
     visitPatConstant(ctx) {
         return this.visit(ctx.con());
     }
+    visitPatWildcard(ctx) {
+        return {
+            tag: 'Wildcard'
+        };
+    }
     visitPatUnit(_ctx) {
         return {
             tag: 'UnitConstant',

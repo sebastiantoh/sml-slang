@@ -354,6 +354,12 @@ const exec_microcode = (cmd) => {
                         found_match = true;
                     }
                 }
+                else if (pat.tag === 'Wildcard') {
+                    // wildcard: match by default, no need to assign env since wildcard has no variables to
+                    // assign to
+                    A.push(exp);
+                    found_match = true;
+                }
                 else if (pat.tag === 'Variable') {
                     // variables match the arg by default
                     assign_in_env(E, pat.id, arg);
