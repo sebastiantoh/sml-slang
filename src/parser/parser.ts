@@ -9,6 +9,7 @@ import { SmlLexer } from '../lang/SmlLexer'
 import {
   ApplicationContext,
   BooleanContext,
+  CaseAnalysisContext,
   CharacterContext,
   ConditionalContext,
   ConjunctionContext,
@@ -168,6 +169,14 @@ class NodeGenerator implements SmlVisitor<Node> {
       loc: contextToLocation(ctx)
     }
   }
+  visitList(ctx: ListContext): ListLiteral {
+    const elements = ctx.exp()
+    return {
+      tag: 'ListLiteral',
+      elements: elements.map(e => this.visit(e)) as Expression[],
+      arity: elements.length
+    }
+  }
   visitExpSequence(ctx: ExpSequenceContext): ExpSequence {
     return {
       tag: 'ExpSequence',
@@ -224,19 +233,25 @@ class NodeGenerator implements SmlVisitor<Node> {
       loc: contextToLocation(ctx)
     }
   }
+  visitCaseAnalysis(ctx: CaseAnalysisContext): Application {
+    // Desugar into function application
+    // (See page 89 of https://smlfamily.github.io/sml90-defn.pdf, Figure 15)
+    return {
+      tag: 'Application',
+      fn: {
+        tag: 'Function',
+        matches: this.visit(ctx.matches()) as Matches,
+        loc: contextToLocation(ctx)
+      },
+      arg: this.visit(ctx.exp()) as Expression,
+      loc: contextToLocation(ctx)
+    }
+  }
   visitFunction(ctx: FunctionContext): Function {
     return {
       tag: 'Function',
       matches: this.visit(ctx.matches()) as Matches,
       loc: contextToLocation(ctx)
-    }
-  }
-  visitList(ctx: ListContext): ListLiteral {
-    const elements = ctx.exp()
-    return {
-      tag: 'ListLiteral',
-      elements: elements.map(e => this.visit(e)) as Expression[],
-      arity: elements.length
     }
   }
 

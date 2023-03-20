@@ -26,6 +26,7 @@ import { LetExpressionContext } from "./SmlParser";
 import { ConjunctionContext } from "./SmlParser";
 import { DisjunctionContext } from "./SmlParser";
 import { ConditionalContext } from "./SmlParser";
+import { CaseAnalysisContext } from "./SmlParser";
 import { FunctionContext } from "./SmlParser";
 import { ConContext } from "./SmlParser";
 import { ExpContext } from "./SmlParser";
@@ -232,6 +233,14 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitConditional?: (ctx: ConditionalContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `CaseAnalysis`
+	 * labeled alternative in `SmlParser.exp`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCaseAnalysis?: (ctx: CaseAnalysisContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `Function`

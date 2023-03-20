@@ -366,7 +366,8 @@ const exec_microcode = (cmd: Microcode) => {
           (pat.tag === 'IntConstant' && arg.tag === 'int') ||
           (pat.tag === 'RealConstant' && arg.tag === 'real') ||
           (pat.tag === 'CharConstant' && arg.tag === 'char') ||
-          (pat.tag === 'StringConstant' && arg.tag === 'string')
+          (pat.tag === 'StringConstant' && arg.tag === 'string') ||
+          (pat.tag === 'BoolConstant' && arg.tag === 'bool')
         ) {
           const is_match = pat.val === arg.js_val
           if (is_match) {
