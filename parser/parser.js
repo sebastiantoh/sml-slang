@@ -99,6 +99,14 @@ class NodeGenerator {
             loc: contextToLocation(ctx)
         };
     }
+    visitList(ctx) {
+        const elements = ctx.exp();
+        return {
+            tag: 'ListLiteral',
+            elements: elements.map(e => this.visit(e)),
+            arity: elements.length
+        };
+    }
     visitExpSequence(ctx) {
         return {
             tag: 'ExpSequence',
@@ -155,19 +163,25 @@ class NodeGenerator {
             loc: contextToLocation(ctx)
         };
     }
+    visitCaseAnalysis(ctx) {
+        // Desugar into function application
+        // (See page 89 of https://smlfamily.github.io/sml90-defn.pdf, Figure 15)
+        return {
+            tag: 'Application',
+            fn: {
+                tag: 'Function',
+                matches: this.visit(ctx.matches()),
+                loc: contextToLocation(ctx)
+            },
+            arg: this.visit(ctx.exp()),
+            loc: contextToLocation(ctx)
+        };
+    }
     visitFunction(ctx) {
         return {
             tag: 'Function',
             matches: this.visit(ctx.matches()),
             loc: contextToLocation(ctx)
-        };
-    }
-    visitList(ctx) {
-        const elements = ctx.exp();
-        return {
-            tag: 'ListLiteral',
-            elements: elements.map(e => this.visit(e)),
-            arity: elements.length
         };
     }
     /**

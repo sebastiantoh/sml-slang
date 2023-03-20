@@ -212,4 +212,30 @@ in
   (fact 5 1) + acc
 end
 `)).toThrow(/acc not found in env/));
+test('case analysis exp ', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  val a = 0
+  val a =
+    case a of
+      0 => 0
+    | x => x + 1
+in
+  a
+end
+`)).toBe(`0`));
+test('nested case analysis exp', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  val a = true
+  val b = true
+  val both_true =
+    case a of
+      false => false
+    | true =>
+    case b of
+      false => false
+    | true => true
+in
+  both_true
+end
+`)).toBe(`true`));
 //# sourceMappingURL=let_exp.js.map
