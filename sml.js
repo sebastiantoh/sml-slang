@@ -131,6 +131,7 @@ exports.builtinBinOperators = {
             (a.tag === 'real' && b.tag === 'real') ||
             (a.tag === 'string' && b.tag === 'string') ||
             (a.tag === 'char' && b.tag === 'char') ||
+            (a.tag === 'bool' && b.tag === 'bool') ||
             (a.tag === 'list' && b.tag === 'list')
         // TODO: add more tags, e.g. lists
         ) {
