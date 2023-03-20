@@ -32,6 +32,7 @@ import {
   ParenthesesContext,
   PatConstantContext,
   PatmatchContext,
+  PatParenthesesContext,
   PatUnitContext,
   PatVariableContext,
   PatWildcardContext,
@@ -299,6 +300,9 @@ class NodeGenerator implements SmlVisitor<Node> {
       id: ctx._id.text!,
       loc: contextToLocation(ctx)
     }
+  }
+  visitPatParentheses(ctx: PatParenthesesContext): Pattern {
+    return this.visit(ctx.pat()) as Pattern
   }
 
   /**

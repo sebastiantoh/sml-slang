@@ -119,7 +119,7 @@ pat
     | UNIT                                                            # PatUnit
     | id=ID                                                           # PatVariable
     // TODO: add infix constructioon
-    // TODO: add parentheses
+    | LPAREN pat RPAREN                                               # PatParentheses
     // TODO: add list
     // TODO: add type annotation
     ;

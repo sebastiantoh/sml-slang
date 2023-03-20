@@ -7,6 +7,7 @@ import { PatConstantContext } from "./SmlParser";
 import { PatWildcardContext } from "./SmlParser";
 import { PatUnitContext } from "./SmlParser";
 import { PatVariableContext } from "./SmlParser";
+import { PatParenthesesContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
 import { RealContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
@@ -82,6 +83,14 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitPatVariable?: (ctx: PatVariableContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `PatParentheses`
+	 * labeled alternative in `SmlParser.pat`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPatParentheses?: (ctx: PatParenthesesContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `Integer`
