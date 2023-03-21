@@ -14,6 +14,10 @@ import { UnitContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { FunDeclContext } from "./SmlParser";
 import { LocalDeclContext } from "./SmlParser";
+import { TypeVariableContext } from "./SmlParser";
+import { TypeConstructorContext } from "./SmlParser";
+import { TypeParenthesesContext } from "./SmlParser";
+import { TypeFunctionContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
 import { ApplicationContext } from "./SmlParser";
@@ -32,6 +36,7 @@ import { ExpContext } from "./SmlParser";
 import { PatmatchContext } from "./SmlParser";
 import { MatchesContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
+import { TypContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { DecSequenceContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
@@ -153,6 +158,34 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      */
     visitLocalDecl?: (ctx: LocalDeclContext) => Result;
     /**
+     * Visit a parse tree produced by the `TypeVariable`
+     * labeled alternative in `SmlParser.typ`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitTypeVariable?: (ctx: TypeVariableContext) => Result;
+    /**
+     * Visit a parse tree produced by the `TypeConstructor`
+     * labeled alternative in `SmlParser.typ`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitTypeConstructor?: (ctx: TypeConstructorContext) => Result;
+    /**
+     * Visit a parse tree produced by the `TypeParentheses`
+     * labeled alternative in `SmlParser.typ`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitTypeParentheses?: (ctx: TypeParenthesesContext) => Result;
+    /**
+     * Visit a parse tree produced by the `TypeFunction`
+     * labeled alternative in `SmlParser.typ`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitTypeFunction?: (ctx: TypeFunctionContext) => Result;
+    /**
      * Visit a parse tree produced by the `Constant`
      * labeled alternative in `SmlParser.exp`.
      * @param ctx the parse tree
@@ -273,6 +306,12 @@ export interface SmlVisitor<Result> extends ParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitPat?: (ctx: PatContext) => Result;
+    /**
+     * Visit a parse tree produced by `SmlParser.typ`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitTyp?: (ctx: TypContext) => Result;
     /**
      * Visit a parse tree produced by `SmlParser.dec`.
      * @param ctx the parse tree

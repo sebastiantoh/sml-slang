@@ -239,6 +239,34 @@ class NodeGenerator {
         return this.visit(ctx.pat());
     }
     /**
+     * Types
+     */
+    visitTypeVariable(ctx) {
+        return {
+            tag: 'TypeVariable',
+            id: ctx.VAR().text
+        };
+    }
+    visitTypeConstructor(ctx) {
+        return {
+            tag: 'TypeConstructor',
+            typeParameters: ctx.VAR().map(varNode => {
+                return {
+                    tag: 'TypeVariable',
+                    id: varNode.text
+                };
+            }),
+            id: ctx.ID().text
+        };
+    }
+    visitTypeFunction(ctx) {
+        return {
+            tag: 'TypeFunction',
+            argTy: this.visit(ctx._argTy),
+            retTy: this.visit(ctx._retTy)
+        };
+    }
+    /**
      * Declarations
      */
     visitValueDecl(ctx) {
