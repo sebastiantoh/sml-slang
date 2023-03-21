@@ -125,7 +125,7 @@ pat
     | UNDERSCORE                                                      # PatWildcard
     | UNIT                                                            # PatUnit
     | id=ID                                                           # PatVariable
-    | pat1=pat CONS pat2=pat                                          # PatInfixConstruction
+    | <assoc=right> pat1=pat CONS pat2=pat                            # PatInfixConstruction
     | LPAREN pat RPAREN                                               # PatParentheses
     // TODO: add list
     // TODO: add type annotation
