@@ -45,6 +45,7 @@ RSQUARE: ']';
 REC: 'rec';
 AND: 'and';
 SEMICOLON: ';';
+COLON: ':';
 COMMA: ',';
 UNIT: '()';
 UNDERSCORE: '_';
@@ -104,7 +105,7 @@ exp
     | LSQUARE (exp (COMMA exp)*)? RSQUARE                             # List
     | LPAREN exp (SEMICOLON exp)+ RPAREN                              # ExpSequence
     | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
-    // TODO: add type annotation
+    | exp COLON typ 	                                              # ExpTypeAnnotation
     | op1=exp ANDALSO op2=exp                                         # Conjunction
     | op1=exp ORELSE op2=exp                                          # Disjunction
     | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional

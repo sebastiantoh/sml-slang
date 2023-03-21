@@ -19,6 +19,7 @@ import {
   DisjunctionContext,
   ExpContext,
   ExpSequenceContext,
+  ExpTypeAnnotationContext,
   ExpVariableContext,
   FunbindContext,
   FunctionContext,
@@ -205,6 +206,11 @@ class NodeGenerator implements SmlVisitor<Node> {
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression),
       loc: contextToLocation(ctx)
     }
+  }
+  visitExpTypeAnnotation(ctx: ExpTypeAnnotationContext): Expression {
+    const exp = this.visit(ctx.exp()) as Expression
+    exp.annotated_type = this.visit(ctx.typ()) as TypeAstNode
+    return exp
   }
   visitConjunction(ctx: ConjunctionContext): ConditionalExpression {
     // Rewrite derived form into equivalent form

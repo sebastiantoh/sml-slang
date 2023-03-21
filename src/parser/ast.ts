@@ -1,4 +1,3 @@
-import { Type } from '../typechecker/types'
 import { SourceLocation } from '../types'
 
 export type Node =
@@ -27,11 +26,15 @@ export type Expression =
   | Constant
   | Application
   | InfixApplication
+  | ListLiteral
   | ExpSequence
   | LetExpression
   | ConditionalExpression
   | Function
-  | ListLiteral
+
+interface BaseExpressionNode extends BaseNode {
+  annotated_type?: TypeAstNode
+}
 
 export type Constant =
   | IntConstant
@@ -40,77 +43,79 @@ export type Constant =
   | CharConstant
   | BoolConstant
   | UnitConstant
-export interface IntConstant extends BaseNode {
+
+export interface IntConstant extends BaseExpressionNode {
   tag: 'IntConstant'
   val: number
   type: 'int'
 }
-export interface RealConstant extends BaseNode {
+export interface RealConstant extends BaseExpressionNode {
   tag: 'RealConstant'
   val: number
   type: 'real'
 }
-export interface StringConstant extends BaseNode {
+export interface StringConstant extends BaseExpressionNode {
   tag: 'StringConstant'
   val: string
   type: 'string'
 }
-export interface CharConstant extends BaseNode {
+export interface CharConstant extends BaseExpressionNode {
   tag: 'CharConstant'
   val: string
   type: 'char'
 }
-export interface BoolConstant extends BaseNode {
+export interface BoolConstant extends BaseExpressionNode {
   tag: 'BoolConstant'
   val: boolean
   type: 'bool'
 }
-export interface UnitConstant extends BaseNode {
+export interface UnitConstant extends BaseExpressionNode {
   tag: 'UnitConstant'
   type: 'unit'
 }
 
-export interface Application extends BaseNode {
+export interface Application extends BaseExpressionNode {
   tag: 'Application'
   fn: Expression
   arg: Expression
 }
 
-export interface InfixApplication extends BaseNode {
+export interface InfixApplication extends BaseExpressionNode {
   tag: 'InfixApplication'
   operand1: Expression
   operand2: Expression
   id: string
 }
 
-export interface ExpSequence extends BaseNode {
+export interface ListLiteral extends BaseExpressionNode {
+  tag: 'ListLiteral'
+  elements: Expression[]
+  arity: number
+}
+
+export interface ExpSequence extends BaseExpressionNode {
   tag: 'ExpSequence'
   exps: Array<Expression>
 }
 
-export interface LetExpression extends BaseNode {
+export interface LetExpression extends BaseExpressionNode {
   tag: 'LetExpression'
   decSequence: DeclarationSequence
   exps: Array<Expression>
 }
 
-export interface ConditionalExpression extends BaseNode {
+export interface ConditionalExpression extends BaseExpressionNode {
   tag: 'ConditionalExpression'
   pred: Expression
   consequent: Expression
   alternative: Expression
 }
 
-export interface Function extends BaseNode {
+export interface Function extends BaseExpressionNode {
   tag: 'Function'
   matches: Matches
 }
 
-export interface ListLiteral extends BaseNode {
-  tag: 'ListLiteral'
-  elements: Expression[]
-  arity: number
-}
 
 /**
  * Match
