@@ -59,6 +59,63 @@ const interleave = (microcodes, instruction) => {
     ret.pop();
     return ret;
 };
+// Checks if value can be matched against pattern, and
+// if so, updates the environment with the proper bindings
+// based on the pattern and value.
+// Returns true if value was successfuly unified with pattern. False otherwise.
+// e.g. case value of pat => ...
+const try_unify = (value, pat) => {
+    if ((pat.tag === 'IntConstant' && value.tag === 'int') ||
+        (pat.tag === 'RealConstant' && value.tag === 'real') ||
+        (pat.tag === 'CharConstant' && value.tag === 'char') ||
+        (pat.tag === 'StringConstant' && value.tag === 'string') ||
+        (pat.tag === 'BoolConstant' && value.tag === 'bool')) {
+        // Since both pat and value are constants, we don't need to update env
+        // e.g. case 1 of 1 => ...
+        return pat.val === value.js_val;
+    }
+    else if (pat.tag === 'UnitConstant') {
+        return value.tag === 'unit';
+    }
+    else if (pat.tag === 'Wildcard') {
+        // Wildcards result in a match by default.
+        // Don't need to assign env since wildcard has no variables to
+        // assign to
+        // e.g. case 1 of _ => ...
+        return true;
+    }
+    else if (pat.tag === 'Variable') {
+        // Variables result in a match by default
+        // Need to bind value to the variable defined in the pattern
+        // e.g. case 1 of x => ...
+        assign_in_env(E, pat.id, value);
+        return true;
+    }
+    else if (pat.tag === 'InfixConstruction') {
+        // we only support ::
+        if (pat.id !== '::') {
+            throw new Error(`${pat.id} is not a supported constructor`);
+        }
+        // guaranteed by typechecker
+        assert(value.tag === 'list');
+        // Attempting to unify something like
+        // e.g. case value of hd::tl => ...
+        // value must be a non-empty list for match to succeed
+        if (value.js_val.length === 0) {
+            return false;
+        }
+        const hd = (0, lodash_1.head)(value.js_val);
+        const tl = {
+            tag: 'list',
+            js_val: (0, lodash_1.tail)(value.js_val)
+        };
+        return try_unify(hd, pat.pat1) && try_unify(tl, pat.pat2);
+    }
+    else {
+        // TODO: handle more complicated patterns here.
+        throw new Error(`TODO: unimplemented ${pat}`);
+    }
+};
 // All the case statements are wrapped in a { }. This is to prevent scopes
 // from interfering with each other (we don't want fallthroughs anyways).
 // Without this wrapping, the declaration of a const x in one case, would prevent
@@ -266,34 +323,9 @@ const exec_microcode = (cmd) => {
             // But we check if the pat and the RHS are valid
             // Examples of valid constant assignment: 1=1, true=true, ()=()
             // Examples of non-valid constant assignment: 1=2, true=false
-            if (cmd.pat.tag === 'UnitConstant') {
-                if (rhs.tag !== 'unit') {
-                    throw new Error(`cannot bind () to ${rhs}. can only bind () to itself`);
-                }
-            }
-            else if (cmd.pat.tag === 'IntConstant' ||
-                cmd.pat.tag === 'RealConstant' ||
-                cmd.pat.tag === 'CharConstant' ||
-                cmd.pat.tag === 'StringConstant' ||
-                cmd.pat.tag === 'BoolConstant') {
-                if ((rhs.tag !== 'int' &&
-                    rhs.tag !== 'real' &&
-                    rhs.tag !== 'char' &&
-                    rhs.tag !== 'string' &&
-                    rhs.tag !== 'bool') ||
-                    // For constants containing values (non-unit), the values must be equal.
-                    // Otherwise, we throw error
-                    cmd.pat.val !== rhs.js_val) {
-                    throw new Error(`cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`);
-                }
-            }
-            else if (cmd.pat.tag === 'Variable') {
-                assign_in_env(E, cmd.pat.id, rhs);
-            }
-            else {
-                // TODO: handle more complicated patterns here.
-                // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
-                throw new Error(`TODO: unimplemented ${cmd.pat}`);
+            const unified = try_unify(rhs, cmd.pat);
+            if (!unified) {
+                throw new Error(`cannot assign ${cmd.pat} to ${rhs}`);
             }
             break;
         }
@@ -340,36 +372,10 @@ const exec_microcode = (cmd) => {
             // Bind params (if necessary) and evaluate function body
             let found_match = false;
             for (const { pat, exp } of fn.matches.matches) {
-                // Find the first pattern that matches the given arg, then
-                // perform relevant bindings, and evaluate the associated expression
-                if ((pat.tag === 'IntConstant' && arg.tag === 'int') ||
-                    (pat.tag === 'RealConstant' && arg.tag === 'real') ||
-                    (pat.tag === 'CharConstant' && arg.tag === 'char') ||
-                    (pat.tag === 'StringConstant' && arg.tag === 'string') ||
-                    (pat.tag === 'BoolConstant' && arg.tag === 'bool')) {
-                    const is_match = pat.val === arg.js_val;
-                    if (is_match) {
-                        // Don't need to assign in env here since both pat and args are constant
-                        A.push(exp);
-                        found_match = true;
-                    }
-                }
-                else if (pat.tag === 'Wildcard') {
-                    // wildcard: match by default, no need to assign env since wildcard has no variables to
-                    // assign to
-                    A.push(exp);
-                    found_match = true;
-                }
-                else if (pat.tag === 'Variable') {
-                    // variables match the arg by default
-                    assign_in_env(E, pat.id, arg);
-                    A.push(exp);
-                    found_match = true;
-                }
-                else {
-                    throw new Error(`TODO: unimplemented ${pat}`);
-                }
+                found_match = try_unify(arg, pat);
                 if (found_match) {
+                    // match found - evaluate the associated exp and stop finding futher matches
+                    A.push(exp);
                     break;
                 }
             }

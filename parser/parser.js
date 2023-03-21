@@ -226,6 +226,18 @@ class NodeGenerator {
             loc: contextToLocation(ctx)
         };
     }
+    visitPatInfixConstruction(ctx) {
+        return {
+            tag: 'InfixConstruction',
+            pat1: this.visit(ctx._pat1),
+            pat2: this.visit(ctx._pat2),
+            id: ctx.CONS().text,
+            loc: contextToLocation(ctx)
+        };
+    }
+    visitPatParentheses(ctx) {
+        return this.visit(ctx.pat());
+    }
     /**
      * Declarations
      */

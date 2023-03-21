@@ -88,6 +88,7 @@ export declare class SmlParser extends Parser {
     patmatch(): PatmatchContext;
     matches(): MatchesContext;
     pat(): PatContext;
+    pat(_p: number): PatContext;
     dec(): DecContext;
     decSequence(): DecSequenceContext;
     valbind(): ValbindContext;
@@ -97,6 +98,7 @@ export declare class SmlParser extends Parser {
     prog(): ProgContext;
     sempred(_localctx: RuleContext, ruleIndex: number, predIndex: number): boolean;
     private exp_sempred;
+    private pat_sempred;
     static readonly _serializedATN: string;
     static __ATN: ATN;
     static get _ATN(): ATN;
@@ -345,6 +347,26 @@ export declare class PatUnitContext extends PatContext {
 export declare class PatVariableContext extends PatContext {
     _id: Token;
     ID(): TerminalNode;
+    constructor(ctx: PatContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class PatInfixConstructionContext extends PatContext {
+    _pat1: PatContext;
+    _pat2: PatContext;
+    CONS(): TerminalNode;
+    pat(): PatContext[];
+    pat(i: number): PatContext;
+    constructor(ctx: PatContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
+export declare class PatParenthesesContext extends PatContext {
+    LPAREN(): TerminalNode;
+    pat(): PatContext;
+    RPAREN(): TerminalNode;
     constructor(ctx: PatContext);
     enterRule(listener: SmlListener): void;
     exitRule(listener: SmlListener): void;
