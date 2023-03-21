@@ -81,9 +81,11 @@ const try_unify = (value: Value, pat: Pattern): boolean => {
     (pat.tag === 'StringConstant' && value.tag === 'string') ||
     (pat.tag === 'BoolConstant' && value.tag === 'bool')
   ) {
-    // Since both pat and value are ocnstants, we don't need to update env
+    // Since both pat and value are constants, we don't need to update env
     // e.g. case 1 of 1 => ...
     return pat.val === value.js_val
+  } else if (pat.tag === 'UnitConstant') {
+    return value.tag === 'unit'
   } else if (pat.tag === 'Wildcard') {
     // Wildcards result in a match by default.
     // Don't need to assign env since wildcard has no variables to
@@ -120,6 +122,7 @@ const try_unify = (value: Value, pat: Pattern): boolean => {
 
     return try_unify(hd, pat.pat1) && try_unify(tl, pat.pat2)
   } else {
+    // TODO: handle more complicated patterns here.
     throw new Error(`TODO: unimplemented ${pat}`)
   }
 }
@@ -337,37 +340,9 @@ const exec_microcode = (cmd: Microcode) => {
       // But we check if the pat and the RHS are valid
       // Examples of valid constant assignment: 1=1, true=true, ()=()
       // Examples of non-valid constant assignment: 1=2, true=false
-      if (cmd.pat.tag === 'UnitConstant') {
-        if (rhs.tag !== 'unit') {
-          throw new Error(`cannot bind () to ${rhs}. can only bind () to itself`)
-        }
-      } else if (
-        cmd.pat.tag === 'IntConstant' ||
-        cmd.pat.tag === 'RealConstant' ||
-        cmd.pat.tag === 'CharConstant' ||
-        cmd.pat.tag === 'StringConstant' ||
-        cmd.pat.tag === 'BoolConstant'
-      ) {
-        if (
-          (rhs.tag !== 'int' &&
-            rhs.tag !== 'real' &&
-            rhs.tag !== 'char' &&
-            rhs.tag !== 'string' &&
-            rhs.tag !== 'bool') ||
-          // For constants containing values (non-unit), the values must be equal.
-          // Otherwise, we throw error
-          cmd.pat.val !== rhs.js_val
-        ) {
-          throw new Error(
-            `cannot bind ${cmd.pat.val} to ${rhs}. can only bind ${cmd.pat.val} to itself`
-          )
-        }
-      } else if (cmd.pat.tag === 'Variable') {
-        assign_in_env(E, cmd.pat.id, rhs)
-      } else {
-        // TODO: handle more complicated patterns here.
-        // e.g. if pat is a::b, then assign a=head(rhs), b=tail(rhs) (after checking the types of rhs)
-        throw new Error(`TODO: unimplemented ${cmd.pat}`)
+      const unified = try_unify(rhs, cmd.pat)
+      if (!unified) {
+        throw new Error(`cannot assign ${cmd.pat} to ${rhs}`)
       }
       break
     }
