@@ -31,6 +31,7 @@ import {
   MatchesContext,
   ParenthesesContext,
   PatConstantContext,
+  PatInfixConstructionContext,
   PatmatchContext,
   PatParenthesesContext,
   PatUnitContext,
@@ -58,6 +59,7 @@ import {
   ExpSequence,
   Function,
   InfixApplication,
+  InfixConstruction,
   IntConstant,
   LetExpression,
   ListLiteral,
@@ -298,6 +300,15 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'Variable',
       id: ctx._id.text!,
+      loc: contextToLocation(ctx)
+    }
+  }
+  visitPatInfixConstruction(ctx: PatInfixConstructionContext): InfixConstruction {
+    return {
+      tag: 'InfixConstruction',
+      pat1: this.visit(ctx._pat1) as Pattern,
+      pat2: this.visit(ctx._pat2) as Pattern,
+      id: ctx.CONS().text,
       loc: contextToLocation(ctx)
     }
   }

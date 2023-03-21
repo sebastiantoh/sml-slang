@@ -118,7 +118,7 @@ pat
     | UNDERSCORE                                                      # PatWildcard
     | UNIT                                                            # PatUnit
     | id=ID                                                           # PatVariable
-    // TODO: add infix constructioon
+    | pat1=pat CONS pat2=pat                                         # PatInfixConstruction
     | LPAREN pat RPAREN                                               # PatParentheses
     // TODO: add list
     // TODO: add type annotation

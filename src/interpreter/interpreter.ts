@@ -1,7 +1,7 @@
 import * as assert from 'assert'
-import { take, takeRight } from 'lodash'
+import { head, tail, take, takeRight } from 'lodash'
 
-import { Expression, Node, Program } from '../parser/ast'
+import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { Environment, Value } from '../types'
 import { Instruction } from './instructions'
@@ -66,6 +66,62 @@ const interleave = (microcodes: Array<Microcode>, instruction: Instruction) => {
   // remove last added instruction
   ret.pop()
   return ret
+}
+
+// Checks if value can be matched against pattern, and
+// if so, updates the environment with the proper bindings
+// based on the pattern and value.
+// Returns true if value was successfuly unified with pattern. False otherwise.
+// e.g. case value of pat => ...
+const try_unify = (value: Value, pat: Pattern): boolean => {
+  if (
+    (pat.tag === 'IntConstant' && value.tag === 'int') ||
+    (pat.tag === 'RealConstant' && value.tag === 'real') ||
+    (pat.tag === 'CharConstant' && value.tag === 'char') ||
+    (pat.tag === 'StringConstant' && value.tag === 'string') ||
+    (pat.tag === 'BoolConstant' && value.tag === 'bool')
+  ) {
+    // Since both pat and value are ocnstants, we don't need to update env
+    // e.g. case 1 of 1 => ...
+    return pat.val === value.js_val
+  } else if (pat.tag === 'Wildcard') {
+    // Wildcards result in a match by default.
+    // Don't need to assign env since wildcard has no variables to
+    // assign to
+    // e.g. case 1 of _ => ...
+    return true
+  } else if (pat.tag === 'Variable') {
+    // Variables result in a match by default
+    // Need to bind value to the variable defined in the pattern
+    // e.g. case 1 of x => ...
+    assign_in_env(E, pat.id, value)
+    return true
+  } else if (pat.tag === 'InfixConstruction') {
+    // we only support ::
+    if (pat.id !== '::') {
+      throw new Error(`${pat.id} is not a supported constructor`)
+    }
+
+    // guaranteed by typechecker
+    assert(value.tag === 'list')
+
+    // Attempting to unify something like
+    // e.g. case value of hd::tl => ...
+
+    // value must be a non-empty list for match to succeed
+    if (value.js_val.length === 0) {
+      return false
+    }
+    const hd = head(value.js_val)!
+    const tl = {
+      tag: 'list',
+      js_val: tail(value.js_val)
+    } as Value
+
+    return try_unify(hd, pat.pat1) && try_unify(tl, pat.pat2)
+  } else {
+    throw new Error(`TODO: unimplemented ${pat}`)
+  }
 }
 
 // All the case statements are wrapped in a { }. This is to prevent scopes
@@ -360,36 +416,10 @@ const exec_microcode = (cmd: Microcode) => {
       // Bind params (if necessary) and evaluate function body
       let found_match = false
       for (const { pat, exp } of fn.matches.matches) {
-        // Find the first pattern that matches the given arg, then
-        // perform relevant bindings, and evaluate the associated expression
-        if (
-          (pat.tag === 'IntConstant' && arg.tag === 'int') ||
-          (pat.tag === 'RealConstant' && arg.tag === 'real') ||
-          (pat.tag === 'CharConstant' && arg.tag === 'char') ||
-          (pat.tag === 'StringConstant' && arg.tag === 'string') ||
-          (pat.tag === 'BoolConstant' && arg.tag === 'bool')
-        ) {
-          const is_match = pat.val === arg.js_val
-          if (is_match) {
-            // Don't need to assign in env here since both pat and args are constant
-            A.push(exp)
-            found_match = true
-          }
-        } else if (pat.tag === 'Wildcard') {
-          // wildcard: match by default, no need to assign env since wildcard has no variables to
-          // assign to
-          A.push(exp)
-          found_match = true
-        } else if (pat.tag === 'Variable') {
-          // variables match the arg by default
-          assign_in_env(E, pat.id, arg)
-          A.push(exp)
-          found_match = true
-        } else {
-          throw new Error(`TODO: unimplemented ${pat}`)
-        }
-
+        found_match = try_unify(arg, pat)
         if (found_match) {
+          // match found - evaluate the associated exp and stop finding futher matches
+          A.push(exp)
           break
         }
       }
