@@ -1,65 +1,65 @@
 import { BuiltinFn, Value } from './types';
-export declare const valueToString: (sml_val: Value) => string;
+export declare const valueToString: (val: Value) => string;
 export declare const builtinBinOperators: {
     '/': (a: Value, b: Value) => {
         tag: string;
-        js_val: number;
+        jsVal: number;
     };
     div: (a: Value, b: Value) => {
         tag: string;
-        js_val: number;
+        jsVal: number;
     };
     mod: (a: Value, b: Value) => {
         tag: string;
-        js_val: number;
+        jsVal: number;
     };
     '*': (a: Value, b: Value) => {
         tag: "int" | "real";
-        js_val: number;
+        jsVal: number;
     };
     '+': (a: Value, b: Value) => {
         tag: "int" | "real";
-        js_val: number;
+        jsVal: number;
     };
     '-': (a: Value, b: Value) => {
         tag: "int" | "real";
-        js_val: number;
+        jsVal: number;
     };
     '^': (a: Value, b: Value) => {
         tag: string;
-        js_val: string;
+        jsVal: string;
     };
     '::': (a: Value, b: Value) => {
         tag: string;
-        js_val: Value[];
+        jsVal: Value[];
     };
     '@': (a: Value, b: Value) => {
         tag: string;
-        js_val: Value[];
+        jsVal: Value[];
     };
     '=': (a: Value, b: Value) => {
         tag: string;
-        js_val: boolean;
+        jsVal: boolean;
     };
     '<>': (a: Value, b: Value) => {
         tag: string;
-        js_val: boolean;
+        jsVal: boolean;
     };
     '<': (a: Value, b: Value) => {
         tag: string;
-        js_val: boolean;
+        jsVal: boolean;
     };
     '>': (a: Value, b: Value) => {
         tag: string;
-        js_val: boolean;
+        jsVal: boolean;
     };
     '<=': (a: Value, b: Value) => {
         tag: string;
-        js_val: boolean;
+        jsVal: boolean;
     };
     '>=': (a: Value, b: Value) => {
         tag: string;
-        js_val: boolean;
+        jsVal: boolean;
     };
 };
 export declare const builtinFns: Array<BuiltinFn>;

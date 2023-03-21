@@ -280,7 +280,7 @@ class NodeGenerator {
     visitValbind(ctx) {
         return {
             tag: 'Valbind',
-            is_rec: ctx.REC() !== undefined,
+            isRec: ctx.REC() !== undefined,
             pat: this.visit(ctx.pat()),
             exp: this.visit(ctx.exp()),
             loc: contextToLocation(ctx)
@@ -348,7 +348,7 @@ class NodeGenerator {
         }
         return {
             tag: 'Valbind',
-            is_rec: true,
+            isRec: true,
             pat: { tag: 'Variable', id: fnName },
             exp: { tag: 'Function', matches: { tag: 'Matches', matches } },
             loc: contextToLocation(ctx)
