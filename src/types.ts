@@ -9,27 +9,27 @@ export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | 
 // type assertions in the interpreter
 export interface Int {
   tag: 'int'
-  js_val: Readonly<number>
+  jsVal: Readonly<number>
 }
 
 export interface Real {
   tag: 'real'
-  js_val: Readonly<number>
+  jsVal: Readonly<number>
 }
 
 export interface String {
   tag: 'string'
-  js_val: Readonly<string>
+  jsVal: Readonly<string>
 }
 
 export interface Char {
   tag: 'char'
-  js_val: Readonly<string>
+  jsVal: Readonly<string>
 }
 
 export interface Bool {
   tag: 'bool'
-  js_val: Readonly<boolean>
+  jsVal: Readonly<boolean>
 }
 
 export interface Unit {
@@ -38,7 +38,7 @@ export interface Unit {
 
 export interface List {
   tag: 'list'
-  js_val: Readonly<Value[]>
+  jsVal: Readonly<Value[]>
 }
 
 export interface Fn {

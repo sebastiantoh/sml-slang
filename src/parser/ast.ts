@@ -165,7 +165,7 @@ export interface LocalDeclaration extends BaseNode {
 
 export interface Valbind extends BaseNode {
   tag: 'Valbind'
-  is_rec: boolean
+  isRec: boolean
   pat: Pattern
   exp: Expression
 }

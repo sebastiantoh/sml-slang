@@ -14,27 +14,27 @@ let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
 
-const init_env = (): Environment => {
+const initEnv = (): Environment => {
   const env = { frame: {}, parent: undefined }
   for (const fn of Sml.builtinFns) {
-    assign_in_env(env, fn.id, fn)
+    assignInEnv(env, fn.id, fn)
   }
   return env
 }
 
-const extend_env = (env: Environment): Environment => {
+const extendEnv = (env: Environment): Environment => {
   return { frame: {}, parent: env }
 }
-const lookup_env = (env: Environment | undefined, k: string): Value => {
+const lookupEnv = (env: Environment | undefined, k: string): Value => {
   if (env === undefined) {
     throw new Error(`${k} not found in env`)
   }
   if (env.frame[k] === undefined) {
-    return lookup_env(env.parent, k)
+    return lookupEnv(env.parent, k)
   }
   return env.frame[k]
 }
-const assign_in_env = (env: Environment, k: string, v: Value) => {
+const assignInEnv = (env: Environment, k: string, v: Value) => {
   // Bindings are immutable, though shadowing is possible.
   // So we simply overwrite what ever value was stored (if any).
   // Bindings in parent frames cannot be modified.
@@ -53,7 +53,7 @@ function peek<T>(stack: Array<T>): T | undefined {
   }
   return stack[-1]
 }
-const rev_push = (stack: Array<any>, items: any[]) => {
+const revPush = (stack: Array<any>, items: any[]) => {
   stack.push(...reverse(items))
 }
 
@@ -73,7 +73,7 @@ const interleave = (microcodes: Array<Microcode>, instruction: Instruction) => {
 // based on the pattern and value.
 // Returns true if value was successfuly unified with pattern. False otherwise.
 // e.g. case value of pat => ...
-const try_match = (value: Value, pat: Pattern): boolean => {
+const tryMatch = (value: Value, pat: Pattern): boolean => {
   if (
     (pat.tag === 'IntConstant' && value.tag === 'int') ||
     (pat.tag === 'RealConstant' && value.tag === 'real') ||
@@ -83,7 +83,7 @@ const try_match = (value: Value, pat: Pattern): boolean => {
   ) {
     // Since both pat and value are constants, we don't need to update env
     // e.g. case 1 of 1 => ...
-    return pat.val === value.js_val
+    return pat.val === value.jsVal
   } else if (pat.tag === 'UnitConstant') {
     return value.tag === 'unit'
   } else if (pat.tag === 'Wildcard') {
@@ -96,7 +96,7 @@ const try_match = (value: Value, pat: Pattern): boolean => {
     // Variables result in a match by default
     // Need to bind value to the variable defined in the pattern
     // e.g. case 1 of x => ...
-    assign_in_env(E, pat.id, value)
+    assignInEnv(E, pat.id, value)
     return true
   } else if (pat.tag === 'InfixConstruction') {
     // we only support ::
@@ -111,16 +111,16 @@ const try_match = (value: Value, pat: Pattern): boolean => {
     // e.g. case value of hd::tl => ...
 
     // value must be a non-empty list for match to succeed
-    if (value.js_val.length === 0) {
+    if (value.jsVal.length === 0) {
       return false
     }
-    const hd = head(value.js_val)!
+    const hd = head(value.jsVal)!
     const tl = {
       tag: 'list',
-      js_val: tail(value.js_val)
+      jsVal: tail(value.jsVal)
     } as Value
 
-    return try_match(hd, pat.pat1) && try_match(tl, pat.pat2)
+    return tryMatch(hd, pat.pat1) && tryMatch(tl, pat.pat2)
   } else {
     // TODO: handle more complicated patterns here.
     throw new Error(`TODO: unimplemented ${pat}`)
@@ -131,7 +131,7 @@ const try_match = (value: Value, pat: Pattern): boolean => {
 // from interfering with each other (we don't want fallthroughs anyways).
 // Without this wrapping, the declaration of a const x in one case, would prevent
 // the declaration of the same const x in another disjoint case
-const exec_microcode = (cmd: Microcode) => {
+const execMicrocode = (cmd: Microcode) => {
   switch (cmd.tag) {
     /**
      * Node Tags
@@ -139,35 +139,35 @@ const exec_microcode = (cmd: Microcode) => {
     case 'IntConstant': {
       S.push({
         tag: 'int',
-        js_val: cmd.val
+        jsVal: cmd.val
       })
       break
     }
     case 'RealConstant': {
       S.push({
         tag: 'real',
-        js_val: cmd.val
+        jsVal: cmd.val
       })
       break
     }
     case 'CharConstant': {
       S.push({
         tag: 'char',
-        js_val: cmd.val
+        jsVal: cmd.val
       })
       break
     }
     case 'StringConstant': {
       S.push({
         tag: 'string',
-        js_val: cmd.val
+        jsVal: cmd.val
       })
       break
     }
     case 'BoolConstant': {
       S.push({
         tag: 'bool',
-        js_val: cmd.val
+        jsVal: cmd.val
       })
       break
     }
@@ -197,12 +197,12 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'ExpSequence': {
-      rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
+      revPush(A, interleave(cmd.exps, { tag: 'PopI' }))
       break
     }
     case 'LetExpression': {
       A.push({ tag: 'RestoreEnvI', env: E })
-      rev_push(A, interleave(cmd.exps, { tag: 'PopI' }))
+      revPush(A, interleave(cmd.exps, { tag: 'PopI' }))
       A.push(cmd.decSequence)
       break
     }
@@ -230,15 +230,15 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'Variable': {
-      S.push(lookup_env(E, cmd.id))
+      S.push(lookupEnv(E, cmd.id))
       break
     }
     case 'DeclarationSequence': {
-      rev_push(A, cmd.decs)
+      revPush(A, cmd.decs)
       break
     }
     case 'ValueDeclaration': {
-      rev_push(A, cmd.valbinds)
+      revPush(A, cmd.valbinds)
       break
     }
     case 'LocalDeclaration': {
@@ -257,7 +257,7 @@ const exec_microcode = (cmd: Microcode) => {
       // - Will traverse up from env=decM until env.parent === oldParent (or localDecN),
       //   before setting env.parent = newParent (currEnv)
       // TODO: is there a better way to do this?
-      rev_push(A, [
+      revPush(A, [
         ...cmd.localDecs.decs,
         {
           tag: 'DecsAfterLocalDecsI',
@@ -270,16 +270,16 @@ const exec_microcode = (cmd: Microcode) => {
     case 'Valbind': {
       // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
       // Each declaration are in their own env frame
-      if (cmd.is_rec) {
+      if (cmd.isRec) {
         if (cmd.exp.tag !== 'Function') {
           throw new Error('using rec requires binding a function')
         }
-        E = extend_env(E)
+        E = extendEnv(E)
         A.push({ tag: 'AssignI', pat: cmd.pat }, cmd.exp)
       } else {
         // Need to evaluate RHS in prev env
         const prevEnv = E
-        E = extend_env(E)
+        E = extendEnv(E)
         A.push({ tag: 'AssignI', pat: cmd.pat }, { tag: 'RestoreEnvI', env: E }, cmd.exp, {
           tag: 'RestoreEnvI',
           env: prevEnv
@@ -288,7 +288,7 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'Program': {
-      rev_push(A, cmd.body.decs)
+      revPush(A, cmd.body.decs)
       break
     }
 
@@ -300,10 +300,10 @@ const exec_microcode = (cmd: Microcode) => {
       break
     }
     case 'BranchI': {
-      const pred_res = S.pop()!
-      assert(pred_res.tag === 'bool')
+      const predRes = S.pop()!
+      assert(predRes.tag === 'bool')
 
-      if (pred_res.js_val) {
+      if (predRes.jsVal) {
         A.push(cmd.consequent)
       } else {
         A.push(cmd.alternative)
@@ -340,14 +340,14 @@ const exec_microcode = (cmd: Microcode) => {
       // But we check if the pat and the RHS are valid
       // Examples of valid constant assignment: 1=1, true=true, ()=()
       // Examples of non-valid constant assignment: 1=2, true=false
-      const unified = try_match(rhs, cmd.pat)
+      const unified = tryMatch(rhs, cmd.pat)
       if (!unified) {
         throw new Error(`cannot assign ${cmd.pat} to ${rhs}`)
       }
       break
     }
     case 'DecsAfterLocalDecsI': {
-      rev_push(A, [
+      revPush(A, [
         ...cmd.decs,
         { tag: 'SetEnvParentI', oldParent: E, newParent: cmd.envBeforeLocalDecs }
       ])
@@ -357,7 +357,7 @@ const exec_microcode = (cmd: Microcode) => {
       const arity = cmd.arity
       const lst = takeRight(S, arity)
       S = take(S, S.length - arity)
-      S.push({ tag: 'list', js_val: lst })
+      S.push({ tag: 'list', jsVal: lst })
       break
     }
     case 'ApplicationI': {
@@ -386,20 +386,20 @@ const exec_microcode = (cmd: Microcode) => {
       } else {
         A.push({ tag: 'RestoreEnvI', env: E }, { tag: 'MarkEndOfFnBodyI' })
       }
-      E = extend_env(fn.env)
+      E = extendEnv(fn.env)
 
       // Bind params (if necessary) and evaluate function body
-      let found_match = false
+      let foundMatch = false
       for (const { pat, exp } of fn.matches.matches) {
-        found_match = try_match(arg, pat)
-        if (found_match) {
+        foundMatch = tryMatch(arg, pat)
+        if (foundMatch) {
           // match found - evaluate the associated exp and stop finding futher matches
           A.push(exp)
           break
         }
       }
 
-      if (!found_match) {
+      if (!foundMatch) {
         throw new Error(`no match found for ${arg}`)
       }
 
@@ -421,19 +421,19 @@ const exec_microcode = (cmd: Microcode) => {
 export function evaluate(node: Node) {
   A = [node]
   S = []
-  E = init_env()
+  E = initEnv()
   stdout = []
 
-  const step_limit = 1000000
+  const stepLimit = 1000000
   let i = 0
-  while (i < step_limit) {
+  while (i < stepLimit) {
     if (A.length === 0) break
     const cmd = A.pop()!
-    exec_microcode(cmd)
+    execMicrocode(cmd)
     i++
   }
-  if (i === step_limit) {
-    throw new Error(`step limit ${step_limit} exceeded`)
+  if (i === stepLimit) {
+    throw new Error(`step limit ${stepLimit} exceeded`)
   }
 }
 

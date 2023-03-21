@@ -3,34 +3,34 @@ import { isEqual } from 'lodash'
 import { stdout } from './interpreter/interpreter'
 import { BuiltinFn, Value } from './types'
 
-export const valueToString = (sml_val: Value): string => {
-  switch (sml_val.tag) {
+export const valueToString = (val: Value): string => {
+  switch (val.tag) {
     case 'int':
-      if (sml_val.js_val < 0) {
-        return `~${Math.abs(sml_val.js_val)}`
+      if (val.jsVal < 0) {
+        return `~${Math.abs(val.jsVal)}`
       }
-      return sml_val.js_val.toString()
+      return val.jsVal.toString()
     case 'real':
-      if (sml_val.js_val < 0) {
-        return `~${Math.abs(sml_val.js_val)}`
+      if (val.jsVal < 0) {
+        return `~${Math.abs(val.jsVal)}`
       }
-      return sml_val.js_val.toString()
+      return val.jsVal.toString()
     case 'string':
-      return `"${sml_val.js_val}"`
+      return `"${val.jsVal}"`
     case 'char':
-      return `#"${sml_val.js_val}"`
+      return `#"${val.jsVal}"`
     case 'bool':
-      return sml_val.js_val.toString()
+      return val.jsVal.toString()
     case 'unit':
       return '()'
     case 'list':
-      return `[${sml_val.js_val.map(e => valueToString(e)).toString()}]`
+      return `[${val.jsVal.map(e => valueToString(e)).toString()}]`
     case 'fn':
       // TODO: once we have a typechecker, we can
       // include more info in the string repr, e.g param types and return types
       return 'fn'
     case 'builtin_fn':
-      return `${sml_val.id}: builtin_fn`
+      return `${val.id}: builtin_fn`
   }
 }
 
@@ -39,24 +39,24 @@ export const valueToString = (sml_val: Value): string => {
 export const builtinBinOperators = {
   '/': (a: Value, b: Value) => {
     if (a.tag === 'real' && b.tag === 'real') {
-      if (b.js_val === 0) {
+      if (b.jsVal === 0) {
         throw new Error('division by zero')
       }
       return {
         tag: 'real',
-        js_val: a.js_val / b.js_val
+        jsVal: a.jsVal / b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
   },
   div: (a: Value, b: Value) => {
     if (a.tag === 'int' && b.tag === 'int') {
-      if (b.js_val === 0) {
+      if (b.jsVal === 0) {
         throw new Error('division by zero')
       }
       return {
         tag: 'int',
-        js_val: Math.floor(a.js_val / b.js_val)
+        jsVal: Math.floor(a.jsVal / b.jsVal)
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -65,7 +65,7 @@ export const builtinBinOperators = {
     if (a.tag === 'int' && b.tag === 'int') {
       return {
         tag: 'int',
-        js_val: ((a.js_val % b.js_val) + b.js_val) % b.js_val
+        jsVal: ((a.jsVal % b.jsVal) + b.jsVal) % b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -74,7 +74,7 @@ export const builtinBinOperators = {
     if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
       return {
         tag: a.tag,
-        js_val: a.js_val * b.js_val
+        jsVal: a.jsVal * b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -83,7 +83,7 @@ export const builtinBinOperators = {
     if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
       return {
         tag: a.tag,
-        js_val: a.js_val + b.js_val
+        jsVal: a.jsVal + b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -92,7 +92,7 @@ export const builtinBinOperators = {
     if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
       return {
         tag: a.tag,
-        js_val: a.js_val - b.js_val
+        jsVal: a.jsVal - b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -101,7 +101,7 @@ export const builtinBinOperators = {
     if (a.tag === 'string' && b.tag === 'string') {
       return {
         tag: 'string',
-        js_val: a.js_val.concat(b.js_val)
+        jsVal: a.jsVal.concat(b.jsVal)
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -111,7 +111,7 @@ export const builtinBinOperators = {
       return {
         tag: 'list',
         // type checker should have ensured that a has proper type
-        js_val: [a, ...b.js_val]
+        jsVal: [a, ...b.jsVal]
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -121,7 +121,7 @@ export const builtinBinOperators = {
       return {
         tag: 'list',
         // type checker should have ensured that a has proper type
-        js_val: [...a.js_val, ...b.js_val]
+        jsVal: [...a.jsVal, ...b.jsVal]
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -139,12 +139,12 @@ export const builtinBinOperators = {
       return {
         tag: 'bool',
         // isEqual supports list (structural) equality, which javascript's builtin == or === does not
-        js_val: isEqual(a.js_val, b.js_val)
+        jsVal: isEqual(a.jsVal, b.jsVal)
       }
     } else if (a.tag === 'unit' && b.tag === 'unit') {
       return {
         tag: 'bool',
-        js_val: true
+        jsVal: true
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -153,7 +153,7 @@ export const builtinBinOperators = {
     const isEq = builtinBinOperators['='](a, b)
     return {
       tag: 'bool',
-      js_val: !isEq.js_val
+      jsVal: !isEq.jsVal
     }
   },
   '<': (a: Value, b: Value) => {
@@ -165,7 +165,7 @@ export const builtinBinOperators = {
     ) {
       return {
         tag: 'bool',
-        js_val: a.js_val < b.js_val
+        jsVal: a.jsVal < b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -179,7 +179,7 @@ export const builtinBinOperators = {
     ) {
       return {
         tag: 'bool',
-        js_val: a.js_val > b.js_val
+        jsVal: a.jsVal > b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -193,7 +193,7 @@ export const builtinBinOperators = {
     ) {
       return {
         tag: 'bool',
-        js_val: a.js_val <= b.js_val
+        jsVal: a.jsVal <= b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -207,7 +207,7 @@ export const builtinBinOperators = {
     ) {
       return {
         tag: 'bool',
-        js_val: a.js_val >= b.js_val
+        jsVal: a.jsVal >= b.jsVal
       }
     }
     throw new Error(`invalid types - received ${a.tag} and ${b.tag}`)
@@ -232,7 +232,7 @@ export const builtinFns: Array<BuiltinFn> = [
       if (arg.tag === 'string') {
         return {
           tag: 'int',
-          js_val: arg.js_val.length
+          jsVal: arg.jsVal.length
         }
       }
       throw new Error(`invalid types - received ${arg.tag}`)
@@ -245,7 +245,7 @@ export const builtinFns: Array<BuiltinFn> = [
       if (arg.tag === 'bool') {
         return {
           tag: 'bool',
-          js_val: !arg.js_val
+          jsVal: !arg.jsVal
         }
       }
       throw new Error(`invalid types - received ${arg.tag}`)

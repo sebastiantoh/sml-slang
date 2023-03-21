@@ -359,7 +359,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitValbind(ctx: ValbindContext): Valbind {
     return {
       tag: 'Valbind',
-      is_rec: ctx.REC() !== undefined,
+      isRec: ctx.REC() !== undefined,
       pat: this.visit(ctx.pat()) as Pattern,
       exp: this.visit(ctx.exp()) as Expression,
       loc: contextToLocation(ctx)
@@ -435,7 +435,7 @@ class NodeGenerator implements SmlVisitor<Node> {
 
     return {
       tag: 'Valbind',
-      is_rec: true,
+      isRec: true,
       pat: { tag: 'Variable', id: fnName },
       exp: { tag: 'Function', matches: { tag: 'Matches', matches } },
       loc: contextToLocation(ctx)
