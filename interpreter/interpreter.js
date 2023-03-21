@@ -64,7 +64,7 @@ const interleave = (microcodes, instruction) => {
 // based on the pattern and value.
 // Returns true if value was successfuly unified with pattern. False otherwise.
 // e.g. case value of pat => ...
-const try_unify = (value, pat) => {
+const try_match = (value, pat) => {
     if ((pat.tag === 'IntConstant' && value.tag === 'int') ||
         (pat.tag === 'RealConstant' && value.tag === 'real') ||
         (pat.tag === 'CharConstant' && value.tag === 'char') ||
@@ -109,7 +109,7 @@ const try_unify = (value, pat) => {
             tag: 'list',
             js_val: (0, lodash_1.tail)(value.js_val)
         };
-        return try_unify(hd, pat.pat1) && try_unify(tl, pat.pat2);
+        return try_match(hd, pat.pat1) && try_match(tl, pat.pat2);
     }
     else {
         // TODO: handle more complicated patterns here.
@@ -323,7 +323,7 @@ const exec_microcode = (cmd) => {
             // But we check if the pat and the RHS are valid
             // Examples of valid constant assignment: 1=1, true=true, ()=()
             // Examples of non-valid constant assignment: 1=2, true=false
-            const unified = try_unify(rhs, cmd.pat);
+            const unified = try_match(rhs, cmd.pat);
             if (!unified) {
                 throw new Error(`cannot assign ${cmd.pat} to ${rhs}`);
             }
@@ -372,7 +372,7 @@ const exec_microcode = (cmd) => {
             // Bind params (if necessary) and evaluate function body
             let found_match = false;
             for (const { pat, exp } of fn.matches.matches) {
-                found_match = try_unify(arg, pat);
+                found_match = try_match(arg, pat);
                 if (found_match) {
                     // match found - evaluate the associated exp and stop finding futher matches
                     A.push(exp);
