@@ -66,11 +66,17 @@ LTE: '<=';
 GTE: '>=';
 ANDALSO: 'andalso';
 ORELSE: 'orelse';
+QUOTE: '\'';
 
 ID
     : LETTER (LETTER | DIGIT | '\'' | '_' )*
     | ( '!' | '%' | '&' | '$' | '#' | '+' | '-' | '/' | ':' |
         '<' | '=' | '>' | '?' | '@' | '\\' | '~' | '`' | '^' | '|' | '*' )+
+    ;
+
+VAR
+    : QUOTE (LETTER | DIGIT | QUOTE | UNDERSCORE)*
+    | QUOTE QUOTE (LETTER | DIGIT | QUOTE | UNDERSCORE)*
     ;
 
 /** Productions */
@@ -122,6 +128,19 @@ pat
     | LPAREN pat RPAREN                                               # PatParentheses
     // TODO: add list
     // TODO: add type annotation
+    ;
+
+typ
+    : VAR                                                             # TypeVariable
+    // Note: based on the grammar spec it should be typ instead
+    // of VAR. But I don't know when the other cases of typ is used
+    // Also, it should be longid instead of id (but we don't plan
+    // on supporting modules)
+    // Example of this rule:
+    // datatype ('a, 'b) pair = empty | cons of 'a * 'b
+    | (VAR? | (VAR (COMMA VAR)+)) id=ID                               # TypeConstructor
+    | LPAREN typ RPAREN                                               # TypeParentheses
+    | argTy=typ '->' retTy=typ                                        # TypeFunction
     ;
 
 dec

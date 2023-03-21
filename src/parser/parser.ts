@@ -41,6 +41,9 @@ import {
   RealContext,
   SmlParser,
   StringContext,
+  TypeConstructorContext,
+  TypeFunctionContext,
+  TypeVariableContext,
   UnitContext,
   ValbindContext,
   ValueDeclContext
@@ -71,6 +74,10 @@ import {
   Program,
   RealConstant,
   StringConstant,
+  TypeAstNode,
+  TypeConstructor,
+  TypeFunction,
+  TypeVariable,
   UnitConstant,
   Valbind,
   ValueDeclaration,
@@ -314,6 +321,35 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitPatParentheses(ctx: PatParenthesesContext): Pattern {
     return this.visit(ctx.pat()) as Pattern
+  }
+
+  /**
+   * Types
+   */
+  visitTypeVariable(ctx: TypeVariableContext): TypeVariable {
+    return {
+      tag: 'TypeVariable',
+      id: ctx.VAR().text
+    }
+  }
+  visitTypeConstructor(ctx: TypeConstructorContext): TypeConstructor {
+    return {
+      tag: 'TypeConstructor',
+      typeParameters: ctx.VAR().map(varNode => {
+        return {
+          tag: 'TypeVariable',
+          id: varNode.text
+        }
+      }),
+      id: ctx.ID().text
+    }
+  }
+  visitTypeFunction(ctx: TypeFunctionContext): TypeFunction {
+    return {
+      tag: 'TypeFunction',
+      argTy: this.visit(ctx._argTy) as TypeAstNode,
+      retTy: this.visit(ctx._retTy) as TypeAstNode
+    }
   }
 
   /**

@@ -18,6 +18,10 @@ import { UnitContext } from "./SmlParser";
 import { ValueDeclContext } from "./SmlParser";
 import { FunDeclContext } from "./SmlParser";
 import { LocalDeclContext } from "./SmlParser";
+import { TypeVariableContext } from "./SmlParser";
+import { TypeConstructorContext } from "./SmlParser";
+import { TypeParenthesesContext } from "./SmlParser";
+import { TypeFunctionContext } from "./SmlParser";
 import { ConstantContext } from "./SmlParser";
 import { ExpVariableContext } from "./SmlParser";
 import { ApplicationContext } from "./SmlParser";
@@ -36,6 +40,7 @@ import { ExpContext } from "./SmlParser";
 import { PatmatchContext } from "./SmlParser";
 import { MatchesContext } from "./SmlParser";
 import { PatContext } from "./SmlParser";
+import { TypContext } from "./SmlParser";
 import { DecContext } from "./SmlParser";
 import { DecSequenceContext } from "./SmlParser";
 import { ValbindContext } from "./SmlParser";
@@ -244,6 +249,58 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitLocalDecl?: (ctx: LocalDeclContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `TypeVariable`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	enterTypeVariable?: (ctx: TypeVariableContext) => void;
+	/**
+	 * Exit a parse tree produced by the `TypeVariable`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	exitTypeVariable?: (ctx: TypeVariableContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `TypeConstructor`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	enterTypeConstructor?: (ctx: TypeConstructorContext) => void;
+	/**
+	 * Exit a parse tree produced by the `TypeConstructor`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	exitTypeConstructor?: (ctx: TypeConstructorContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `TypeParentheses`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	enterTypeParentheses?: (ctx: TypeParenthesesContext) => void;
+	/**
+	 * Exit a parse tree produced by the `TypeParentheses`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	exitTypeParentheses?: (ctx: TypeParenthesesContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `TypeFunction`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	enterTypeFunction?: (ctx: TypeFunctionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `TypeFunction`
+	 * labeled alternative in `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	exitTypeFunction?: (ctx: TypeFunctionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `Constant`
@@ -468,6 +525,17 @@ export interface SmlListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitPat?: (ctx: PatContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	enterTyp?: (ctx: TypContext) => void;
+	/**
+	 * Exit a parse tree produced by `SmlParser.typ`.
+	 * @param ctx the parse tree
+	 */
+	exitTyp?: (ctx: TypContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SmlParser.dec`.

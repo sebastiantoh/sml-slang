@@ -1,3 +1,4 @@
+import { Type } from '../typechecker/types'
 import { SourceLocation } from '../types'
 
 export type Node =
@@ -5,6 +6,7 @@ export type Node =
   | Match
   | Matches
   | Pattern
+  | TypeAstNode
   | Declaration
   | DeclarationSequence
   | Valbind
@@ -140,6 +142,28 @@ export interface InfixConstruction extends BaseNode {
   pat1: Pattern
   pat2: Pattern
   id: string
+}
+
+/**
+ * Types
+ */
+export type TypeAstNode = TypeVariable | TypeConstructor | TypeFunction
+
+export interface TypeVariable extends BaseNode {
+  tag: 'TypeVariable'
+  id: string
+}
+
+export interface TypeConstructor extends BaseNode {
+  tag: 'TypeConstructor'
+  typeParameters: TypeVariable[]
+  id: string
+}
+
+export interface TypeFunction extends BaseNode {
+  tag: 'TypeFunction'
+  argTy: TypeAstNode
+  retTy: TypeAstNode
 }
 
 /**
