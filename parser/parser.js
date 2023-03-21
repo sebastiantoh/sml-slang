@@ -243,6 +243,11 @@ class NodeGenerator {
     visitPatParentheses(ctx) {
         return this.visit(ctx.pat());
     }
+    visitPatTypeAnnotation(ctx) {
+        const pat = this.visit(ctx.pat());
+        pat.annotated_type = this.visit(ctx.typ());
+        return pat;
+    }
     /**
      * Types
      */

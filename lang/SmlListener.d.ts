@@ -5,6 +5,7 @@ import { PatUnitContext } from "./SmlParser";
 import { PatVariableContext } from "./SmlParser";
 import { PatInfixConstructionContext } from "./SmlParser";
 import { PatParenthesesContext } from "./SmlParser";
+import { PatTypeAnnotationContext } from "./SmlParser";
 import { IntegerContext } from "./SmlParser";
 import { RealContext } from "./SmlParser";
 import { CharacterContext } from "./SmlParser";
@@ -122,6 +123,18 @@ export interface SmlListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitPatParentheses?: (ctx: PatParenthesesContext) => void;
+    /**
+     * Enter a parse tree produced by the `PatTypeAnnotation`
+     * labeled alternative in `SmlParser.pat`.
+     * @param ctx the parse tree
+     */
+    enterPatTypeAnnotation?: (ctx: PatTypeAnnotationContext) => void;
+    /**
+     * Exit a parse tree produced by the `PatTypeAnnotation`
+     * labeled alternative in `SmlParser.pat`.
+     * @param ctx the parse tree
+     */
+    exitPatTypeAnnotation?: (ctx: PatTypeAnnotationContext) => void;
     /**
      * Enter a parse tree produced by the `Integer`
      * labeled alternative in `SmlParser.con`.

@@ -389,6 +389,15 @@ export declare class PatParenthesesContext extends PatContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
+export declare class PatTypeAnnotationContext extends PatContext {
+    pat(): PatContext;
+    COLON(): TerminalNode;
+    typ(): TypContext;
+    constructor(ctx: PatContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
 export declare class TypContext extends ParserRuleContext {
     constructor(parent: ParserRuleContext | undefined, invokingState: number);
     get ruleIndex(): number;
