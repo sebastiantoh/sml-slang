@@ -124,6 +124,11 @@ class NodeGenerator {
             loc: contextToLocation(ctx)
         };
     }
+    visitExpTypeAnnotation(ctx) {
+        const exp = this.visit(ctx.exp());
+        exp.annotated_type = this.visit(ctx.typ());
+        return exp;
+    }
     visitConjunction(ctx) {
         // Rewrite derived form into equivalent form
         // See Figure 15 of https://smlfamily.github.io/sml90-defn.pdf (page 89)

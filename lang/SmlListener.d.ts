@@ -26,6 +26,7 @@ import { ParenthesesContext } from "./SmlParser";
 import { ListContext } from "./SmlParser";
 import { ExpSequenceContext } from "./SmlParser";
 import { LetExpressionContext } from "./SmlParser";
+import { ExpTypeAnnotationContext } from "./SmlParser";
 import { ConjunctionContext } from "./SmlParser";
 import { DisjunctionContext } from "./SmlParser";
 import { ConditionalContext } from "./SmlParser";
@@ -373,6 +374,18 @@ export interface SmlListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     exitLetExpression?: (ctx: LetExpressionContext) => void;
+    /**
+     * Enter a parse tree produced by the `ExpTypeAnnotation`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     */
+    enterExpTypeAnnotation?: (ctx: ExpTypeAnnotationContext) => void;
+    /**
+     * Exit a parse tree produced by the `ExpTypeAnnotation`
+     * labeled alternative in `SmlParser.exp`.
+     * @param ctx the parse tree
+     */
+    exitExpTypeAnnotation?: (ctx: ExpTypeAnnotationContext) => void;
     /**
      * Enter a parse tree produced by the `Conjunction`
      * labeled alternative in `SmlParser.exp`.
