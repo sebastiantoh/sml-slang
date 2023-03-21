@@ -35,6 +35,7 @@ import {
   PatInfixConstructionContext,
   PatmatchContext,
   PatParenthesesContext,
+  PatTypeAnnotationContext,
   PatUnitContext,
   PatVariableContext,
   PatWildcardContext,
@@ -327,6 +328,11 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitPatParentheses(ctx: PatParenthesesContext): Pattern {
     return this.visit(ctx.pat()) as Pattern
+  }
+  visitPatTypeAnnotation(ctx: PatTypeAnnotationContext): Pattern {
+    const pat = this.visit(ctx.pat()) as Pattern
+    pat.annotated_type = this.visit(ctx.typ()) as TypeAstNode
+    return pat
   }
 
   /**

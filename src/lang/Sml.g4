@@ -128,7 +128,7 @@ pat
     | <assoc=right> pat1=pat CONS pat2=pat                            # PatInfixConstruction
     | LPAREN pat RPAREN                                               # PatParentheses
     // TODO: add list
-    // TODO: add type annotation
+    | pat COLON typ 	                                              # PatTypeAnnotation
     ;
 
 typ
@@ -150,8 +150,6 @@ dec
     | 'local' localDecs=decSequence 'in' decs=decSequence 'end'       # LocalDecl
     ;
 
-// TODO: everywhere that uses "dec" in the
-// grammar rules online should be replaced with this instead
 decSequence: (dec SEMICOLON?)* dec;
 
 valbind: REC? pat EQ exp;
