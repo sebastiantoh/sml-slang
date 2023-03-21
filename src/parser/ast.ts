@@ -116,7 +116,6 @@ export interface Function extends BaseExpressionNode {
   matches: Matches
 }
 
-
 /**
  * Match
  */
