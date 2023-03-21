@@ -285,7 +285,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitPatConstant(ctx: PatConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
   }
-  visitPatWildcard(ctx: PatWildcardContext): Wildcard {
+  visitPatWildcard(_ctx: PatWildcardContext): Wildcard {
     return {
       tag: 'Wildcard'
     }
