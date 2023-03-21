@@ -208,7 +208,7 @@ class NodeGenerator {
     visitPatConstant(ctx) {
         return this.visit(ctx.con());
     }
-    visitPatWildcard(ctx) {
+    visitPatWildcard(_ctx) {
         return {
             tag: 'Wildcard'
         };
