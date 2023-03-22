@@ -347,12 +347,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitTypeConstructor(ctx: TypeConstructorContext): TypeConstructor {
     return {
       tag: 'TypeConstructor',
-      typeParameters: ctx.VAR().map(varNode => {
-        return {
-          tag: 'TypeVariable',
-          id: varNode.text
-        }
-      }),
+      typeParameters: ctx.typ().map(tc => this.visit(tc) as TypeAstNode),
       id: ctx.ID().text
     }
   }

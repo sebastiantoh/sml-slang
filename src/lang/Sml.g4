@@ -133,17 +133,14 @@ pat
 
 typ
     : VAR                                                             # TypeVariable
-    // Note: based on the grammar spec it should be typ instead
-    // of VAR. But I don't know when the other cases of typ is used
-    // Also, it should be longid instead of id (but we don't plan
-    // on supporting modules)
+    | id=ID                                                           # TypeConstructor
+    | typ id=ID                                                       # TypeConstructor
     // Example of this rule:
     // datatype ('a, 'b) pair = empty | cons of 'a * 'b
-    | (VAR? | (VAR (COMMA VAR)+)) id=ID                               # TypeConstructor
+    | LPAREN typ (COMMA typ)+ RPAREN id=ID                            # TypeConstructor
     | LPAREN typ RPAREN                                               # TypeParentheses
     | argTy=typ '->' retTy=typ                                        # TypeFunction
     ;
-
 dec
     : 'val' valbind (AND valbind)*                                    # ValueDecl
     | 'fun' funbind (AND funbind)*                                    # FunDecl
