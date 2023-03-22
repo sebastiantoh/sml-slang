@@ -19,7 +19,7 @@ interface BaseNode {
   loc?: SourceLocation
 }
 
-interface BaseTypeAnnotatedNode extends BaseNode {
+interface BaseTypeAnnotatableNode extends BaseNode {
   annotated_type?: TypeAstNode
 }
 
@@ -44,74 +44,74 @@ export type Constant =
   | BoolConstant
   | UnitConstant
 
-export interface IntConstant extends BaseTypeAnnotatedNode {
+export interface IntConstant extends BaseTypeAnnotatableNode {
   tag: 'IntConstant'
   val: number
   type: 'int'
 }
-export interface RealConstant extends BaseTypeAnnotatedNode {
+export interface RealConstant extends BaseTypeAnnotatableNode {
   tag: 'RealConstant'
   val: number
   type: 'real'
 }
-export interface StringConstant extends BaseTypeAnnotatedNode {
+export interface StringConstant extends BaseTypeAnnotatableNode {
   tag: 'StringConstant'
   val: string
   type: 'string'
 }
-export interface CharConstant extends BaseTypeAnnotatedNode {
+export interface CharConstant extends BaseTypeAnnotatableNode {
   tag: 'CharConstant'
   val: string
   type: 'char'
 }
-export interface BoolConstant extends BaseTypeAnnotatedNode {
+export interface BoolConstant extends BaseTypeAnnotatableNode {
   tag: 'BoolConstant'
   val: boolean
   type: 'bool'
 }
-export interface UnitConstant extends BaseTypeAnnotatedNode {
+export interface UnitConstant extends BaseTypeAnnotatableNode {
   tag: 'UnitConstant'
   type: 'unit'
 }
 
-export interface Application extends BaseTypeAnnotatedNode {
+export interface Application extends BaseTypeAnnotatableNode {
   tag: 'Application'
   fn: Expression
   arg: Expression
 }
 
-export interface InfixApplication extends BaseTypeAnnotatedNode {
+export interface InfixApplication extends BaseTypeAnnotatableNode {
   tag: 'InfixApplication'
   operand1: Expression
   operand2: Expression
   id: string
 }
 
-export interface ListLiteral extends BaseTypeAnnotatedNode {
+export interface ListLiteral extends BaseTypeAnnotatableNode {
   tag: 'ListLiteral'
   elements: Expression[]
   arity: number
 }
 
-export interface ExpSequence extends BaseTypeAnnotatedNode {
+export interface ExpSequence extends BaseTypeAnnotatableNode {
   tag: 'ExpSequence'
   exps: Array<Expression>
 }
 
-export interface LetExpression extends BaseTypeAnnotatedNode {
+export interface LetExpression extends BaseTypeAnnotatableNode {
   tag: 'LetExpression'
   decSequence: DeclarationSequence
   exps: Array<Expression>
 }
 
-export interface ConditionalExpression extends BaseTypeAnnotatedNode {
+export interface ConditionalExpression extends BaseTypeAnnotatableNode {
   tag: 'ConditionalExpression'
   pred: Expression
   consequent: Expression
   alternative: Expression
 }
 
-export interface Function extends BaseTypeAnnotatedNode {
+export interface Function extends BaseTypeAnnotatableNode {
   tag: 'Function'
   matches: Matches
 }
@@ -134,14 +134,14 @@ export interface Matches extends BaseNode {
  */
 export type Pattern = Constant | Wildcard | Variable | InfixConstruction
 
-export interface Wildcard extends BaseTypeAnnotatedNode {
+export interface Wildcard extends BaseTypeAnnotatableNode {
   tag: 'Wildcard'
 }
-export interface Variable extends BaseTypeAnnotatedNode {
+export interface Variable extends BaseTypeAnnotatableNode {
   tag: 'Variable'
   id: string
 }
-export interface InfixConstruction extends BaseTypeAnnotatedNode {
+export interface InfixConstruction extends BaseTypeAnnotatableNode {
   tag: 'InfixConstruction'
   pat1: Pattern
   pat2: Pattern
