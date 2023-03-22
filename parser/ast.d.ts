@@ -115,7 +115,7 @@ export interface TypeVariable extends BaseNode {
 }
 export interface TypeConstructor extends BaseNode {
     tag: 'TypeConstructor';
-    typeParameters: TypeVariable[];
+    typeParameters: TypeAstNode[];
     id: string;
 }
 export interface TypeFunction extends BaseNode {

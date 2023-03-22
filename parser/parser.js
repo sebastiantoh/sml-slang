@@ -260,12 +260,7 @@ class NodeGenerator {
     visitTypeConstructor(ctx) {
         return {
             tag: 'TypeConstructor',
-            typeParameters: ctx.VAR().map(varNode => {
-                return {
-                    tag: 'TypeVariable',
-                    id: varNode.text
-                };
-            }),
+            typeParameters: ctx.typ().map(tc => this.visit(tc)),
             id: ctx.ID().text
         };
     }

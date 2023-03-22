@@ -413,8 +413,10 @@ export declare class TypeVariableContext extends TypContext {
 export declare class TypeConstructorContext extends TypContext {
     _id: Token;
     ID(): TerminalNode;
-    VAR(): TerminalNode[];
-    VAR(i: number): TerminalNode;
+    typ(): TypContext[];
+    typ(i: number): TypContext;
+    LPAREN(): TerminalNode | undefined;
+    RPAREN(): TerminalNode | undefined;
     COMMA(): TerminalNode[];
     COMMA(i: number): TerminalNode;
     constructor(ctx: TypContext);
