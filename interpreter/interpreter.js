@@ -208,11 +208,11 @@ const execMicrocode = (cmd) => {
             break;
         }
         case 'Match': {
-            throw new Error('TODO');
+            assert(false, 'Match node should never appear in the top of the agenda');
             break;
         }
         case 'Matches': {
-            throw new Error('TODO');
+            assert(false, 'Matches node should never appear in the top of the agenda');
             break;
         }
         case 'Variable': {
