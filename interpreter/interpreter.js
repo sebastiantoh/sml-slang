@@ -189,7 +189,7 @@ const execMicrocode = (cmd) => {
         case 'LetExpression': {
             A.push({ tag: 'RestoreEnvI', env: E });
             revPush(A, interleave(cmd.exps, { tag: 'PopI' }));
-            A.push(cmd.decSequence);
+            revPush(A, cmd.decs);
             break;
         }
         case 'ConditionalExpression': {
@@ -208,11 +208,11 @@ const execMicrocode = (cmd) => {
             break;
         }
         case 'Match': {
-            assert(false, 'Match node should never appear in the top of the agenda');
+            assert(false, 'Match node should never appear at the top of the agenda');
             break;
         }
         case 'Matches': {
-            assert(false, 'Matches node should never appear in the top of the agenda');
+            assert(false, 'Matches node should never appear in the agenda');
             break;
         }
         case 'Variable': {
@@ -220,7 +220,7 @@ const execMicrocode = (cmd) => {
             break;
         }
         case 'DeclarationSequence': {
-            revPush(A, cmd.decs);
+            assert(false, 'DeclarationSequence node should never appear in the agenda');
             break;
         }
         case 'ValueDeclaration': {
@@ -243,10 +243,10 @@ const execMicrocode = (cmd) => {
             //   before setting env.parent = newParent (currEnv)
             // TODO: is there a better way to do this?
             revPush(A, [
-                ...cmd.localDecs.decs,
+                ...cmd.localDecs,
                 {
                     tag: 'DecsAfterLocalDecsI',
-                    decs: cmd.decs.decs,
+                    decs: cmd.decs,
                     envBeforeLocalDecs: E
                 }
             ]);
@@ -274,7 +274,7 @@ const execMicrocode = (cmd) => {
             break;
         }
         case 'Program': {
-            revPush(A, cmd.body.decs);
+            revPush(A, cmd.body);
             break;
         }
         /**
@@ -371,7 +371,7 @@ const execMicrocode = (cmd) => {
             E = extendEnv(fn.env);
             // Bind params (if necessary) and evaluate function body
             let foundMatch = false;
-            for (const { pat, exp } of fn.matches.matches) {
+            for (const { pat, exp } of fn.matches) {
                 foundMatch = tryMatch(arg, pat);
                 if (foundMatch) {
                     // match found - evaluate the associated exp and stop finding futher matches

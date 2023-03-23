@@ -119,7 +119,7 @@ class NodeGenerator {
     visitLetExpression(ctx) {
         return {
             tag: 'LetExpression',
-            decSequence: this.visit(ctx.decSequence()),
+            decs: this.visit(ctx.decSequence()).decs,
             exps: ctx.exp().map((ec) => this.visit(ec)),
             loc: contextToLocation(ctx)
         };
@@ -175,7 +175,7 @@ class NodeGenerator {
             tag: 'Application',
             fn: {
                 tag: 'Function',
-                matches: this.visit(ctx.matches()),
+                matches: this.visit(ctx.matches()).matches,
                 loc: contextToLocation(ctx)
             },
             arg: this.visit(ctx.exp()),
@@ -185,7 +185,7 @@ class NodeGenerator {
     visitFunction(ctx) {
         return {
             tag: 'Function',
-            matches: this.visit(ctx.matches()),
+            matches: this.visit(ctx.matches()).matches,
             loc: contextToLocation(ctx)
         };
     }
@@ -295,8 +295,8 @@ class NodeGenerator {
     visitLocalDecl(ctx) {
         return {
             tag: 'LocalDeclaration',
-            localDecs: this.visit(ctx._localDecs),
-            decs: this.visit(ctx._decs),
+            localDecs: this.visit(ctx._localDecs).decs,
+            decs: this.visit(ctx._decs).decs,
             loc: contextToLocation(ctx)
         };
     }
@@ -342,7 +342,7 @@ class NodeGenerator {
                 const fn = {
                     // TODO: do we want to keep track of the locations of each of these functions?
                     tag: 'Function',
-                    matches: { tag: 'Matches', matches: [{ tag: 'Match', pat: p, exp }] }
+                    matches: [{ tag: 'Match', pat: p, exp }]
                 };
                 exp = fn;
             });
@@ -383,7 +383,7 @@ class NodeGenerator {
             tag: 'Valbind',
             isRec: true,
             pat: { tag: 'Variable', id: fnName },
-            exp: { tag: 'Function', matches: { tag: 'Matches', matches } },
+            exp: { tag: 'Function', matches },
             loc: contextToLocation(ctx)
         };
     }
@@ -393,7 +393,7 @@ class NodeGenerator {
     visitProg(ctx) {
         return {
             tag: 'Program',
-            body: this.visit(ctx.decSequence())
+            body: this.visit(ctx.decSequence()).decs
         };
     }
     visit(tree) {
