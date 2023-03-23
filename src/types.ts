@@ -1,4 +1,4 @@
-import { Matches } from './parser/ast'
+import { Match } from './parser/ast'
 import { TypeEnvironment } from './typechecker/environment'
 
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List
@@ -43,7 +43,7 @@ export interface List {
 
 export interface Fn {
   tag: 'fn'
-  matches: Matches
+  matches: Match[]
   env: Environment
 }
 

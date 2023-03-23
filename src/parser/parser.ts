@@ -203,7 +203,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitLetExpression(ctx: LetExpressionContext): LetExpression {
     return {
       tag: 'LetExpression',
-      decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
+      decs: (this.visit(ctx.decSequence()) as DeclarationSequence).decs,
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression),
       loc: contextToLocation(ctx)
     }
@@ -259,7 +259,7 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'Application',
       fn: {
         tag: 'Function',
-        matches: this.visit(ctx.matches()) as Matches,
+        matches: (this.visit(ctx.matches()) as Matches).matches,
         loc: contextToLocation(ctx)
       },
       arg: this.visit(ctx.exp()) as Expression,
@@ -269,7 +269,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitFunction(ctx: FunctionContext): Function {
     return {
       tag: 'Function',
-      matches: this.visit(ctx.matches()) as Matches,
+      matches: (this.visit(ctx.matches()) as Matches).matches,
       loc: contextToLocation(ctx)
     }
   }
@@ -347,12 +347,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitTypeConstructor(ctx: TypeConstructorContext): TypeConstructor {
     return {
       tag: 'TypeConstructor',
-      typeParameters: ctx.VAR().map(varNode => {
-        return {
-          tag: 'TypeVariable',
-          id: varNode.text
-        }
-      }),
+      typeParameters: ctx.typ().map(tc => this.visit(tc) as TypeAstNode),
       id: ctx.ID().text
     }
   }
@@ -388,8 +383,8 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitLocalDecl(ctx: LocalDeclContext): LocalDeclaration {
     return {
       tag: 'LocalDeclaration',
-      localDecs: this.visit(ctx._localDecs) as DeclarationSequence,
-      decs: this.visit(ctx._decs) as DeclarationSequence,
+      localDecs: (this.visit(ctx._localDecs) as DeclarationSequence).decs,
+      decs: (this.visit(ctx._decs) as DeclarationSequence).decs,
       loc: contextToLocation(ctx)
     }
   }
@@ -440,7 +435,7 @@ class NodeGenerator implements SmlVisitor<Node> {
           const fn = {
             // TODO: do we want to keep track of the locations of each of these functions?
             tag: 'Function',
-            matches: { tag: 'Matches', matches: [{ tag: 'Match', pat: p, exp }] }
+            matches: [{ tag: 'Match', pat: p, exp }]
           } as Function
           exp = fn
         })
@@ -485,7 +480,7 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'Valbind',
       isRec: true,
       pat: { tag: 'Variable', id: fnName },
-      exp: { tag: 'Function', matches: { tag: 'Matches', matches } },
+      exp: { tag: 'Function', matches },
       loc: contextToLocation(ctx)
     }
   }
@@ -496,7 +491,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitProg(ctx: ProgContext): Program {
     return {
       tag: 'Program',
-      body: this.visit(ctx.decSequence()) as DeclarationSequence
+      body: (this.visit(ctx.decSequence()) as DeclarationSequence).decs
     }
   }
 
