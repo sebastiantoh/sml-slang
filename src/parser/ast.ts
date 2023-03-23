@@ -113,7 +113,7 @@ export interface ConditionalExpression extends BaseTypeAnnotatableNode {
 
 export interface Function extends BaseTypeAnnotatableNode {
   tag: 'Function'
-  matches: Matches
+  matches: Array<Match>
 }
 
 /**

@@ -222,11 +222,11 @@ const execMicrocode = (cmd: Microcode) => {
       break
     }
     case 'Match': {
-      assert(false, 'Match node should never appear in the top of the agenda')
+      assert(false, 'Match node should never appear at the top of the agenda')
       break
     }
     case 'Matches': {
-      assert(false, 'Matches node should never appear in the top of the agenda')
+      assert(false, 'Matches node should never appear in the agenda')
       break
     }
     case 'Variable': {
@@ -390,7 +390,7 @@ const execMicrocode = (cmd: Microcode) => {
 
       // Bind params (if necessary) and evaluate function body
       let foundMatch = false
-      for (const { pat, exp } of fn.matches.matches) {
+      for (const { pat, exp } of fn.matches) {
         foundMatch = tryMatch(arg, pat)
         if (foundMatch) {
           // match found - evaluate the associated exp and stop finding futher matches
