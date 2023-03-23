@@ -203,7 +203,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitLetExpression(ctx: LetExpressionContext): LetExpression {
     return {
       tag: 'LetExpression',
-      decSequence: this.visit(ctx.decSequence()) as DeclarationSequence,
+      decs: (this.visit(ctx.decSequence()) as DeclarationSequence).decs,
       exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression),
       loc: contextToLocation(ctx)
     }
@@ -383,8 +383,8 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitLocalDecl(ctx: LocalDeclContext): LocalDeclaration {
     return {
       tag: 'LocalDeclaration',
-      localDecs: this.visit(ctx._localDecs) as DeclarationSequence,
-      decs: this.visit(ctx._decs) as DeclarationSequence,
+      localDecs: (this.visit(ctx._localDecs) as DeclarationSequence).decs,
+      decs: (this.visit(ctx._decs) as DeclarationSequence).decs,
       loc: contextToLocation(ctx)
     }
   }
@@ -491,7 +491,7 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitProg(ctx: ProgContext): Program {
     return {
       tag: 'Program',
-      body: this.visit(ctx.decSequence()) as DeclarationSequence
+      body: (this.visit(ctx.decSequence()) as DeclarationSequence).decs
     }
   }
 

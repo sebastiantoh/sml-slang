@@ -203,7 +203,7 @@ const execMicrocode = (cmd: Microcode) => {
     case 'LetExpression': {
       A.push({ tag: 'RestoreEnvI', env: E })
       revPush(A, interleave(cmd.exps, { tag: 'PopI' }))
-      A.push(cmd.decSequence)
+      revPush(A, cmd.decs)
       break
     }
     case 'ConditionalExpression': {
@@ -234,7 +234,7 @@ const execMicrocode = (cmd: Microcode) => {
       break
     }
     case 'DeclarationSequence': {
-      revPush(A, cmd.decs)
+      assert(false, 'DeclarationSequence node should never appear in the agenda')
       break
     }
     case 'ValueDeclaration': {
@@ -258,10 +258,10 @@ const execMicrocode = (cmd: Microcode) => {
       //   before setting env.parent = newParent (currEnv)
       // TODO: is there a better way to do this?
       revPush(A, [
-        ...cmd.localDecs.decs,
+        ...cmd.localDecs,
         {
           tag: 'DecsAfterLocalDecsI',
-          decs: cmd.decs.decs,
+          decs: cmd.decs,
           envBeforeLocalDecs: E
         }
       ])
@@ -288,7 +288,7 @@ const execMicrocode = (cmd: Microcode) => {
       break
     }
     case 'Program': {
-      revPush(A, cmd.body.decs)
+      revPush(A, cmd.body)
       break
     }
 

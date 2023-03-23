@@ -100,7 +100,7 @@ export interface ExpSequence extends BaseTypeAnnotatableNode {
 
 export interface LetExpression extends BaseTypeAnnotatableNode {
   tag: 'LetExpression'
-  decSequence: DeclarationSequence
+  decs: Array<Declaration>
   exps: Array<Expression>
 }
 
@@ -187,8 +187,8 @@ export interface ValueDeclaration extends BaseNode {
 
 export interface LocalDeclaration extends BaseNode {
   tag: 'LocalDeclaration'
-  localDecs: DeclarationSequence
-  decs: DeclarationSequence
+  localDecs: Array<Declaration>
+  decs: Array<Declaration>
 }
 
 export interface Valbind extends BaseNode {
@@ -202,5 +202,5 @@ export interface Valbind extends BaseNode {
  */
 export interface Program extends BaseNode {
   tag: 'Program'
-  body: DeclarationSequence
+  body: Array<Declaration>
 }
