@@ -10,12 +10,7 @@ import {
   STR_TY
 } from './utils'
 
-type TypeEnvironmentFrame = { [k: string]: TypeScheme }
-
-export interface TypeEnvironment {
-  frame: TypeEnvironmentFrame
-  parent?: TypeEnvironment
-}
+export type TypeEnvironment = { [k: string]: TypeScheme }
 
 const primitiveFuncs: [string, TypeScheme][] = [
   ['/', { type: makeFunctionType(REAL_TY, REAL_TY, REAL_TY), typeVariables: [] }],
@@ -41,7 +36,14 @@ const primitiveFuncs: [string, TypeScheme][] = [
 
 export function createInitialTypeEnvironments(): TypeEnvironment {
   // initial type env only contains inbuilt funcs
-  return { frame: Object.fromEntries(primitiveFuncs) }
+  return Object.fromEntries(primitiveFuncs)
+}
+
+export function getTypeSchemeFromEnv(env: TypeEnvironment, id: string): TypeScheme {
+  if (!env.hasOwnProperty(id)) {
+    throw new Error(`Unbound value identifier "${id}".`)
+  }
+  return env[id]
 }
 
 let CUR_FRESH_VAR = 0
