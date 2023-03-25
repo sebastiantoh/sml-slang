@@ -48,7 +48,7 @@ export function getTypeSchemeFromEnv(env: TypeEnvironment, id: string): TypeSche
 
 let CUR_FRESH_VAR = 0
 
-function freshTypeVariable(): TypeVariable {
+export function freshTypeVariable(): TypeVariable {
   return { id: CUR_FRESH_VAR++ }
 }
 

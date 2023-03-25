@@ -1,5 +1,10 @@
 import { Node } from '../parser/ast'
-import { getTypeSchemeFromEnv, instantiate, TypeEnvironment } from './environment'
+import {
+  freshTypeVariable,
+  getTypeSchemeFromEnv,
+  instantiate,
+  TypeEnvironment
+} from './environment'
 import { Type, TypeConstraint } from './types'
 import { UNIT_TY } from './utils'
 
@@ -18,6 +23,12 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     case 'Variable':
       const ts = getTypeSchemeFromEnv(env, node.id)
       return [instantiate(ts), []]
+    // Application
+    case 'Application':
+      const t = freshTypeVariable()
+      const [t1, C1] = hindleyMilner(env, node.fn)
+      const [t2, C2] = hindleyMilner(env, node.arg)
+      return [t, [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }]]
   }
 
   return [UNIT_TY, []]
