@@ -1,11 +1,5 @@
 import { TypeScheme } from './types'
-import {
-  DUMMY_TYPE_VAR_TY,
-  INT_TY,
-  makeFunctionType,
-  REAL_TY,
-  STR_TY
-} from './utils'
+import { DUMMY_TYPE_VAR_TY, INT_TY, makeFunctionType, REAL_TY, STR_TY } from './utils'
 
 type TypeEnvironmentFrame = { [k: string]: TypeScheme }
 
