@@ -1,4 +1,4 @@
-import { MatchType, PrimitiveType, Type } from './types'
+import { FunctionType, ListType, PrimitiveType, Type, TypeVariable } from './types'
 
 export const INT_TY: PrimitiveType = 'int'
 export const REAL_TY: PrimitiveType = 'real'
@@ -6,6 +6,7 @@ export const STR_TY: PrimitiveType = 'string'
 export const CHAR_TY: PrimitiveType = 'char'
 export const BOOL_TY: PrimitiveType = 'bool'
 export const UNIT_TY: PrimitiveType = 'unit'
+export const DUMMY_TYPE_VAR_TY: TypeVariable = { id: 0 }
 
 /* Checking Type helpers */
 
@@ -37,14 +38,23 @@ export function isPrimitiveType(type: Type): type is PrimitiveType {
   return [type].some(isInt || isReal || isStr || isChar || isBool || isUnit)
 }
 
-export function isMatchType(type: Type): type is MatchType {
+export function isFunctionType(type: Type): type is FunctionType {
   return (
-    (type as MatchType).parameterType !== undefined && (type as MatchType).returnType !== undefined
+    (type as FunctionType).parameterType !== undefined &&
+    (type as FunctionType).returnType !== undefined
   )
 }
 
+export function isListType(type: Type): type is ListType {
+  return (type as ListType).elementType !== undefined
+}
+
+export function isTypeVariableType(type: Type): type is TypeVariable {
+  return (type as TypeVariable).id !== undefined
+}
+
 export function isSameType(fst: Type, snd: Type): boolean {
-  if (isMatchType(fst) && isMatchType(snd)) {
+  if (isFunctionType(fst) && isFunctionType(snd)) {
     const isSameParamType = isSameType(fst.parameterType, snd.parameterType)
     const isSameReturnType = isSameType(fst.returnType, snd.returnType)
     return isSameParamType && isSameReturnType
@@ -56,15 +66,15 @@ export function isSameType(fst: Type, snd: Type): boolean {
 
 // given types t0 t1 t2 .... tN, create a function type of
 // form: fun t0 -> fun t1 -> fun t2 -> ... -> tN
-export function makeMatchType(...types: Type[]): MatchType {
+export function makeFunctionType(...types: Type[]): FunctionType {
   const parameterTypes = types.slice(0, -1)
   const returnType = types[types.length - 1]
-  return curryMatchTypes(parameterTypes, returnType)
+  return curryFunctionTypes(parameterTypes, returnType)
 }
 
 // convert match type of format: x0 x1 x2 .... -> xN
 // to: x0 -> x1 -> x2 -> ..... -> xN
-export function curryMatchTypes(paramTypes: Type[], returnType: Type): MatchType {
+export function curryFunctionTypes(paramTypes: Type[], returnType: Type): FunctionType {
   let tmpType = returnType
   for (let i = paramTypes.length - 1; i >= 0; i--) {
     tmpType = {
@@ -72,20 +82,24 @@ export function curryMatchTypes(paramTypes: Type[], returnType: Type): MatchType
       returnType: tmpType
     }
   }
-  return tmpType as MatchType
+  return tmpType as FunctionType
 }
 
 /* Prettifiers */
 
-export function stringifyType(type: Type | Type[]): string {
-  if (Array.isArray(type)) {
-    return type.map(stringifyType).join(' or ')
-  }
+export function stringifyType(type: Type): string {
   if (isPrimitiveType(type)) {
     return type.toString()
   }
+  if (isListType(type)) {
+    return `${stringifyType(type.elementType)} list`
+  }
+  if (isTypeVariableType(type)) {
+    // TODO: change this to 'a, 'b, ....
+    return `t${type.id}`
+  }
   let parameterType = stringifyType(type.parameterType)
-  if (isMatchType(type.parameterType)) {
+  if (isFunctionType(type.parameterType)) {
     parameterType = `(${parameterType})`
   }
   return `${parameterType} -> ${stringifyType(type.returnType)}`
