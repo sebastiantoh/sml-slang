@@ -22,3 +22,9 @@ export interface TypeScheme {
   type: Type
   typeVariables: TypeVariable[]
 }
+
+// represents type1 = type2
+export interface TypeConstraint {
+  type1: Type
+  type2: Type
+}
