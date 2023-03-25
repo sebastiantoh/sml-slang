@@ -34,7 +34,7 @@ export class TypeError implements SourceError {
 }
 
 export class TypeMismatchError extends TypeError {
-  constructor(public node: Node, public expected: Type | Type[], public got: Type | Type[]) {
+  constructor(public node: Node, public expected: Type, public got: Type) {
     super(node)
   }
 
