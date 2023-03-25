@@ -1,10 +1,7 @@
-import { Type } from './types';
-type TypeEnvironmentFrame = {
-    [k: string]: Type | Type[];
+import { Type, TypeScheme } from './types';
+export type TypeEnvironment = {
+    [k: string]: TypeScheme;
 };
-export interface TypeEnvironment {
-    frame: TypeEnvironmentFrame;
-    parent?: TypeEnvironment;
-}
-export declare function createInitialTypeEnvironments(): TypeEnvironment;
-export {};
+export declare function createInitialTypeEnvironment(): TypeEnvironment;
+export declare function getTypeSchemeFromEnv(env: TypeEnvironment, id: string): TypeScheme;
+export declare function instantiate(typeScheme: TypeScheme): Type;

@@ -1,34 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.typeCheck = void 0;
-const expressions_1 = require("./expressions");
+exports.hindleyMilner = void 0;
+const environment_1 = require("./environment");
 const utils_1 = require("./utils");
-function typeCheck(node) {
+function hindleyMilner(env, node) {
     switch (node.tag) {
-        /* Constant */
+        /* Expressions */
+        // Constant
         case 'IntConstant':
         case 'RealConstant':
         case 'StringConstant':
         case 'CharConstant':
         case 'BoolConstant':
         case 'UnitConstant':
-            return node.type;
-        /* Application */
-        /* InfixApplication */
-        /* ExpSequence */
-        /* LetExpression */
-        /* ConditionalExpression */
-        case 'ConditionalExpression':
-            return (0, expressions_1.typeCheckConditional)(node);
-        /* Function */
-        /* Match */
-        case 'Match':
-            return {
-                parameterType: typeCheck(node.pat),
-                returnType: typeCheck(node.exp)
-            };
+            return [node.type, []];
+        // Variable
+        case 'Variable':
+            const ts = (0, environment_1.getTypeSchemeFromEnv)(env, node.id);
+            return [(0, environment_1.instantiate)(ts), []];
     }
-    return utils_1.UNIT_TY;
+    return [utils_1.UNIT_TY, []];
 }
-exports.typeCheck = typeCheck;
+exports.hindleyMilner = hindleyMilner;
 //# sourceMappingURL=index.js.map

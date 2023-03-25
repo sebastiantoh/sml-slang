@@ -1,3 +1,4 @@
 import { Node } from '../parser/ast';
-import { Type } from './types';
-export declare function typeCheck(node: Node): Type;
+import { TypeEnvironment } from './environment';
+import { Type, TypeConstraint } from './types';
+export declare function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeConstraint[]];

@@ -12,9 +12,9 @@ export declare class TypeError implements SourceError {
 }
 export declare class TypeMismatchError extends TypeError {
     node: Node;
-    expected: Type | Type[];
-    got: Type | Type[];
-    constructor(node: Node, expected: Type | Type[], got: Type | Type[]);
+    expected: Type;
+    got: Type;
+    constructor(node: Node, expected: Type, got: Type);
     explain(): string;
     elaborate(): string;
 }
