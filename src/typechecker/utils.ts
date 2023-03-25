@@ -9,7 +9,6 @@ export const UNIT_TY: PrimitiveType = 'unit'
 export const DUMMY_TYPE_VAR_TY: TypeVariable = { id: 0 }
 
 /* Checking Type helpers */
-
 export function isInt(type: Type): boolean {
   return type === INT_TY
 }
@@ -35,24 +34,25 @@ export function isUnit(type: Type): boolean {
 }
 
 export function isPrimitiveType(type: Type): type is PrimitiveType {
-  return [type].some(isInt || isReal || isStr || isChar || isBool || isUnit)
+  return isInt(type) || isReal(type) || isStr(type) || isChar(type) || isBool(type) || isUnit(type)
 }
 
 export function isFunctionType(type: Type): type is FunctionType {
   return (
-    (type as FunctionType).parameterType !== undefined &&
-    (type as FunctionType).returnType !== undefined
+    (type as FunctionType)?.parameterType !== undefined &&
+    (type as FunctionType)?.returnType !== undefined
   )
 }
 
 export function isListType(type: Type): type is ListType {
-  return (type as ListType).elementType !== undefined
+  return (type as ListType)?.elementType !== undefined
 }
 
 export function isTypeVariableType(type: Type): type is TypeVariable {
-  return (type as TypeVariable).id !== undefined
+  return (type as TypeVariable)?.id !== undefined
 }
 
+// TODO: update this!
 export function isSameType(fst: Type, snd: Type): boolean {
   if (isFunctionType(fst) && isFunctionType(snd)) {
     const isSameParamType = isSameType(fst.parameterType, snd.parameterType)
@@ -63,7 +63,6 @@ export function isSameType(fst: Type, snd: Type): boolean {
 }
 
 /* FunctionType helpers */
-
 // given types t0 t1 t2 .... tN, create a function type of
 // form: fun t0 -> fun t1 -> fun t2 -> ... -> tN
 export function makeFunctionType(...types: Type[]): FunctionType {
@@ -86,7 +85,6 @@ export function curryFunctionTypes(paramTypes: Type[], returnType: Type): Functi
 }
 
 /* Prettifiers */
-
 export function stringifyType(type: Type): string {
   if (isPrimitiveType(type)) {
     return type.toString()

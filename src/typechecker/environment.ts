@@ -34,7 +34,7 @@ const primitiveFuncs: [string, TypeScheme][] = [
   )
 ]
 
-export function createInitialTypeEnvironments(): TypeEnvironment {
+export function createInitialTypeEnvironment(): TypeEnvironment {
   // initial type env only contains inbuilt funcs
   return Object.fromEntries(primitiveFuncs)
 }
