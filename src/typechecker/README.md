@@ -10,6 +10,8 @@ env |- e : t -| C
 
 We unify the set of constraints to solve for `t`, outputting type error if a unifying type is unavailable.
 
+`if fresh 't` refers to initialisation of a new type variable that has not been used before.
+
 # Rules
 
 ## Expressions
@@ -54,8 +56,6 @@ mod : int -> int -> int
 > : 'a . 'a -> 'a -> 'a
 <= : 'a . 'a -> 'a -> 'a
 >= : 'a . 'a -> 'a -> 'a
-andalso : bool -> bool -> bool
-orelse : bool -> bool -> bool
 print : 'a . 'a -> unit
 ```
 
@@ -96,12 +96,16 @@ env |- if e1 then e2 else e3 : 't -| C1, C2, C3, t1 = bool, 't = t2, 't = t3
     and env |- e3 : t3 -| C3
 ```
 
-### Match
+### Case Analysis
+This is desugared to function application, so we do not need to handle this.
+
+### Function
+We evaluate the type of a function in two steps. First, we evaluate the type of `match` to test for validity and then utilise the type and set of constriants to evaluate the function type.
+
+#### Evaluate `match`
 We check that all patterns have same types and all expressions have same types.
 
-Pattern type is one of: primitive, type variable, list.
-
-First go through patterns and check if we have a type that works for all (so no conflicts like 2 diff types of primitives etc.)
+First go through patterns and check if we have a type that works for all (so no conflicts like 2 diff types of primitives etc.). Types can be PrimitiveType | ListType | TypeVariable.
 
 The logic for (generic) unifying types of patterns (type of 't) can be simply:
 ```
@@ -118,31 +122,24 @@ The logic for (generic) unifying types of patterns (type of 't) can be simply:
     are there 2 different patterns typing to 2 different primitives? type error!
     else 't = p
 ```
+
+#### Evaluate function
 ```
 env |- p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| C1, C2, ..., Cn, t1 = t2, t1 = t3, ..., t1 = tn
-    if fresh 't, where 't = is the most generic unification of all types of p1, p2, ... pn (if exists)
-    and env |- e1 : t1 -| C1
-    and env |- e2 : t2 -| C2
-    and env |- e3 : t3 -| C3
+    if fresh 't, where 't = is the most generic unification of all types of p1, p2, ... pn from above (if exists)
+    and extend_env(p1) |- e1 : t1 -| C1
+    and extend_env(p2) |- e2 : t2 -| C2
+    and extend_env(p3) |- e3 : t3 -| C3
     ...
-    and env |- en : tn -| Cn
+    and extend_env(pn) |- en : tn -| Cn
 ```
 e.g.
 - `fun f x = x | f y = y` has a pattern of type `'a . 'a`
 - `fun f x = x | f 3 = 3` has a pattern of type `int`
 - `fun f [] = 1 | f [x] = 2 | f x = 3` has a pattern of type `'a . 'a list`
+- `fun f (hd::tl) = [hd] | f [x] = [1,2,3]` has a pattern of type `int list`
+- `fun f f1 = f1 1 | f f2 = f2 2 | f f3 = f3 3` has a pattern of type `'a . (int -> 'a) -> 'a`
 
-### Case Analysis
-```
-env |- case e of match : 't -| C1, C2, t1 = t2, 't = t3
-    if fresh 't
-    and env |- e : t1 -| C1
-    and env |- match : t2 -> t3 -| C2
-```
-e.g.
-- `case 1 of 2 => 3` returns `int`
-
-### Function
 ```
 env |- fun match : 't -| C, 't = t1 -> t2
     if fresh 't
@@ -185,7 +182,7 @@ env |- v : 't -| {}
 TODO
 
 e.g.
-- `fun f (hd::tl) = [1,2,3]` returns?
+- `fun f (hd::tl) = [1,2,3]` has a pattern of type `'a . 'a list`
 
 ### List
 Go through patterns and check we can unify it to a specific type.
