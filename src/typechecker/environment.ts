@@ -1,5 +1,14 @@
-import { TypeScheme } from './types'
-import { DUMMY_TYPE_VAR_TY, INT_TY, makeFunctionType, REAL_TY, STR_TY } from './utils'
+import { Type, TypeScheme, TypeVariable } from './types'
+import {
+  DUMMY_TYPE_VAR_TY,
+  INT_TY,
+  isFunctionType,
+  isListType,
+  isPrimitiveType,
+  makeFunctionType,
+  REAL_TY,
+  STR_TY
+} from './utils'
 
 type TypeEnvironmentFrame = { [k: string]: TypeScheme }
 
@@ -17,7 +26,7 @@ const primitiveFuncs: [string, TypeScheme][] = [
   ['*', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['-', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['^', { type: makeFunctionType(STR_TY, STR_TY, STR_TY), typeVariables: [] }],
-  ...['=', '<>', '<', '>', '<=', '>='].map(
+  ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(
     comp =>
       // TODO: might need to update these to equality type variables (''a, ''b, etc.)
       [
@@ -33,4 +42,37 @@ const primitiveFuncs: [string, TypeScheme][] = [
 export function createInitialTypeEnvironments(): TypeEnvironment {
   // initial type env only contains inbuilt funcs
   return { frame: Object.fromEntries(primitiveFuncs) }
+}
+
+let CUR_FRESH_VAR = 0
+
+function freshTypeVariable(): TypeVariable {
+  return { id: CUR_FRESH_VAR++ }
+}
+
+export function instantiate(typeScheme: TypeScheme): Type {
+  const typeMappings = typeScheme.typeVariables.map(tv => [tv, freshTypeVariable()])
+  function substitute(type: Type): Type {
+    if (isPrimitiveType(type)) {
+      return type
+    }
+    if (isFunctionType(type)) {
+      return {
+        parameterType: substitute(type.parameterType),
+        returnType: substitute(type.returnType)
+      }
+    }
+    if (isListType(type)) {
+      return {
+        elementType: substitute(type.elementType)
+      }
+    }
+    for (const [typeVar, freshTypeVar] of typeMappings) {
+      if (typeVar == type) {
+        return freshTypeVar
+      }
+    }
+    return type
+  }
+  return substitute(typeScheme.type)
 }
