@@ -206,7 +206,12 @@ env |- v : 't -| {}
 ```
 
 ### Infix Construction
-TODO
+```
+env |- hd::tl : 't list -| C1, C2, t1 = 't, t2 = 't list
+    if fresh 't
+    and env |- hd : t1 -| C1
+    and env |- tl : t2 -| C2
+```
 
 e.g.
 - `fun f (hd::tl) = [1,2,3]` has a pattern of type `'a . 'a list`
