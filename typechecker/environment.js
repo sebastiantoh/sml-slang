@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.instantiate = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = void 0;
+exports.instantiate = exports.freshTypeVariable = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = void 0;
+const lodash_1 = require("lodash");
+const _1 = require(".");
+const errors_1 = require("./errors");
 const utils_1 = require("./utils");
 const primitiveFuncs = [
     ['/', { type: (0, utils_1.makeFunctionType)(utils_1.REAL_TY, utils_1.REAL_TY, utils_1.REAL_TY), typeVariables: [] }],
@@ -33,10 +36,84 @@ function getTypeSchemeFromEnv(env, id) {
     return env[id];
 }
 exports.getTypeSchemeFromEnv = getTypeSchemeFromEnv;
+function extendTypeEnv(env, decs) {
+    for (const dec of decs) {
+        switch (dec.tag) {
+            case 'ValueDeclaration': {
+                for (const valbind of dec.valbinds) {
+                    switch (valbind.pat.tag) {
+                        // if wildcard, we typecheck the expression and simply ignore the dec
+                        case 'Wildcard': {
+                            const [_, __] = (0, _1.hindleyMilner)(env, valbind.exp);
+                            break;
+                        }
+                        // if unit, check that rhs is also unit
+                        case 'UnitConstant': {
+                            const [t, _] = (0, _1.hindleyMilner)(env, valbind.exp);
+                            if (!(0, utils_1.isUnit)(t)) {
+                                throw new errors_1.TypeMismatchError(valbind, utils_1.UNIT_TY, t);
+                            }
+                            break;
+                        }
+                        // if constant, we check that lhs value = rhs value
+                        case 'IntConstant':
+                        case 'RealConstant':
+                        case 'StringConstant':
+                        case 'CharConstant':
+                        case 'BoolConstant': {
+                            /*
+                              TODO: make this more sophisticated - rn jus checks same num of both side.
+              
+                              support things like:
+                              val 2 = 1 + 1;
+              
+                              (or)
+              
+                              val x = 1;
+                              val 2 = 1 + x
+                            */
+                            if (valbind.exp.tag !== valbind.pat.tag || valbind.exp.val != valbind.pat.val) {
+                                // TODO: add support for Constant type errors
+                                throw new Error(`Invalid constant binding. Expected type ${valbind.pat.tag} with value ${valbind.pat.val}, got ${valbind.exp.tag}.`);
+                            }
+                            break;
+                        }
+                        case 'Variable': {
+                            const [t, C] = (0, _1.hindleyMilner)(env, valbind.exp);
+                            env = generalize(C, env, valbind.pat.id, t);
+                            break;
+                        }
+                        case 'InfixConstruction': {
+                            throw new Error(`TODO: add support for infix`);
+                        }
+                        // TODO: add support for lists.
+                    }
+                }
+                break;
+            }
+            case 'LocalDeclaration': {
+                const envWithLocalDecs = extendTypeEnv(env, dec.localDecs);
+                const envWithDecs = extendTypeEnv(envWithLocalDecs, dec.decs);
+                /*
+                  now we remove all declarations from local declarations
+                  make sure things like `local val x = 5 in val x = 3 end;` work as expected
+        
+                  TODO: figure out if theres a nice way of doing this without needing a seperate function extendTypeEnvWithLocalDecs(env, decs, envWithLocalDecs)
+                    perhaps we cld have an optional third param for this function envWithLocalDecs, which is used as the env if defined?
+                    right now this doesnt work properly!
+                */
+                return envWithDecs;
+            }
+        }
+    }
+    return env;
+}
+exports.extendTypeEnv = extendTypeEnv;
 let CUR_FRESH_VAR = 0;
 function freshTypeVariable() {
     return { id: CUR_FRESH_VAR++ };
 }
+exports.freshTypeVariable = freshTypeVariable;
 function instantiate(typeScheme) {
     const typeMappings = typeScheme.typeVariables.map(tv => [tv, freshTypeVariable()]);
     function substitute(type) {
@@ -64,4 +141,34 @@ function instantiate(typeScheme) {
     return substitute(typeScheme.type);
 }
 exports.instantiate = instantiate;
+function unsolved(type) {
+    if ((0, utils_1.isPrimitiveType)(type)) {
+        return [];
+    }
+    if ((0, utils_1.isFunctionType)(type)) {
+        return [...unsolved(type.parameterType), ...unsolved(type.returnType)];
+    }
+    if ((0, utils_1.isListType)(type)) {
+        return unsolved(type.elementType);
+    }
+    return [type];
+}
+function unsolvedEnv(env) {
+    let tvs = [];
+    for (const id in env) {
+        const ts = env[id];
+        tvs = [...tvs, ...unsolved(ts.type)];
+    }
+    return tvs;
+}
+// inefficient way of generalizing. TODO: make this more efficient?
+function generalize(C, env, id, type) {
+    const newEnv = lodash_1.default.cloneDeep(env);
+    newEnv[id] = {
+        type: type,
+        // TODO: check that this list difference works for type vars
+        typeVariables: lodash_1.default.difference(unsolved(type), unsolvedEnv(env))
+    };
+    return newEnv;
+}
 //# sourceMappingURL=environment.js.map

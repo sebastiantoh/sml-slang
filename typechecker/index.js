@@ -12,12 +12,70 @@ function hindleyMilner(env, node) {
         case 'StringConstant':
         case 'CharConstant':
         case 'BoolConstant':
-        case 'UnitConstant':
+        case 'UnitConstant': {
             return [node.type, []];
+        }
         // Variable
-        case 'Variable':
+        case 'Variable': {
             const ts = (0, environment_1.getTypeSchemeFromEnv)(env, node.id);
             return [(0, environment_1.instantiate)(ts), []];
+        }
+        // Application
+        case 'Application': {
+            const t = (0, environment_1.freshTypeVariable)();
+            const [t1, C1] = hindleyMilner(env, node.fn);
+            const [t2, C2] = hindleyMilner(env, node.arg);
+            return [t, [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }]];
+        }
+        // List
+        case 'ListLiteral': {
+            const t = (0, environment_1.freshTypeVariable)();
+            let C = [];
+            for (const el of node.elements) {
+                const [tmp_ty, tmp_C] = hindleyMilner(env, el);
+                C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }];
+            }
+            return [t, C];
+        }
+        // Let Expression
+        case 'LetExpression': {
+            const extendedEnv = (0, environment_1.extendTypeEnv)(env, node.decs);
+            let t = utils_1.UNIT_TY;
+            let C = [];
+            for (const exp of node.exps) {
+                ;
+                [t, C] = hindleyMilner(extendedEnv, exp);
+            }
+            return [t, C];
+        }
+        // Expression Sequence
+        case 'ExpSequence': {
+            let t = utils_1.UNIT_TY;
+            let C = [];
+            for (const exp of node.exps) {
+                ;
+                [t, C] = hindleyMilner(env, exp);
+            }
+            return [t, C];
+        }
+        // Conditional
+        case 'ConditionalExpression': {
+            const t = (0, environment_1.freshTypeVariable)();
+            const [t1, C1] = hindleyMilner(env, node.pred);
+            const [t2, C2] = hindleyMilner(env, node.consequent);
+            const [t3, C3] = hindleyMilner(env, node.alternative);
+            return [
+                t,
+                [
+                    ...C1,
+                    ...C2,
+                    ...C3,
+                    { type1: t1, type2: utils_1.BOOL_TY },
+                    { type1: t, type2: t2 },
+                    { type1: t, type2: t3 }
+                ]
+            ];
+        }
     }
     return [utils_1.UNIT_TY, []];
 }
