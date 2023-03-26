@@ -62,7 +62,7 @@ const interleave = (microcodes, instruction) => {
 // Checks if value can be matched against pattern, and
 // if so, updates the environment with the proper bindings
 // based on the pattern and value.
-// Returns true if value was successfuly unified with pattern. False otherwise.
+// Returns true if value was successfuly matched with pattern. False otherwise.
 // e.g. case value of pat => ...
 const tryMatch = (value, pat) => {
     if ((pat.tag === 'IntConstant' && value.tag === 'int') ||
@@ -323,8 +323,8 @@ const execMicrocode = (cmd) => {
             // But we check if the pat and the RHS are valid
             // Examples of valid constant assignment: 1=1, true=true, ()=()
             // Examples of non-valid constant assignment: 1=2, true=false
-            const unified = tryMatch(rhs, cmd.pat);
-            if (!unified) {
+            const matched = tryMatch(rhs, cmd.pat);
+            if (!matched) {
                 throw new Error(`cannot assign ${cmd.pat} to ${rhs}`);
             }
             break;
