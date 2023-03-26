@@ -93,6 +93,12 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       throw new Error('TODO')
     }
 
+    /* Patterns */
+    case 'Wildcard': {
+      const t = freshTypeVariable()
+      return [t, []]
+    }
+
     /* Programs */
     case 'Program': {
       // suffices to typecheck declarations in the program

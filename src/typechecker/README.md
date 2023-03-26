@@ -127,7 +127,7 @@ env |- if e1 then e2 else e3 : 't -| C1, C2, C3, t1 = bool, 't = t2, 't = t3
 This is desugared to function application, so we do not need to handle this.
 
 ### Function
-We evaluate the type of a function in two steps. First, we evaluate the type of `match` to test for validity and then utilise the type and set of constriants to evaluate the function type.
+We evaluate the type of a function in two steps. First, we evaluate the type of `match` to test for validity and then utilise the type and set of constraints to evaluate the function type.
 
 #### Evaluate `match`
 We check that all patterns have same types and all expressions have same types.
@@ -256,7 +256,7 @@ extend_env(env, val p1 = e1 and p2 = e2 .... and pn = en) -> env
     if env |- e1 : t1 -| C1
     and env |- e2 : t2 -| C2
     ...
-    and env |- en : tn -| Cn 
+    and env |- en : tn -| Cn
 
     assert(p1 = t1, p2 = t2,..., pn = tn)
 ```
