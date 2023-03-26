@@ -122,18 +122,18 @@ This is desugared to function application, so we do not need to handle this.
 
 ### Function
 ```
-env |- fn p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| P_C1, P_C2, ..., P_Cn, p_t1 = 't, p_t2 = 't, ..., p_tn = 't
-                                                             C1, C2, ..., Cn, t1 = t2, t1 = t3, ..., t1 = tn
-    if fresh 't,
+env |- fn p1 => e1 | p2 => e2 | ... | pn => en : 'arg -> 'ret -| P_C1, P_C2, ..., P_Cn, p_t1 = 'arg, p_t2 = 'arg, ..., p_tn = 'arg
+                                                                 C1, C2, ..., Cn, t1 = 'ret, t2 = 'ret, ..., tn = 'ret
+    if fresh 'arg,
+    and fresh 'ret,
     and env |- p1 : p_t1 -| P_C1
     and env |- p2 : p_t2 -| P_C2
     ...
     and env |- pn : p_tn -| P_Cn
-    and extend_env(p1) |- e1 : t1 -| C1
-    and extend_env(p2) |- e2 : t2 -| C2
-    and extend_env(p3) |- e3 : t3 -| C3
+    and extend_env(env, p1, p_t1) |- e1 : t1 -| C1
+    and extend_env(env, p2, p_t2) |- e2 : t2 -| C2
     ...
-    and extend_env(pn) |- en : tn -| Cn
+    and extend_env(env, pn, p_tn) |- en : tn -| Cn
 ```
 
 e.g.
