@@ -80,6 +80,17 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         ]
       ]
     }
+    // Function
+    case 'Function': {
+      throw new Error("TODO")
+    }
+
+    /* Programs */
+    case 'Program': {
+      // suffices to typecheck declarations in the program
+      const _ = extendTypeEnv(env, node.body)
+      return [UNIT_TY, []]
+    }
   }
 
   return [UNIT_TY, []]
