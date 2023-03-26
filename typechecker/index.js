@@ -76,6 +76,16 @@ function hindleyMilner(env, node) {
                 ]
             ];
         }
+        // Function
+        case 'Function': {
+            throw new Error('TODO');
+        }
+        /* Programs */
+        case 'Program': {
+            // suffices to typecheck declarations in the program
+            const _ = (0, environment_1.extendTypeEnv)(env, node.body);
+            return [utils_1.UNIT_TY, []];
+        }
     }
     return [utils_1.UNIT_TY, []];
 }
