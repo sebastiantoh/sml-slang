@@ -121,53 +121,25 @@ env |- if e1 then e2 else e3 : 't -| C1, C2, C3, t1 = bool, 't = t2, 't = t3
 This is desugared to function application, so we do not need to handle this.
 
 ### Function
-We evaluate the type of a function in two steps. First, we evaluate the type of `match` to test for validity and then utilise the type and set of constraints to evaluate the function type.
-
-#### Evaluate `match`
-We check that all patterns have same types and all expressions have same types.
-
-First go through patterns and check if we have a type that works for all (so no conflicts like 2 diff types of primitives etc.). Types can be PrimitiveType | ListType | TypeVariable.
-
-The logic for (generic) unifying types of patterns (type of 't) can be simply:
 ```
-    any list defined?
-        any primitives (p) defined in any of the lists?
-            are there 2 different primitives defined? type error!
-            else 't = p list
-        type is 'a list
-    any type variable defined?
-        do any of the patterns type to a primitive (p)?
-            are there 2 different patterns typing to 2 different primitives? type error!
-            else type is 't = p
-        type is 't
-    are there 2 different patterns typing to 2 different primitives? type error!
-    else 't = p
-```
-
-#### Evaluate function
-```
-env |- p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| C1, C2, ..., Cn, t1 = t2, t1 = t3, ..., t1 = tn
-    if fresh 't, where 't = is the most generic unification of all types of p1, p2, ... pn from above (if exists)
+env |- fn p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| P_C1, P_C2, ..., P_Cn, p_t1 = 't, p_t2 = 't, ..., p_tn = 't
+                                                          C1, C2, ..., Cn, t1 = t2, t1 = t3, ..., t1 = tn
+    if fresh 't,
+    and env |- p1 : p_t1 -| P_C1
+    and env |- p2 : p_t2 -| P_C2
+    ...
+    and env |- pn : p_tn -| P_Cn
     and extend_env(p1) |- e1 : t1 -| C1
     and extend_env(p2) |- e2 : t2 -| C2
     and extend_env(p3) |- e3 : t3 -| C3
     ...
     and extend_env(pn) |- en : tn -| Cn
 ```
-e.g.
-- `fun f x = x | f y = y` has a pattern of type `'a . 'a`
-- `fun f x = x | f 3 = 3` has a pattern of type `int`
-- `fun f [] = 1 | f [x] = 2 | f x = 3` has a pattern of type `'a . 'a list`
-- `fun f (hd::tl) = [hd] | f [x] = [1,2,3]` has a pattern of type `int list`
-- `fun f f1 = f1 1 | f f2 = f2 2 | f f3 = f3 3` has a pattern of type `'a . (int -> 'a) -> 'a`
 
-```
-env |- fun match : 't -| C, 't = t1 -> t2
-    if fresh 't
-    and env |- match : t1 -> t2 -| C
-```
 e.g.
-- `fun f [] = 1 | f [x] = 2 | f x = 3` returns `'a . 'a list -> int`
+- `fn [] => 1 | [x] => 2 | x => 3` returns `'a . 'a list -> int`
+- `fn 3 => 3 | x => x` has a pattern of type `int -> int`
+- `fn (hd::tl) => [hd] | [x] => [1,2,3]` has a pattern of type `int list -> int list`
 
 -----------------------------------------------------------------------------------
 
