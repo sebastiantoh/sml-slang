@@ -82,7 +82,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     }
     // Function
     case 'Function': {
-      throw new Error("TODO")
+      throw new Error('TODO')
     }
 
     /* Programs */
