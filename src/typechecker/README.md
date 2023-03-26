@@ -129,7 +129,7 @@ This is desugared to function application, so we do not need to handle this.
 ### Function
 ```
 env |- fn p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| P_C1, P_C2, ..., P_Cn, p_t1 = 't, p_t2 = 't, ..., p_tn = 't
-                                                          C1, C2, ..., Cn, t1 = t2, t1 = t3, ..., t1 = tn
+                                                             C1, C2, ..., Cn, t1 = t2, t1 = t3, ..., t1 = tn
     if fresh 't,
     and env |- p1 : p_t1 -| P_C1
     and env |- p2 : p_t2 -| P_C2
@@ -144,8 +144,8 @@ env |- fn p1 => e1 | p2 => e2 | ... | pn => en : 't -> t1 -| P_C1, P_C2, ..., P_
 
 e.g.
 - `fn [] => 1 | [x] => 2 | x => 3` returns `'a . 'a list -> int`
-- `fn 3 => 3 | x => x` has a pattern of type `int -> int`
-- `fn (hd::tl) => [hd] | [x] => [1,2,3]` has a pattern of type `int list -> int list`
+- `fn 3 => 3 | x => x` returns `int -> int`
+- `fn (hd::tl) => [hd] | [x] => [1,2,3]` returns `int list -> int list`
 
 -----------------------------------------------------------------------------------
 
