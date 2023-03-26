@@ -7,7 +7,7 @@ import {
   TypeEnvironment
 } from './environment'
 import { Type, TypeConstraint } from './types'
-import { UNIT_TY } from './utils'
+import { BOOL_TY, UNIT_TY } from './utils'
 
 export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeConstraint[]] {
   switch (node.tag) {
@@ -49,7 +49,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       let t: Type = UNIT_TY
       let C: TypeConstraint[] = []
       for (const exp of node.exps) {
-        [t, C] = hindleyMilner(extendedEnv, exp)
+        ;[t, C] = hindleyMilner(extendedEnv, exp)
       }
       return [t, C]
     }
@@ -58,9 +58,27 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       let t: Type = UNIT_TY
       let C: TypeConstraint[] = []
       for (const exp of node.exps) {
-        [t, C] = hindleyMilner(env, exp)
+        ;[t, C] = hindleyMilner(env, exp)
       }
       return [t, C]
+    }
+    // Conditional
+    case 'ConditionalExpression': {
+      const t = freshTypeVariable()
+      const [t1, C1] = hindleyMilner(env, node.pred)
+      const [t2, C2] = hindleyMilner(env, node.consequent)
+      const [t3, C3] = hindleyMilner(env, node.alternative)
+      return [
+        t,
+        [
+          ...C1,
+          ...C2,
+          ...C3,
+          { type1: t1, type2: BOOL_TY },
+          { type1: t, type2: t2 },
+          { type1: t, type2: t3 }
+        ]
+      ]
     }
   }
 
