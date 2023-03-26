@@ -90,6 +90,18 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const t = freshTypeVariable()
       return [t, []]
     }
+    case 'InfixConstruction': {
+      // we only support ::
+      if (node.id !== '::') {
+        throw new Error(`${node.id} is not a supported constructor`)
+      }
+      const t = freshTypeVariable()
+      const [t1, C1] = hindleyMilner(env, node.pat1)
+      const [t2, C2] = hindleyMilner(env, node.pat2)
+      const tList = { elementType: t }
+      return [tList, [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]]
+    }
+    // TODO: add lists
 
     /* Programs */
     case 'Program': {
