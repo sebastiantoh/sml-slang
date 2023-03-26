@@ -49,7 +49,16 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       let t: Type = UNIT_TY
       let C: TypeConstraint[] = []
       for (const exp of node.exps) {
-        ;[t, C] = hindleyMilner(extendedEnv, exp)
+        [t, C] = hindleyMilner(extendedEnv, exp)
+      }
+      return [t, C]
+    }
+    // Expression Sequence
+    case 'ExpSequence': {
+      let t: Type = UNIT_TY
+      let C: TypeConstraint[] = []
+      for (const exp of node.exps) {
+        [t, C] = hindleyMilner(env, exp)
       }
       return [t, C]
     }

@@ -96,7 +96,17 @@ e.g.
 - `val x = let local val x = 5 in val y = x end in y end` returns `int`
 
 ### Expression Sequence
-TODO
+```
+env |- (e1; e2; ...; en) : tn -| Cn
+    if env |- e1 : t1 -| C1
+    and env |- e2 : t2 -| C2
+    and env |- e3 : t3 -| C3
+    ...
+    and env |- en : tn -| Cn
+```
+e.g.
+- `(x + 2; "hi"; true)` returns `bool`
+- `(x + 2; "hi" + 1; true)` returns type error
 
 ### Conditional
 ```
