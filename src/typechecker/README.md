@@ -78,14 +78,25 @@ env |- [e1, e2, ... en] : 't list -| C1, C2, .. Cn, 't = t1, 't = t2, ... 't = t
     and env |- en : tn -| Cn
 ```
 
-### Local Declaration
+### Let Expression
 extend_env(env, dec) takes in an env and a set of declarations and extends it with the generalizations of the types defined (see Declarations below for more info)
+
+TODO: are any of the constraints C1 .. Cn-1 needed?
 ```
-env |- let dec in e1; e2; ...; en end: t -| C
-    extend_env(env, dec) |- en : t -| C
+env |- let dec in e1; e2; ...; en end: tn -| Cn
+    if extend_env(env, dec) |- e1 : t1 -| C1
+    and extend_env(env, dec) |- e2 : t2 -| C2
+    and extend_env(env, dec) |- e3 : t3 -| C3
+    ...
+    and extend_env(env, dec) |- en : tn -| Cn
 ```
 e.g.
 - `let val x = 2 in x + 2; "hi"; true end;` returns `bool`
+- `let val x = 2 in x + 2; "hi" + 4; true end;` returns type error
+- `val x = let local val x = 5 in val y = x end in y end` returns `int`
+
+### Expression Sequence
+TODO
 
 ### Conditional
 ```
@@ -242,6 +253,7 @@ extend_env(env, dec1 ; dec2 ; ... ; decn) -> extend_env(extend_env(......extend_
 ```
 
 ### Local
+TODO: update this. this is incorrect! we dont want decs in dec1 to show up in our final env.
 ```
 extend_env(env, local dec1 in dec2 end) -> extend_env(extend_env(env, dec1), dec2)
 ```

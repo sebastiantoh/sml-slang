@@ -1,5 +1,6 @@
 import { Node } from '../parser/ast'
 import {
+  extendTypeEnv,
   freshTypeVariable,
   getTypeSchemeFromEnv,
   instantiate,
@@ -39,6 +40,16 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       for (const el of node.elements) {
         const [tmp_ty, tmp_C] = hindleyMilner(env, el)
         C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }]
+      }
+      return [t, C]
+    }
+    // Let Expression
+    case 'LetExpression': {
+      const extendedEnv = extendTypeEnv(env, node.decs)
+      let t: Type = UNIT_TY
+      let C: TypeConstraint[] = []
+      for (const exp of node.exps) {
+        ;[t, C] = hindleyMilner(extendedEnv, exp)
       }
       return [t, C]
     }
