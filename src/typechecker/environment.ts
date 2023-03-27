@@ -204,31 +204,31 @@ function generalize(
   return newEnv
 }
 
-function substituteIntoType(type: Type, typeVar: TypeVariable, subsType: Type): Type {
+function substituteTypeVarIntoType(type: Type, typeVar: TypeVariable, subsType: Type): Type {
   if (isPrimitiveType(type)) {
     return type
   }
   if (isFunctionType(type)) {
     return {
-      parameterType: substituteIntoType(type.parameterType, typeVar, subsType),
-      returnType: substituteIntoType(type.returnType, typeVar, subsType)
+      parameterType: substituteTypeVarIntoType(type.parameterType, typeVar, subsType),
+      returnType: substituteTypeVarIntoType(type.returnType, typeVar, subsType)
     }
   }
   if (isListType(type)) {
-    return { elementType: substituteIntoType(type.elementType, typeVar, subsType) }
+    return { elementType: substituteTypeVarIntoType(type.elementType, typeVar, subsType) }
   }
   return type.id === typeVar.id ? subsType : type
 }
 
 // subs type for typeVar for all constraints in C
-function substituteIntoConstraints(
+function substituteTypeVarIntoConstraints(
   C: TypeConstraint[],
   typeVar: TypeVariable,
   type: Type
 ): TypeConstraint[] {
   return C.map(({ type1: t1, type2: t2 }) => ({
-    type1: substituteIntoType(t1, typeVar, type),
-    type2: substituteIntoType(t2, typeVar, type)
+    type1: substituteTypeVarIntoType(t1, typeVar, type),
+    type2: substituteTypeVarIntoType(t2, typeVar, type)
   }))
 }
 
@@ -251,13 +251,13 @@ export function unify(C: TypeConstraint[]): TypeSubstitution[] {
   // t1 is a type variable 'x and 'x does not occur in t2
   if (isTypeVariableType(t1) && !hasTypeVariable(t2, t1)) {
     const S = { from: t1, to: t2 }
-    return [S, ...unify(substituteIntoConstraints(C2, t1, t2))]
+    return [S, ...unify(substituteTypeVarIntoConstraints(C2, t1, t2))]
   }
 
   // t2 is a type variable 'x and 'x does not occur in t1
   if (isTypeVariableType(t2) && !hasTypeVariable(t1, t2)) {
     const S = { from: t2, to: t1 }
-    return [S, ...unify(substituteIntoConstraints(C2, t2, t1))]
+    return [S, ...unify(substituteTypeVarIntoConstraints(C2, t2, t1))]
   }
 
   // t1 and t2 are function types
@@ -278,4 +278,31 @@ export function unify(C: TypeConstraint[]): TypeSubstitution[] {
   // to support that we will need to additionally inlcude node in our type constraints
   // (or) simply include the line and col nums in the type constraints
   throw new Error(`Failed to unify type constraint ${stringifyType(t1)} = ${stringifyType(t2)}.`)
+}
+
+export function substituteIntoType(type: Type, S: TypeSubstitution[]): Type {
+  function _subsIntoType(type: Type, S: TypeSubstitution): Type {
+    if (isPrimitiveType(type)) {
+      return type
+    }
+    if (isSameType(type, S.from)) {
+      return S.to
+    }
+    if (isFunctionType(type)) {
+      return {
+        parameterType: _subsIntoType(type.parameterType, S),
+        returnType: _subsIntoType(type.returnType, S)
+      }
+    }
+    if (isListType(type)) {
+      return { elementType: _subsIntoType(type.elementType, S) }
+    }
+    // different type var
+    return type
+  }
+
+  for (const ts of S) {
+    type = _subsIntoType(type, ts)
+  }
+  return type
 }
