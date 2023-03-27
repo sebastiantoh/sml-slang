@@ -120,7 +120,12 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
       jsVal: tail(value.jsVal)
     } as Value
 
-    return tryMatch(hd, pat.pat1) && tryMatch(tl, pat.pat2)
+    const envCopy = cloneDeep(E)
+    const matched = tryMatch(hd, pat.pat1) && tryMatch(tl, pat.pat2)
+    if (!matched) {
+      E = envCopy
+    }
+    return matched
   } else if (pat.tag === 'ListPattern') {
     // List pattern does not match with non-list values
     if (value.tag !== 'list') {

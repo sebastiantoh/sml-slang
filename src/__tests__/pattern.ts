@@ -42,6 +42,20 @@ in
 end
 `)
     ).toBe(`123`))
+
+  test('infix construction pattern matching with partial match', () =>
+    expect(
+      parseAndEvaluateExp(`
+let
+  fun f lst =
+    case lst of
+      x::[1,2,3] => x
+    | _ => 0
+in
+  f [1,2,3,4]
+end
+`)
+    ).toBe(`0`))
 })
 
 describe('ListPattern', () => {
