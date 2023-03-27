@@ -176,11 +176,14 @@ function unsolvedEnv(env) {
 }
 // inefficient way of generalizing. TODO: make this more efficient?
 function generalize(C, env, id, type) {
+    // solve constraints C and get a type t
+    const S = unify(C);
+    const t = substituteIntoType(type, S);
     const newEnv = (0, lodash_1.cloneDeep)(env);
     newEnv[id] = {
-        type: type,
+        type: t,
         // TODO: check that this list difference works for type vars
-        typeVariables: (0, lodash_1.difference)(unsolved(type), unsolvedEnv(env))
+        typeVariables: (0, lodash_1.difference)(unsolved(t), unsolvedEnv(env))
     };
     return newEnv;
 }

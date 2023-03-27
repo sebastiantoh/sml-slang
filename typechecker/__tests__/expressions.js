@@ -39,5 +39,23 @@ in
   x
 end
   `)).toBe(`int`));
+    test('valid sequence in let expr', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val x = 2 + 3
+in
+  x + 2;
+  "hi";
+  true
+end
+  `)).toBe(`bool`));
+    test('invalid sequence in let expr', () => expect(() => {
+        (0, utils_1.parseAndTypeCheckExp)(`
+let
+  val x = true + 2
+in
+  x
+end
+  `);
+    }).toThrow(/Failed to unify type constraint int = bool./));
 });
 //# sourceMappingURL=expressions.js.map
