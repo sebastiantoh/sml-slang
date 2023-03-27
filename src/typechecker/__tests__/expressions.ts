@@ -23,3 +23,27 @@ describe('Constant', () => {
     test('unit', () => expect(parseAndTypeCheckExp('()')).toBe('unit'))
   })
 })
+
+describe('LetExpression', () => {
+  test('simple val dec', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val x = true
+in
+  x
+end
+  `)
+    ).toBe(`bool`))
+
+  test('simple val dec with infix operator evaluation', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val x = 2 + 3
+in
+  x
+end
+  `)
+    ).toBe(`int`))
+})

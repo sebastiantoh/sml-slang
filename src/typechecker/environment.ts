@@ -1,11 +1,10 @@
-import _ from 'lodash'
+import { cloneDeep, difference } from 'lodash'
 
 import { Declaration } from '../parser/ast'
 import { hindleyMilner } from '.'
 import { TypeMismatchError } from './errors'
 import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types'
 import {
-  DUMMY_TYPE_VAR_TY,
   hasTypeVariable,
   INT_TY,
   isFunctionType,
@@ -23,6 +22,12 @@ import {
 
 export type TypeEnvironment = { [k: string]: TypeScheme }
 
+let CUR_FRESH_VAR = 0
+
+export function freshTypeVariable(): TypeVariable {
+  return { id: CUR_FRESH_VAR++ }
+}
+
 const primitiveFuncs: [string, TypeScheme][] = [
   ['/', { type: makeFunctionType(REAL_TY, REAL_TY, REAL_TY), typeVariables: [] }],
   ['div', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
@@ -32,17 +37,17 @@ const primitiveFuncs: [string, TypeScheme][] = [
   ['*', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['-', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['^', { type: makeFunctionType(STR_TY, STR_TY, STR_TY), typeVariables: [] }],
-  ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(
-    comp =>
-      // TODO: might need to update these to equality type variables (''a, ''b, etc.)
-      [
-        comp,
-        {
-          type: makeFunctionType(DUMMY_TYPE_VAR_TY, DUMMY_TYPE_VAR_TY, DUMMY_TYPE_VAR_TY),
-          typeVariables: [DUMMY_TYPE_VAR_TY]
-        }
-      ] as [string, TypeScheme]
-  )
+  ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => {
+    const t = freshTypeVariable()
+    // TODO: might need to update these to equality type variables (''a, ''b, etc.)
+    return [
+      comp,
+      {
+        type: makeFunctionType(t, t, t),
+        typeVariables: [t]
+      }
+    ] as [string, TypeScheme]
+  })
 ]
 
 export function createInitialTypeEnvironment(): TypeEnvironment {
@@ -133,10 +138,15 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
   return env
 }
 
-let CUR_FRESH_VAR = 0
-
-export function freshTypeVariable(): TypeVariable {
-  return { id: CUR_FRESH_VAR++ }
+export function getPrimitiveFuncTypes(env: TypeEnvironment, id: string): [Type, Type, Type] {
+  if (!env.hasOwnProperty(id)) {
+    throw new Error(`Unsupported infix operator "${id}".`)
+  }
+  const type = env[id].type
+  if (!isFunctionType(type) || !isFunctionType(type.returnType)) {
+    throw new Error(`Infix operator "${id}" declared as non fun -> fun type.`)
+  }
+  return [type.parameterType, type.returnType.parameterType, type.returnType.returnType]
 }
 
 export function instantiate(typeScheme: TypeScheme): Type {
@@ -195,11 +205,11 @@ function generalize(
   id: string,
   type: Type
 ): TypeEnvironment {
-  const newEnv = _.cloneDeep(env)
+  const newEnv = cloneDeep(env)
   newEnv[id] = {
     type: type,
     // TODO: check that this list difference works for type vars
-    typeVariables: _.difference(unsolved(type), unsolvedEnv(env))
+    typeVariables: difference(unsolved(type), unsolvedEnv(env))
   }
   return newEnv
 }

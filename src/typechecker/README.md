@@ -41,6 +41,13 @@ env |- e1 e2 : 't -| C1, C2, t1 = t2 -> 't
 ```
 
 ### Infix Application
+```
+env |- e1 op e2 : t3 -| C1, C2, t1 = t4, t2 = t5
+    if op = t1 -> t2 -> t3
+    and env |- e1 : t4 -| C1
+    and env |- e2 : t5 -| C2
+```
+
 Since we dont allow user defined infix applications, it suffices to ensure that our type env starts with the types of all our built in infix operators.
 ```
 / : real -> real -> real
@@ -56,7 +63,6 @@ mod : int -> int -> int
 > : 'a . 'a -> 'a -> 'a
 <= : 'a . 'a -> 'a -> 'a
 >= : 'a . 'a -> 'a -> 'a
-print : 'a . 'a -> unit
 ```
 
 NOTE: Previously we had the following:

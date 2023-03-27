@@ -6,7 +6,6 @@ export const STR_TY: PrimitiveType = 'string'
 export const CHAR_TY: PrimitiveType = 'char'
 export const BOOL_TY: PrimitiveType = 'bool'
 export const UNIT_TY: PrimitiveType = 'unit'
-export const DUMMY_TYPE_VAR_TY: TypeVariable = { id: 0 }
 
 /* Checking Type helpers */
 export function isInt(type: Type): boolean {
