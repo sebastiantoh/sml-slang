@@ -81,13 +81,27 @@ let
         val x = 5
       in
         val y = x
-      end 
+      end
     in
-      y 
+      y
     end
   in
     x
   end;
   `)
     ).toBe(`int`))
+
+  describe('Function', () => {
+    test('function with type variables in parameter and return type', () =>
+      expect(parseAndTypeCheckExp('fn x => x')).toBe('t9 -> t9'))
+
+    test('function with no type variables in parameter and return type', () =>
+      expect(parseAndTypeCheckExp('fn 3 => 3 | x => x')).toBe('int -> int'))
+
+    // TODO: uncomment these test case once list patterns have been merged
+    // test('function with type variables in parameter type, but not return type', () => expect(parseAndTypeCheckExp('fn [] => 1 | [x] => 2 | x => 3')).toBe('t1 list -> int'))
+
+    // test('function that requires inference from multiple matches', () => expect(
+    //   parseAndTypeCheckExp(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(`int list -> int list`))
+  })
 })

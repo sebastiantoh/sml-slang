@@ -112,7 +112,9 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     }
 
     /* Patterns */
-    case 'Wildcard': {
+    // For wildcard and variables, we are not able to infer any more information
+    case 'Wildcard':
+    case 'PatVariable': {
       const t = freshTypeVariable()
       return [t, []]
     }
