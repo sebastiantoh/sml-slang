@@ -132,7 +132,7 @@ export interface Matches extends BaseNode {
 /**
  * Patterns
  */
-export type Pattern = Constant | Wildcard | Variable | InfixConstruction
+export type Pattern = Constant | Wildcard | Variable | InfixConstruction | ListPattern
 
 export interface Wildcard extends BaseTypeAnnotatableNode {
   tag: 'Wildcard'
@@ -146,6 +146,11 @@ export interface InfixConstruction extends BaseTypeAnnotatableNode {
   pat1: Pattern
   pat2: Pattern
   id: string
+}
+export interface ListPattern extends BaseTypeAnnotatableNode {
+  tag: 'ListPattern'
+  elements: Pattern[]
+  arity: number
 }
 
 /**

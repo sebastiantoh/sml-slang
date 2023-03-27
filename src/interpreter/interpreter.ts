@@ -121,6 +121,41 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
     } as Value
 
     return tryMatch(hd, pat.pat1) && tryMatch(tl, pat.pat2)
+  } else if (pat.tag === 'ListPattern') {
+    // List pattern does not match with non-list values
+    if (value.tag !== 'list') {
+      return false
+    }
+
+    const pats = pat.elements
+    const vals = value.jsVal
+
+    // Lists of different length does not match
+    if (vals.length !== pats.length) {
+      return false
+    }
+
+    // Cannot have two of the same variable in one list pattern
+    // Right now, a list pattern with two variables will not be able to match,
+    // but should return an error
+    const patVarSet = new Set()
+    let numVars = 0
+    pat.elements.map(e => {
+      if (e.tag === 'Variable') {
+        numVars++
+        patVarSet.add(e.id)
+      }
+    })
+
+    if (patVarSet.size !== numVars) {
+      return false
+    }
+
+    for (let i = 0; i < pat.arity; i++) {
+      tryMatch(vals[i], pats[i])
+    }
+
+    return true
   } else {
     // TODO: handle more complicated patterns here.
     throw new Error(`TODO: unimplemented ${pat}`)
