@@ -77,7 +77,7 @@ class NodeGenerator {
     }
     visitExpVariable(ctx) {
         return {
-            tag: 'Variable',
+            tag: 'ExpVariable',
             id: ctx._id.text,
             loc: contextToLocation(ctx)
         };
@@ -226,7 +226,7 @@ class NodeGenerator {
     }
     visitPatVariable(ctx) {
         return {
-            tag: 'Variable',
+            tag: 'PatVariable',
             id: ctx._id.text,
             loc: contextToLocation(ctx)
         };
@@ -382,7 +382,7 @@ class NodeGenerator {
         return {
             tag: 'Valbind',
             isRec: true,
-            pat: { tag: 'Variable', id: fnName },
+            pat: { tag: 'PatVariable', id: fnName },
             exp: { tag: 'Function', matches },
             loc: contextToLocation(ctx)
         };

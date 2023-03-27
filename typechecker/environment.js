@@ -85,7 +85,7 @@ function extendTypeEnv(env, decs) {
                             }
                             break;
                         }
-                        case 'Variable': {
+                        case 'PatVariable': {
                             const [t, C] = (0, _1.hindleyMilner)(env, valbind.exp);
                             env = generalize(C, env, valbind.pat.id, t);
                             break;

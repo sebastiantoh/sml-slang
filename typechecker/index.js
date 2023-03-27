@@ -16,7 +16,7 @@ function hindleyMilner(env, node) {
             return [node.type, []];
         }
         // Variable
-        case 'Variable': {
+        case 'ExpVariable': {
             const ts = (0, environment_1.getTypeSchemeFromEnv)(env, node.id);
             return [(0, environment_1.instantiate)(ts), []];
         }

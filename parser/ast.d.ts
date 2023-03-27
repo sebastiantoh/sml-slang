@@ -10,7 +10,7 @@ interface BaseTypeAnnotatableNode extends BaseNode {
 /**
  * Expressions
  */
-export type Expression = Constant | Application | InfixApplication | ListLiteral | ExpSequence | LetExpression | ConditionalExpression | Function | Variable;
+export type Expression = Constant | ExpVariable | Application | InfixApplication | ListLiteral | ExpSequence | LetExpression | ConditionalExpression | Function;
 export type Constant = IntConstant | RealConstant | StringConstant | CharConstant | BoolConstant | UnitConstant;
 export interface IntConstant extends BaseTypeAnnotatableNode {
     tag: 'IntConstant';
@@ -40,6 +40,10 @@ export interface BoolConstant extends BaseTypeAnnotatableNode {
 export interface UnitConstant extends BaseTypeAnnotatableNode {
     tag: 'UnitConstant';
     type: 'unit';
+}
+export interface ExpVariable extends BaseTypeAnnotatableNode {
+    tag: 'ExpVariable';
+    id: string;
 }
 export interface Application extends BaseTypeAnnotatableNode {
     tag: 'Application';
@@ -91,12 +95,12 @@ export interface Matches extends BaseNode {
 /**
  * Patterns
  */
-export type Pattern = Constant | Wildcard | Variable | InfixConstruction;
+export type Pattern = Constant | Wildcard | PatVariable | InfixConstruction;
 export interface Wildcard extends BaseTypeAnnotatableNode {
     tag: 'Wildcard';
 }
-export interface Variable extends BaseTypeAnnotatableNode {
-    tag: 'Variable';
+export interface PatVariable extends BaseTypeAnnotatableNode {
+    tag: 'PatVariable';
     id: string;
 }
 export interface InfixConstruction extends BaseTypeAnnotatableNode {
