@@ -119,7 +119,7 @@ end
     ).toBe(`5`))
 
   test('list pattern matching with an identical variable', () =>
-    expect(
+    expect(() =>
       parseAndEvaluateExp(`
 let
   fun one_x_x xs = 
@@ -130,7 +130,7 @@ in
   one_x_x [1,2,3]
 end
 `)
-    ).toBe(`0`))
+    ).toThrow('Cannot have two of the same variable in one list pattern'))
 
   test('list pattern matching with infix construction', () =>
     expect(
@@ -159,4 +159,19 @@ in
 end
 `)
     ).toBe(`[4]`))
+
+  test('list pattern matching with nested list', () =>
+    expect(
+      parseAndEvaluateExp(`
+let
+  fun nested_list xs = 
+    case xs of
+      [[1], [2,3,4]] => false
+    | [[1,2], [3,4]] => true
+    | _ => false
+in
+  nested_list [[1,2],[3,4]]
+end
+`)
+    ).toBe(`true`))
 })

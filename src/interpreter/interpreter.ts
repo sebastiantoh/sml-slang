@@ -141,7 +141,6 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
     }
 
     // Cannot have two of the same variable in one list pattern
-    // Should this throw an error instead?
     const patVarSet = new Set()
     let numVars = 0
     pat.elements.map(e => {
@@ -151,8 +150,10 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
       }
     })
 
+    // Throw error if there is a duplicate variable
+    // TODO: we might want to change this into a parsing error
     if (patVarSet.size !== numVars) {
-      return false
+      throw new Error('Cannot have two of the same variable in one list pattern')
     }
 
     // Matching might fail on the later patterns,
