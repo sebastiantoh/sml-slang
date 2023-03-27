@@ -155,7 +155,7 @@ export function extendTypeEnvFromPattern(
     case 'Wildcard': {
       return newEnv
     }
-    case 'Variable': {
+    case 'PatVariable': {
       newEnv[pat.id] = {
         type: patType,
         typeVariables: []
