@@ -3,17 +3,21 @@ import _ from 'lodash'
 import { Declaration } from '../parser/ast'
 import { hindleyMilner } from '.'
 import { TypeMismatchError } from './errors'
-import { Type, TypeConstraint, TypeScheme, TypeVariable } from './types'
+import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types'
 import {
   DUMMY_TYPE_VAR_TY,
+  hasTypeVariable,
   INT_TY,
   isFunctionType,
   isListType,
   isPrimitiveType,
+  isSameType,
+  isTypeVariableType,
   isUnit,
   makeFunctionType,
   REAL_TY,
   STR_TY,
+  stringifyType,
   UNIT_TY
 } from './utils'
 
@@ -198,4 +202,80 @@ function generalize(
     typeVariables: _.difference(unsolved(type), unsolvedEnv(env))
   }
   return newEnv
+}
+
+function substituteIntoType(type: Type, typeVar: TypeVariable, subsType: Type): Type {
+  if (isPrimitiveType(type)) {
+    return type
+  }
+  if (isFunctionType(type)) {
+    return {
+      parameterType: substituteIntoType(type.parameterType, typeVar, subsType),
+      returnType: substituteIntoType(type.returnType, typeVar, subsType)
+    }
+  }
+  if (isListType(type)) {
+    return { elementType: substituteIntoType(type.elementType, typeVar, subsType) }
+  }
+  return type.id === typeVar.id ? subsType : type
+}
+
+// subs type for typeVar for all constraints in C
+function substituteIntoConstraints(
+  C: TypeConstraint[],
+  typeVar: TypeVariable,
+  type: Type
+): TypeConstraint[] {
+  return C.map(({ type1: t1, type2: t2 }) => ({
+    type1: substituteIntoType(t1, typeVar, type),
+    type2: substituteIntoType(t2, typeVar, type)
+  }))
+}
+
+export function unify(C: TypeConstraint[]): TypeSubstitution[] {
+  // no more subsitutions can be generated
+  if (C.length === 0) {
+    return []
+  }
+  const [{ type1: t1, type2: t2 }, ...C2] = C
+  // both t1 and t2 are the same simple types
+  // - throw away constraint (no useful info)
+  if (
+    (isPrimitiveType(t1) && isPrimitiveType(t2)) ||
+    (isTypeVariableType(t1) && isTypeVariableType(t2))
+  ) {
+    if (isSameType(t1, t2)) {
+      return unify(C2)
+    }
+  }
+  // t1 is a type variable 'x and 'x does not occur in t2
+  if (isTypeVariableType(t1) && !hasTypeVariable(t2, t1)) {
+    const S = { from: t1, to: t2 }
+    return [S, ...unify(substituteIntoConstraints(C2, t1, t2))]
+  }
+
+  // t2 is a type variable 'x and 'x does not occur in t1
+  if (isTypeVariableType(t2) && !hasTypeVariable(t1, t2)) {
+    const S = { from: t2, to: t1 }
+    return [S, ...unify(substituteIntoConstraints(C2, t2, t1))]
+  }
+
+  // t1 and t2 are function types
+  if (isFunctionType(t1) && isFunctionType(t2)) {
+    return unify([
+      { type1: t1.parameterType, type2: t2.parameterType },
+      { type1: t1.returnType, type2: t2.returnType },
+      ...C2
+    ])
+  }
+
+  // t1 and t2 are list types
+  if (isListType(t1) && isListType(t2)) {
+    return unify([{ type1: t1.elementType, type2: t2.elementType }, ...C2])
+  }
+
+  // TODO: make errors better - can include line number etc.
+  // to support that we will need to additionally inlcude node in our type constraints
+  // (or) simply include the line and col nums in the type constraints
+  throw new Error(`Failed to unify type constraint ${stringifyType(t1)} = ${stringifyType(t2)}.`)
 }
