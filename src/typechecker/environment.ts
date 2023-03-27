@@ -1,6 +1,7 @@
+import assert from 'assert'
 import { cloneDeep, difference } from 'lodash'
 
-import { Declaration } from '../parser/ast'
+import { Declaration, Pattern } from '../parser/ast'
 import { hindleyMilner } from '.'
 import { TypeMismatchError } from './errors'
 import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types'
@@ -136,6 +137,46 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
     }
   }
   return env
+}
+
+export function extendTypeEnvFromPattern(
+  env: TypeEnvironment,
+  pat: Pattern,
+  patType: Type
+): TypeEnvironment {
+  const newEnv = cloneDeep(env)
+  switch (pat.tag) {
+    // Do nothing for the case of constants / wildcards
+    case 'IntConstant':
+    case 'RealConstant':
+    case 'StringConstant':
+    case 'CharConstant':
+    case 'BoolConstant':
+    case 'Wildcard': {
+      return newEnv
+    }
+    case 'Variable': {
+      newEnv[pat.id] = {
+        type: patType,
+        typeVariables: []
+      }
+      return newEnv
+    }
+    case 'InfixConstruction': {
+      // we only support ::
+      if (pat.id !== '::') {
+        throw new Error(`${pat.id} is not a supported constructor`)
+      }
+
+      assert(isListType(patType))
+      const { elementType } = patType
+      const envExtendedFromPat1 = extendTypeEnvFromPattern(newEnv, pat.pat1, elementType)
+      return extendTypeEnvFromPattern(envExtendedFromPat1, pat.pat2, patType)
+    }
+    default: {
+      throw new Error(`${pat.tag} not implemented`)
+    }
+  }
 }
 
 export function getPrimitiveFuncTypes(env: TypeEnvironment, id: string): [Type, Type, Type] {

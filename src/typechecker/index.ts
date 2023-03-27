@@ -1,6 +1,7 @@
 import { Node } from '../parser/ast'
 import {
   extendTypeEnv,
+  extendTypeEnvFromPattern,
   freshTypeVariable,
   getPrimitiveFuncTypes,
   getTypeSchemeFromEnv,
@@ -90,7 +91,24 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     }
     // Function
     case 'Function': {
-      throw new Error('TODO')
+      const parameterType = freshTypeVariable()
+      const returnType = freshTypeVariable()
+      const funTy = { parameterType, returnType }
+      const constraints: TypeConstraint[] = []
+
+      for (const { pat, exp } of node.matches) {
+        const [patTy, patConstraints] = hindleyMilner(env, pat)
+        const extendedEnv = extendTypeEnvFromPattern(env, pat, patTy)
+        const [expTy, expConstraints] = hindleyMilner(extendedEnv, exp)
+
+        constraints.push(
+          ...patConstraints,
+          ...expConstraints,
+          { type1: parameterType, type2: patTy },
+          { type1: returnType, type2: expTy }
+        )
+      }
+      return [funTy, constraints]
     }
 
     /* Patterns */
@@ -117,7 +135,9 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const _ = extendTypeEnv(env, node.body)
       return [UNIT_TY, []]
     }
-  }
 
-  return [UNIT_TY, []]
+    default: {
+      throw new Error(`${node.tag} not implemented`)
+    }
+  }
 }

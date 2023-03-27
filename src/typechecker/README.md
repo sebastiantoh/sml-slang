@@ -128,9 +128,9 @@ This is desugared to function application, so we do not need to handle this.
 
 ### Function
 ```
-env |- fn p1 => e1 | p2 => e2 | ... | pn => en : 'arg -> 'ret -| P_C1, P_C2, ..., P_Cn, p_t1 = 'arg, p_t2 = 'arg, ..., p_tn = 'arg
+env |- fn p1 => e1 | p2 => e2 | ... | pn => en : 'param -> 'ret -| P_C1, P_C2, ..., P_Cn, p_t1 = 'param, p_t2 = 'param, ..., p_tn = 'param
                                                                  C1, C2, ..., Cn, t1 = 'ret, t2 = 'ret, ..., tn = 'ret
-    if fresh 'arg,
+    if fresh 'param,
     and fresh 'ret,
     and env |- p1 : p_t1 -| P_C1
     and env |- p2 : p_t2 -| P_C2
