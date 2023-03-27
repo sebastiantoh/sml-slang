@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.instantiate = exports.freshTypeVariable = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = void 0;
+exports.substituteIntoType = exports.unify = exports.instantiate = exports.freshTypeVariable = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = void 0;
 const lodash_1 = require("lodash");
 const _1 = require(".");
 const errors_1 = require("./errors");
@@ -171,4 +171,94 @@ function generalize(C, env, id, type) {
     };
     return newEnv;
 }
+function substituteTypeVarIntoType(type, typeVar, subsType) {
+    if ((0, utils_1.isPrimitiveType)(type)) {
+        return type;
+    }
+    if ((0, utils_1.isFunctionType)(type)) {
+        return {
+            parameterType: substituteTypeVarIntoType(type.parameterType, typeVar, subsType),
+            returnType: substituteTypeVarIntoType(type.returnType, typeVar, subsType)
+        };
+    }
+    if ((0, utils_1.isListType)(type)) {
+        return { elementType: substituteTypeVarIntoType(type.elementType, typeVar, subsType) };
+    }
+    return type.id === typeVar.id ? subsType : type;
+}
+// subs type for typeVar for all constraints in C
+function substituteTypeVarIntoConstraints(C, typeVar, type) {
+    return C.map(({ type1: t1, type2: t2 }) => ({
+        type1: substituteTypeVarIntoType(t1, typeVar, type),
+        type2: substituteTypeVarIntoType(t2, typeVar, type)
+    }));
+}
+function unify(C) {
+    // no more subsitutions can be generated
+    if (C.length === 0) {
+        return [];
+    }
+    const [{ type1: t1, type2: t2 }, ...C2] = C;
+    // both t1 and t2 are the same simple types
+    // - throw away constraint (no useful info)
+    if (((0, utils_1.isPrimitiveType)(t1) && (0, utils_1.isPrimitiveType)(t2)) ||
+        ((0, utils_1.isTypeVariableType)(t1) && (0, utils_1.isTypeVariableType)(t2))) {
+        if ((0, utils_1.isSameType)(t1, t2)) {
+            return unify(C2);
+        }
+    }
+    // t1 is a type variable 'x and 'x does not occur in t2
+    if ((0, utils_1.isTypeVariableType)(t1) && !(0, utils_1.hasTypeVariable)(t2, t1)) {
+        const S = { from: t1, to: t2 };
+        return [S, ...unify(substituteTypeVarIntoConstraints(C2, t1, t2))];
+    }
+    // t2 is a type variable 'x and 'x does not occur in t1
+    if ((0, utils_1.isTypeVariableType)(t2) && !(0, utils_1.hasTypeVariable)(t1, t2)) {
+        const S = { from: t2, to: t1 };
+        return [S, ...unify(substituteTypeVarIntoConstraints(C2, t2, t1))];
+    }
+    // t1 and t2 are function types
+    if ((0, utils_1.isFunctionType)(t1) && (0, utils_1.isFunctionType)(t2)) {
+        return unify([
+            { type1: t1.parameterType, type2: t2.parameterType },
+            { type1: t1.returnType, type2: t2.returnType },
+            ...C2
+        ]);
+    }
+    // t1 and t2 are list types
+    if ((0, utils_1.isListType)(t1) && (0, utils_1.isListType)(t2)) {
+        return unify([{ type1: t1.elementType, type2: t2.elementType }, ...C2]);
+    }
+    // TODO: make errors better - can include line number etc.
+    // to support that we will need to additionally inlcude node in our type constraints
+    // (or) simply include the line and col nums in the type constraints
+    throw new Error(`Failed to unify type constraint ${(0, utils_1.stringifyType)(t1)} = ${(0, utils_1.stringifyType)(t2)}.`);
+}
+exports.unify = unify;
+function substituteIntoType(type, S) {
+    function _subsIntoType(type, S) {
+        if ((0, utils_1.isPrimitiveType)(type)) {
+            return type;
+        }
+        if ((0, utils_1.isSameType)(type, S.from)) {
+            return S.to;
+        }
+        if ((0, utils_1.isFunctionType)(type)) {
+            return {
+                parameterType: _subsIntoType(type.parameterType, S),
+                returnType: _subsIntoType(type.returnType, S)
+            };
+        }
+        if ((0, utils_1.isListType)(type)) {
+            return { elementType: _subsIntoType(type.elementType, S) };
+        }
+        // different type var
+        return type;
+    }
+    for (const ts of S) {
+        type = _subsIntoType(type, ts);
+    }
+    return type;
+}
+exports.substituteIntoType = substituteIntoType;
 //# sourceMappingURL=environment.js.map

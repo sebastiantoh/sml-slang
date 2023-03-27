@@ -18,3 +18,7 @@ export interface TypeConstraint {
     type1: Type;
     type2: Type;
 }
+export interface TypeSubstitution {
+    from: Type;
+    to: Type;
+}

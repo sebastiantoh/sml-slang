@@ -17,6 +17,7 @@ export declare function isFunctionType(type: Type): type is FunctionType;
 export declare function isListType(type: Type): type is ListType;
 export declare function isTypeVariableType(type: Type): type is TypeVariable;
 export declare function isSameType(fst: Type, snd: Type): boolean;
+export declare function hasTypeVariable(type: Type, typeVar: TypeVariable): boolean;
 export declare function makeFunctionType(...types: Type[]): FunctionType;
 export declare function curryFunctionTypes(paramTypes: Type[], returnType: Type): FunctionType;
 export declare function stringifyType(type: Type): string;

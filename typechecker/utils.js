@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.DUMMY_TYPE_VAR_TY = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
+exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.hasTypeVariable = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.DUMMY_TYPE_VAR_TY = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
 exports.INT_TY = 'int';
 exports.REAL_TY = 'real';
 exports.STR_TY = 'string';
@@ -50,16 +50,35 @@ function isTypeVariableType(type) {
     return (type === null || type === void 0 ? void 0 : type.id) !== undefined;
 }
 exports.isTypeVariableType = isTypeVariableType;
-// TODO: update this!
 function isSameType(fst, snd) {
     if (isFunctionType(fst) && isFunctionType(snd)) {
         const isSameParamType = isSameType(fst.parameterType, snd.parameterType);
         const isSameReturnType = isSameType(fst.returnType, snd.returnType);
         return isSameParamType && isSameReturnType;
     }
+    if (isListType(fst) && isListType(snd)) {
+        return isSameType(fst.elementType, snd.elementType);
+    }
+    if (isTypeVariableType(fst) && isTypeVariableType(snd)) {
+        return fst.id === snd.id;
+    }
     return isPrimitiveType(fst) && isPrimitiveType(snd) && fst === snd;
 }
 exports.isSameType = isSameType;
+// checks if type contains typeVar
+function hasTypeVariable(type, typeVar) {
+    if (isPrimitiveType(type)) {
+        return false;
+    }
+    if (isFunctionType(type)) {
+        return hasTypeVariable(type.parameterType, typeVar) || hasTypeVariable(type.returnType, typeVar);
+    }
+    if (isListType(type)) {
+        return hasTypeVariable(type.elementType, typeVar);
+    }
+    return type.id === typeVar.id;
+}
+exports.hasTypeVariable = hasTypeVariable;
 /* FunctionType helpers */
 // given types t0 t1 t2 .... tN, create a function type of
 // form: fun t0 -> fun t1 -> fun t2 -> ... -> tN

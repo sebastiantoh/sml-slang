@@ -1,5 +1,5 @@
 import { Declaration } from '../parser/ast';
-import { Type, TypeScheme, TypeVariable } from './types';
+import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types';
 export type TypeEnvironment = {
     [k: string]: TypeScheme;
 };
@@ -8,3 +8,5 @@ export declare function getTypeSchemeFromEnv(env: TypeEnvironment, id: string): 
 export declare function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEnvironment;
 export declare function freshTypeVariable(): TypeVariable;
 export declare function instantiate(typeScheme: TypeScheme): Type;
+export declare function unify(C: TypeConstraint[]): TypeSubstitution[];
+export declare function substituteIntoType(type: Type, S: TypeSubstitution[]): Type;
