@@ -63,6 +63,7 @@ import {
   DeclarationSequence,
   Expression,
   ExpSequence,
+  ExpVariable,
   Function,
   InfixApplication,
   InfixConstruction,
@@ -75,6 +76,7 @@ import {
   Matches,
   Node,
   Pattern,
+  PatVariable,
   Program,
   RealConstant,
   StringConstant,
@@ -85,7 +87,6 @@ import {
   UnitConstant,
   Valbind,
   ValueDeclaration,
-  Variable,
   Wildcard
 } from './ast'
 
@@ -161,9 +162,9 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitConstant(ctx: ConstantContext): Constant {
     return this.visit(ctx.con()) as Constant
   }
-  visitExpVariable(ctx: ExpVariableContext): Variable {
+  visitExpVariable(ctx: ExpVariableContext): ExpVariable {
     return {
-      tag: 'Variable',
+      tag: 'ExpVariable',
       id: ctx._id.text!,
       loc: contextToLocation(ctx)
     }
@@ -312,9 +313,9 @@ class NodeGenerator implements SmlVisitor<Node> {
       type: 'unit'
     }
   }
-  visitPatVariable(ctx: PatVariableContext): Variable {
+  visitPatVariable(ctx: PatVariableContext): PatVariable {
     return {
-      tag: 'Variable',
+      tag: 'PatVariable',
       id: ctx._id.text!,
       loc: contextToLocation(ctx)
     }
@@ -489,7 +490,7 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'Valbind',
       isRec: true,
-      pat: { tag: 'Variable', id: fnName },
+      pat: { tag: 'PatVariable', id: fnName },
       exp: { tag: 'Function', matches },
       loc: contextToLocation(ctx)
     }

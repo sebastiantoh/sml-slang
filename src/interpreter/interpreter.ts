@@ -92,7 +92,7 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
     // assign to
     // e.g. case 1 of _ => ...
     return true
-  } else if (pat.tag === 'Variable') {
+  } else if (pat.tag === 'PatVariable') {
     // Variables result in a match by default
     // Need to bind value to the variable defined in the pattern
     // e.g. case 1 of x => ...
@@ -144,7 +144,7 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
     const patVarSet = new Set()
     let numVars = 0
     pat.elements.map(e => {
-      if (e.tag === 'Variable') {
+      if (e.tag === 'PatVariable') {
         numVars++
         patVarSet.add(e.id)
       }
@@ -224,6 +224,10 @@ const execMicrocode = (cmd: Microcode) => {
       })
       break
     }
+    case 'ExpVariable': {
+      S.push(lookupEnv(E, cmd.id))
+      break
+    }
     case 'ListLiteral': {
       A.push({ tag: 'ListI', arity: cmd.arity }, ...reverse(cmd.elements))
       break
@@ -274,10 +278,6 @@ const execMicrocode = (cmd: Microcode) => {
     }
     case 'Matches': {
       assert(false, 'Matches node should never appear in the agenda')
-      break
-    }
-    case 'Variable': {
-      S.push(lookupEnv(E, cmd.id))
       break
     }
     case 'DeclarationSequence': {

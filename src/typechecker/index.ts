@@ -23,7 +23,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       return [node.type, []]
     }
     // Variable
-    case 'Variable': {
+    case 'ExpVariable': {
       const ts = getTypeSchemeFromEnv(env, node.id)
       return [instantiate(ts), []]
     }
