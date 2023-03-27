@@ -106,7 +106,7 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
               }
               break
             }
-            case 'Variable': {
+            case 'PatVariable': {
               const [t, C] = hindleyMilner(env, valbind.exp)
               env = generalize(C, env, valbind.pat.id, t)
               break

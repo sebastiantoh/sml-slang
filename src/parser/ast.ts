@@ -28,6 +28,7 @@ interface BaseTypeAnnotatableNode extends BaseNode {
  */
 export type Expression =
   | Constant
+  | ExpVariable
   | Application
   | InfixApplication
   | ListLiteral
@@ -35,7 +36,6 @@ export type Expression =
   | LetExpression
   | ConditionalExpression
   | Function
-  | Variable
 
 export type Constant =
   | IntConstant
@@ -73,6 +73,11 @@ export interface BoolConstant extends BaseTypeAnnotatableNode {
 export interface UnitConstant extends BaseTypeAnnotatableNode {
   tag: 'UnitConstant'
   type: 'unit'
+}
+
+export interface ExpVariable extends BaseTypeAnnotatableNode {
+  tag: 'ExpVariable'
+  id: string
 }
 
 export interface Application extends BaseTypeAnnotatableNode {
@@ -133,13 +138,13 @@ export interface Matches extends BaseNode {
 /**
  * Patterns
  */
-export type Pattern = Constant | Wildcard | Variable | InfixConstruction
+export type Pattern = Constant | Wildcard | PatVariable | InfixConstruction
 
 export interface Wildcard extends BaseTypeAnnotatableNode {
   tag: 'Wildcard'
 }
-export interface Variable extends BaseTypeAnnotatableNode {
-  tag: 'Variable'
+export interface PatVariable extends BaseTypeAnnotatableNode {
+  tag: 'PatVariable'
   id: string
 }
 export interface InfixConstruction extends BaseTypeAnnotatableNode {
