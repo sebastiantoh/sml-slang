@@ -10,7 +10,7 @@ interface BaseTypeAnnotatableNode extends BaseNode {
 /**
  * Expressions
  */
-export type Expression = Constant | Application | InfixApplication | ListLiteral | ExpSequence | LetExpression | ConditionalExpression | Function;
+export type Expression = Constant | Application | InfixApplication | ListLiteral | ExpSequence | LetExpression | ConditionalExpression | Function | Variable;
 export type Constant = IntConstant | RealConstant | StringConstant | CharConstant | BoolConstant | UnitConstant;
 export interface IntConstant extends BaseTypeAnnotatableNode {
     tag: 'IntConstant';
