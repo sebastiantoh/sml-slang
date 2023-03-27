@@ -205,11 +205,15 @@ function generalize(
   id: string,
   type: Type
 ): TypeEnvironment {
+  // solve constraints C and get a type t
+  const S = unify(C)
+  const t = substituteIntoType(type, S)
+
   const newEnv = cloneDeep(env)
   newEnv[id] = {
-    type: type,
+    type: t,
     // TODO: check that this list difference works for type vars
-    typeVariables: difference(unsolved(type), unsolvedEnv(env))
+    typeVariables: difference(unsolved(t), unsolvedEnv(env))
   }
   return newEnv
 }
