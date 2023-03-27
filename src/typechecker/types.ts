@@ -28,3 +28,9 @@ export interface TypeConstraint {
   type1: Type
   type2: Type
 }
+
+// represents a type substitution {to / from}
+export interface TypeSubstitution {
+  from: Type
+  to: Type
+}

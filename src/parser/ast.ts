@@ -35,6 +35,7 @@ export type Expression =
   | LetExpression
   | ConditionalExpression
   | Function
+  | Variable
 
 export type Constant =
   | IntConstant

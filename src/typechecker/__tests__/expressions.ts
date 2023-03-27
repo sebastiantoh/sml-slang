@@ -23,3 +23,71 @@ describe('Constant', () => {
     test('unit', () => expect(parseAndTypeCheckExp('()')).toBe('unit'))
   })
 })
+
+describe('LetExpression', () => {
+  test('simple val dec', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val x = true
+in
+  x
+end
+  `)
+    ).toBe(`bool`))
+
+  test('simple val dec with infix operator evaluation', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val x = 2 + 3
+in
+  x
+end
+  `)
+    ).toBe(`int`))
+
+  test('valid sequence in let expr', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val x = 2 + 3
+in
+  x + 2;
+  "hi";
+  true
+end
+  `)
+    ).toBe(`bool`))
+
+  test('invalid sequence in let expr', () =>
+    expect(() => {
+      parseAndTypeCheckExp(`
+let
+  val x = true + 2
+in
+  x
+end
+  `)
+    }).toThrow(/Failed to unify type constraint int = bool./))
+
+  test('more complex nesting of lets and locals', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val x =
+    let
+      local
+        val x = 5
+      in
+        val y = x
+      end 
+    in
+      y 
+    end
+  in
+    x
+  end;
+  `)
+    ).toBe(`int`))
+})
