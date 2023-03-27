@@ -52,14 +52,33 @@ export function isTypeVariableType(type: Type): type is TypeVariable {
   return (type as TypeVariable)?.id !== undefined
 }
 
-// TODO: update this!
 export function isSameType(fst: Type, snd: Type): boolean {
   if (isFunctionType(fst) && isFunctionType(snd)) {
     const isSameParamType = isSameType(fst.parameterType, snd.parameterType)
     const isSameReturnType = isSameType(fst.returnType, snd.returnType)
     return isSameParamType && isSameReturnType
   }
+  if (isListType(fst) && isListType(snd)) {
+    return isSameType(fst.elementType, snd.elementType)
+  }
+  if (isTypeVariableType(fst) && isTypeVariableType(snd)) {
+    return fst.id === snd.id
+  }
   return isPrimitiveType(fst) && isPrimitiveType(snd) && fst === snd
+}
+
+// checks if type contains typeVar
+export function hasTypeVariable(type: Type, typeVar: TypeVariable): boolean {
+  if (isPrimitiveType(type)) {
+    return false
+  }
+  if (isFunctionType(type)) {
+    return hasTypeVariable(type.parameterType, typeVar) || hasTypeVariable(type.returnType, typeVar)
+  }
+  if (isListType(type)) {
+    return hasTypeVariable(type.elementType, typeVar)
+  }
+  return type.id === typeVar.id
 }
 
 /* FunctionType helpers */
