@@ -24,4 +24,20 @@ describe('Constant', () => {
         test('unit', () => expect((0, utils_1.parseAndTypeCheckExp)('()')).toBe('unit'));
     });
 });
+describe('LetExpression', () => {
+    test('simple val dec', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val x = true
+in
+  x
+end
+  `)).toBe(`bool`));
+    test('simple val dec with infix operator evaluation', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val x = 2 + 3
+in
+  x
+end
+  `)).toBe(`int`));
+});
 //# sourceMappingURL=expressions.js.map

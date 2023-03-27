@@ -5,7 +5,6 @@ export declare const STR_TY: PrimitiveType;
 export declare const CHAR_TY: PrimitiveType;
 export declare const BOOL_TY: PrimitiveType;
 export declare const UNIT_TY: PrimitiveType;
-export declare const DUMMY_TYPE_VAR_TY: TypeVariable;
 export declare function isInt(type: Type): boolean;
 export declare function isReal(type: Type): boolean;
 export declare function isStr(type: Type): boolean;

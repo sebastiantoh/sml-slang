@@ -27,6 +27,13 @@ function hindleyMilner(env, node) {
             const [t2, C2] = hindleyMilner(env, node.arg);
             return [t, [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }]];
         }
+        // Infix Application
+        case 'InfixApplication': {
+            const [t1, t2, t3] = (0, environment_1.getPrimitiveFuncTypes)(env, node.id);
+            const [t4, C1] = hindleyMilner(env, node.operand1);
+            const [t5, C2] = hindleyMilner(env, node.operand2);
+            return [t3, [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }]];
+        }
         // List
         case 'ListLiteral': {
             const t = (0, environment_1.freshTypeVariable)();

@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.substituteIntoType = exports.unify = exports.instantiate = exports.freshTypeVariable = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = void 0;
+exports.substituteIntoType = exports.unify = exports.instantiate = exports.getPrimitiveFuncTypes = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = exports.freshTypeVariable = void 0;
 const lodash_1 = require("lodash");
 const _1 = require(".");
 const errors_1 = require("./errors");
 const utils_1 = require("./utils");
+let CUR_FRESH_VAR = 0;
+function freshTypeVariable() {
+    return { id: CUR_FRESH_VAR++ };
+}
+exports.freshTypeVariable = freshTypeVariable;
 const primitiveFuncs = [
     ['/', { type: (0, utils_1.makeFunctionType)(utils_1.REAL_TY, utils_1.REAL_TY, utils_1.REAL_TY), typeVariables: [] }],
     ['div', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
@@ -14,15 +19,17 @@ const primitiveFuncs = [
     ['*', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
     ['-', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
     ['^', { type: (0, utils_1.makeFunctionType)(utils_1.STR_TY, utils_1.STR_TY, utils_1.STR_TY), typeVariables: [] }],
-    ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => 
-    // TODO: might need to update these to equality type variables (''a, ''b, etc.)
-    [
-        comp,
-        {
-            type: (0, utils_1.makeFunctionType)(utils_1.DUMMY_TYPE_VAR_TY, utils_1.DUMMY_TYPE_VAR_TY, utils_1.DUMMY_TYPE_VAR_TY),
-            typeVariables: [utils_1.DUMMY_TYPE_VAR_TY]
-        }
-    ])
+    ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => {
+        const t = freshTypeVariable();
+        // TODO: might need to update these to equality type variables (''a, ''b, etc.)
+        return [
+            comp,
+            {
+                type: (0, utils_1.makeFunctionType)(t, t, t),
+                typeVariables: [t]
+            }
+        ];
+    })
 ];
 function createInitialTypeEnvironment() {
     // initial type env only contains inbuilt funcs
@@ -109,11 +116,17 @@ function extendTypeEnv(env, decs) {
     return env;
 }
 exports.extendTypeEnv = extendTypeEnv;
-let CUR_FRESH_VAR = 0;
-function freshTypeVariable() {
-    return { id: CUR_FRESH_VAR++ };
+function getPrimitiveFuncTypes(env, id) {
+    if (!env.hasOwnProperty(id)) {
+        throw new Error(`Unsupported infix operator "${id}".`);
+    }
+    const type = env[id].type;
+    if (!(0, utils_1.isFunctionType)(type) || !(0, utils_1.isFunctionType)(type.returnType)) {
+        throw new Error(`Infix operator "${id}" declared as non fun -> fun type.`);
+    }
+    return [type.parameterType, type.returnType.parameterType, type.returnType.returnType];
 }
-exports.freshTypeVariable = freshTypeVariable;
+exports.getPrimitiveFuncTypes = getPrimitiveFuncTypes;
 function instantiate(typeScheme) {
     const typeMappings = typeScheme.typeVariables.map(tv => [tv, freshTypeVariable()]);
     function substitute(type) {
@@ -163,11 +176,11 @@ function unsolvedEnv(env) {
 }
 // inefficient way of generalizing. TODO: make this more efficient?
 function generalize(C, env, id, type) {
-    const newEnv = lodash_1.default.cloneDeep(env);
+    const newEnv = (0, lodash_1.cloneDeep)(env);
     newEnv[id] = {
         type: type,
         // TODO: check that this list difference works for type vars
-        typeVariables: lodash_1.default.difference(unsolved(type), unsolvedEnv(env))
+        typeVariables: (0, lodash_1.difference)(unsolved(type), unsolvedEnv(env))
     };
     return newEnv;
 }

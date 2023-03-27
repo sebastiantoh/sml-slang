@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.hasTypeVariable = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.DUMMY_TYPE_VAR_TY = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
+exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.hasTypeVariable = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
 exports.INT_TY = 'int';
 exports.REAL_TY = 'real';
 exports.STR_TY = 'string';
 exports.CHAR_TY = 'char';
 exports.BOOL_TY = 'bool';
 exports.UNIT_TY = 'unit';
-exports.DUMMY_TYPE_VAR_TY = { id: 0 };
 /* Checking Type helpers */
 function isInt(type) {
     return type === exports.INT_TY;
