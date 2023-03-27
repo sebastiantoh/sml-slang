@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { head, tail, take, takeRight } from 'lodash'
+import { cloneDeep, head, tail, take, takeRight } from 'lodash'
 
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
@@ -136,8 +136,7 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
     }
 
     // Cannot have two of the same variable in one list pattern
-    // Right now, a list pattern with two variables will not be able to match,
-    // but should return an error
+    // Should this throw an error instead?
     const patVarSet = new Set()
     let numVars = 0
     pat.elements.map(e => {
@@ -151,8 +150,15 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
       return false
     }
 
+    // Matching might fail on the later patterns,
+    // create backup environment to roll back if a tryMatch fails
+    const envCopy = cloneDeep(E)
     for (let i = 0; i < pat.arity; i++) {
-      tryMatch(vals[i], pats[i])
+      const res = tryMatch(vals[i], pats[i])
+      if (!res) {
+        E = envCopy
+        return false
+      }
     }
 
     return true
