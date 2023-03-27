@@ -70,4 +70,24 @@ in
 end
   `)
     }).toThrow(/Failed to unify type constraint int = bool./))
+
+  test('more complex nesting of lets and locals', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val x =
+    let
+      local
+        val x = 5
+      in
+        val y = x
+      end 
+    in
+      y 
+    end
+  in
+    x
+  end;
+  `)
+    ).toBe(`int`))
 })
