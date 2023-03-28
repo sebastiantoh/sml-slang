@@ -64,7 +64,7 @@ const interleave = (microcodes, instruction) => {
 // based on the pattern and value.
 // Returns true if value was successfuly matched with pattern. False otherwise.
 // e.g. case value of pat => ...
-const tryMatch = (value, pat) => {
+const tryMatch = (originalEnv, value, pat) => {
     if ((pat.tag === 'IntConstant' && value.tag === 'int') ||
         (pat.tag === 'RealConstant' && value.tag === 'real') ||
         (pat.tag === 'CharConstant' && value.tag === 'char') ||
@@ -72,24 +72,26 @@ const tryMatch = (value, pat) => {
         (pat.tag === 'BoolConstant' && value.tag === 'bool')) {
         // Since both pat and value are constants, we don't need to update env
         // e.g. case 1 of 1 => ...
-        return pat.val === value.jsVal;
+        return [(0, lodash_1.isEqual)(pat.val, value.jsVal), originalEnv];
     }
     else if (pat.tag === 'UnitConstant') {
-        return value.tag === 'unit';
+        return [value.tag === 'unit', originalEnv];
     }
     else if (pat.tag === 'Wildcard') {
         // Wildcards result in a match by default.
         // Don't need to assign env since wildcard has no variables to
         // assign to
         // e.g. case 1 of _ => ...
-        return true;
+        return [true, originalEnv];
     }
     else if (pat.tag === 'PatVariable') {
         // Variables result in a match by default
         // Need to bind value to the variable defined in the pattern
         // e.g. case 1 of x => ...
-        assignInEnv(E, pat.id, value);
-        return true;
+        // create a shallow copy
+        const updatedEnv = Object.assign({}, originalEnv);
+        assignInEnv(updatedEnv, pat.id, value);
+        return [true, updatedEnv];
     }
     else if (pat.tag === 'InfixConstruction') {
         // we only support ::
@@ -98,18 +100,24 @@ const tryMatch = (value, pat) => {
         }
         // guaranteed by typechecker
         assert(value.tag === 'list');
-        // Attempting to unify something like
+        // Attempting to match something like
         // e.g. case value of hd::tl => ...
         // value must be a non-empty list for match to succeed
         if (value.jsVal.length === 0) {
-            return false;
+            return [false, originalEnv];
         }
         const hd = (0, lodash_1.head)(value.jsVal);
         const tl = {
             tag: 'list',
             jsVal: (0, lodash_1.tail)(value.jsVal)
         };
-        return tryMatch(hd, pat.pat1) && tryMatch(tl, pat.pat2);
+        const updatedEnv = Object.assign({}, originalEnv);
+        const [matchedPat1, envWithPat1] = tryMatch(updatedEnv, hd, pat.pat1);
+        const [matchedPat2, envWithPat1AndPat2] = tryMatch(envWithPat1, tl, pat.pat2);
+        if (matchedPat1 && matchedPat2) {
+            return [true, envWithPat1AndPat2];
+        }
+        return [false, originalEnv];
     }
     else {
         // TODO: handle more complicated patterns here.
@@ -204,9 +212,11 @@ const execMicrocode = (cmd) => {
             S.push({
                 tag: 'fn',
                 matches: cmd.matches,
-                // note: we create a copy of this env since the env may be mutated, e.g:
+                // note: we create a shallow copy of this env since the env may be mutated, e.g:
                 // in a local declaration, the parent of E will be mutated
-                // TODO: deep copy needed?
+                // We create only a shallow copy instead of a deep copy because if the function
+                // is recursive and is not anonymous, the env will be updated later with
+                // a binding from the function name to the function
                 env: Object.assign({}, E)
             });
             break;
@@ -310,7 +320,7 @@ const execMicrocode = (cmd) => {
         }
         case 'SetEnvParentI': {
             let tmp = E;
-            while (tmp && tmp.parent !== cmd.oldParent) {
+            while (tmp && !(0, lodash_1.isEqual)(tmp.parent, cmd.oldParent)) {
                 tmp = tmp.parent;
             }
             assert(tmp !== undefined);
@@ -323,10 +333,11 @@ const execMicrocode = (cmd) => {
             // But we check if the pat and the RHS are valid
             // Examples of valid constant assignment: 1=1, true=true, ()=()
             // Examples of non-valid constant assignment: 1=2, true=false
-            const matched = tryMatch(rhs, cmd.pat);
+            const [matched, updatedEnv] = tryMatch(E, rhs, cmd.pat);
             if (!matched) {
                 throw new Error(`cannot assign ${cmd.pat} to ${rhs}`);
             }
+            E = updatedEnv;
             break;
         }
         case 'DecsAfterLocalDecsI': {
@@ -372,9 +383,11 @@ const execMicrocode = (cmd) => {
             // Bind params (if necessary) and evaluate function body
             let foundMatch = false;
             for (const { pat, exp } of fn.matches) {
-                foundMatch = tryMatch(arg, pat);
-                if (foundMatch) {
+                const [matched, updatedEnv] = tryMatch(E, arg, pat);
+                if (matched) {
                     // match found - evaluate the associated exp and stop finding futher matches
+                    foundMatch = true;
+                    E = updatedEnv;
                     A.push(exp);
                     break;
                 }
