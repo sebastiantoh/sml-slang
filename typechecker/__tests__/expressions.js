@@ -86,6 +86,8 @@ in
 end
 `)).toBe(`('a -> 'b) -> ('c -> 'a) -> 'c -> 'b`));
         test('function type inferred from :: operator', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn lists_of_list => [1,2,3]::[4,5,6]::lists_of_list`)).toBe(`int list list -> int list list`));
+        test('function type inferred from :: operator in pattern', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn fst::snd::tl => (fst+snd)::tl`)).toBe(`int list -> int list`));
+        test('function type inferred from :: operator in pattern with type variable in param and return type', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn fst::snd::tl => fst::tl`)).toBe(`'a list -> 'a list`));
         test('function type inferred from @ operator', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn lists_of_list => lists_of_list @ [[1,2,3],[4,5,6]]`)).toBe(`int list list -> int list list`));
     });
 });

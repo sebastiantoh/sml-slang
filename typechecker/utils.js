@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.hasTypeVariable = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
-const console_1 = require("console");
+const assert = require("assert");
 const lodash_1 = require("lodash");
 exports.INT_TY = 'int';
 exports.REAL_TY = 'real';
@@ -128,7 +128,7 @@ function stringifyType(type) {
     // collect all the type variables in the type and
     // assign first type in result to 'a and so on
     const tvs = (0, lodash_1.uniqBy)(collectTypeVars(type), tv => tv.id);
-    const tvsToStringifiedTvs = new Map(tvs.sort(tv => tv.id).map((tv, idx) => [tv, stringifyTypeVariable(tv, idx)]));
+    const tvsToStringifiedTvs = new Map(tvs.sort(tv => tv.id).map((tv, idx) => [tv.id, stringifyTypeVariable(tv, idx)]));
     function _stringifyType(type) {
         if (isPrimitiveType(type)) {
             return type.toString();
@@ -137,8 +137,8 @@ function stringifyType(type) {
             return `${_stringifyType(type.elementType)} list`;
         }
         if (isTypeVariableType(type)) {
-            (0, console_1.assert)(tvsToStringifiedTvs.has(type));
-            return tvsToStringifiedTvs.get(type);
+            assert(tvsToStringifiedTvs.has(type.id));
+            return tvsToStringifiedTvs.get(type.id);
         }
         let parameterType = _stringifyType(type.parameterType);
         if (isFunctionType(type.parameterType)) {
