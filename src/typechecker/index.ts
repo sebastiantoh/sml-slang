@@ -50,7 +50,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         const [tmp_ty, tmp_C] = hindleyMilner(env, el)
         C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }]
       }
-      return [t, C]
+      return [{ elementType: t }, C]
     }
     // Let Expression
     case 'LetExpression': {
@@ -129,7 +129,16 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const tList = { elementType: t }
       return [tList, [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]]
     }
-    // TODO: add lists
+    case 'ListPattern': {
+      const t = freshTypeVariable()
+      const tList = { elementType: t }
+      const constraints: TypeConstraint[] = []
+      for (const pat of node.elements) {
+        const [elementTy, elementConstraints] = hindleyMilner(env, pat)
+        constraints.push(...elementConstraints, { type1: elementTy, type2: t })
+      }
+      return [tList, constraints]
+    }
 
     /* Programs */
     case 'Program': {

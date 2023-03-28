@@ -1,4 +1,4 @@
-import assert from 'assert'
+import * as assert from 'assert'
 import { cloneDeep, difference } from 'lodash'
 
 import { Declaration, Pattern } from '../parser/ast'
@@ -115,7 +115,9 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
             case 'InfixConstruction': {
               throw new Error(`TODO: add support for infix`)
             }
-            // TODO: add support for lists.
+            case 'ListPattern': {
+              throw new Error("TODO")
+            }
           }
         }
         break
@@ -140,11 +142,10 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
 }
 
 export function extendTypeEnvFromPattern(
-  env: TypeEnvironment,
+  originalEnv: TypeEnvironment,
   pat: Pattern,
   patType: Type
 ): TypeEnvironment {
-  const newEnv = cloneDeep(env)
   switch (pat.tag) {
     // Do nothing for the case of constants / wildcards
     case 'IntConstant':
@@ -153,9 +154,10 @@ export function extendTypeEnvFromPattern(
     case 'CharConstant':
     case 'BoolConstant':
     case 'Wildcard': {
-      return newEnv
+      return originalEnv
     }
     case 'PatVariable': {
+      const newEnv = cloneDeep(originalEnv)
       newEnv[pat.id] = {
         type: patType,
         typeVariables: []
@@ -170,8 +172,17 @@ export function extendTypeEnvFromPattern(
 
       assert(isListType(patType))
       const { elementType } = patType
-      const envExtendedFromPat1 = extendTypeEnvFromPattern(newEnv, pat.pat1, elementType)
+      const envExtendedFromPat1 = extendTypeEnvFromPattern(originalEnv, pat.pat1, elementType)
       return extendTypeEnvFromPattern(envExtendedFromPat1, pat.pat2, patType)
+    }
+    case 'ListPattern': {
+      assert(isListType(patType))
+      const { elementType } = patType
+      let env = originalEnv
+      for (const elePat of pat.elements) {
+        env = extendTypeEnvFromPattern(env, elePat, elementType)
+      }
+      return env
     }
     default: {
       throw new Error(`${pat.tag} not implemented`)
