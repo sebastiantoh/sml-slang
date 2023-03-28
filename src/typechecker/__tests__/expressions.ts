@@ -81,13 +81,50 @@ let
         val x = 5
       in
         val y = x
-      end 
+      end
     in
-      y 
+      y
     end
   in
     x
   end;
   `)
     ).toBe(`int`))
+
+  describe('Function', () => {
+    test('function with type variables in parameter and return type', () =>
+      expect(parseAndTypeCheckExp('fn x => x')).toBe('t11 -> t11'))
+
+    test('function with no type variables in parameter and return type', () =>
+      expect(parseAndTypeCheckExp('fn 3 => 3 | x => x')).toBe('int -> int'))
+
+    test('function with type variables in parameter type, but not return type', () =>
+      expect(parseAndTypeCheckExp('fn [] => 1 | [x] => 2 | x => 3')).toBe('t18 list -> int'))
+
+    test('function that requires inference from multiple matches', () =>
+      expect(parseAndTypeCheckExp(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(
+        `int list -> int list`
+      ))
+
+    test('nested function types', () =>
+      expect(
+        parseAndTypeCheckExp(`
+let
+  fun compose f g x = f (g x)
+in
+  compose
+end
+`)
+      ).toBe(`(t41 -> t42) -> (t43 -> t41) -> t43 -> t42`))
+
+    test('function type inferred from :: operator', () =>
+      expect(parseAndTypeCheckExp(`fn lists_of_list => [1,2,3]::[4,5,6]::lists_of_list`)).toBe(
+        `int list list -> int list list`
+      ))
+
+    test('function type inferred from @ operator', () =>
+      expect(parseAndTypeCheckExp(`fn lists_of_list => lists_of_list @ [[1,2,3],[4,5,6]]`)).toBe(
+        `int list list -> int list list`
+      ))
+  })
 })

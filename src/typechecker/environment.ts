@@ -1,6 +1,7 @@
+import * as assert from 'assert'
 import { cloneDeep, difference } from 'lodash'
 
-import { Declaration } from '../parser/ast'
+import { Declaration, Pattern } from '../parser/ast'
 import { hindleyMilner } from '.'
 import { TypeMismatchError } from './errors'
 import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types'
@@ -37,6 +38,22 @@ const primitiveFuncs: [string, TypeScheme][] = [
   ['*', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['-', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['^', { type: makeFunctionType(STR_TY, STR_TY, STR_TY), typeVariables: [] }],
+  [
+    '::',
+    (function (): TypeScheme {
+      const t = freshTypeVariable()
+      const tList = { elementType: t }
+      return { type: makeFunctionType(t, tList, tList), typeVariables: [t] }
+    })()
+  ],
+  [
+    '@',
+    (function (): TypeScheme {
+      const t = freshTypeVariable()
+      const tList = { elementType: t }
+      return { type: makeFunctionType(tList, tList, tList), typeVariables: [t] }
+    })()
+  ],
   ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => {
     const t = freshTypeVariable()
     // TODO: might need to update these to equality type variables (''a, ''b, etc.)
@@ -114,7 +131,9 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
             case 'InfixConstruction': {
               throw new Error(`TODO: add support for infix`)
             }
-            // TODO: add support for lists.
+            case 'ListPattern': {
+              throw new Error('TODO')
+            }
           }
         }
         break
@@ -136,6 +155,55 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
     }
   }
   return env
+}
+
+export function extendTypeEnvFromPattern(
+  originalEnv: TypeEnvironment,
+  pat: Pattern,
+  patType: Type
+): TypeEnvironment {
+  switch (pat.tag) {
+    // Do nothing for the case of constants / wildcards
+    case 'IntConstant':
+    case 'RealConstant':
+    case 'StringConstant':
+    case 'CharConstant':
+    case 'BoolConstant':
+    case 'Wildcard': {
+      return originalEnv
+    }
+    case 'PatVariable': {
+      const newEnv = cloneDeep(originalEnv)
+      newEnv[pat.id] = {
+        type: patType,
+        typeVariables: []
+      }
+      return newEnv
+    }
+    case 'InfixConstruction': {
+      // we only support ::
+      if (pat.id !== '::') {
+        throw new Error(`${pat.id} is not a supported constructor`)
+      }
+
+      assert(isListType(patType))
+      const { elementType } = patType
+      const envExtendedFromPat1 = extendTypeEnvFromPattern(originalEnv, pat.pat1, elementType)
+      return extendTypeEnvFromPattern(envExtendedFromPat1, pat.pat2, patType)
+    }
+    case 'ListPattern': {
+      assert(isListType(patType))
+      const { elementType } = patType
+      let env = originalEnv
+      for (const elePat of pat.elements) {
+        env = extendTypeEnvFromPattern(env, elePat, elementType)
+      }
+      return env
+    }
+    default: {
+      throw new Error(`${pat.tag} not implemented`)
+    }
+  }
 }
 
 export function getPrimitiveFuncTypes(env: TypeEnvironment, id: string): [Type, Type, Type] {

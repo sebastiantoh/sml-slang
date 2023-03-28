@@ -1,6 +1,7 @@
 import { Node } from '../parser/ast'
 import {
   extendTypeEnv,
+  extendTypeEnvFromPattern,
   freshTypeVariable,
   getPrimitiveFuncTypes,
   getTypeSchemeFromEnv,
@@ -49,7 +50,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         const [tmp_ty, tmp_C] = hindleyMilner(env, el)
         C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }]
       }
-      return [t, C]
+      return [{ elementType: t }, C]
     }
     // Let Expression
     case 'LetExpression': {
@@ -90,7 +91,53 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     }
     // Function
     case 'Function': {
-      throw new Error('TODO')
+      const parameterType = freshTypeVariable()
+      const returnType = freshTypeVariable()
+      const funTy = { parameterType, returnType }
+      const constraints: TypeConstraint[] = []
+
+      for (const { pat, exp } of node.matches) {
+        const [patTy, patConstraints] = hindleyMilner(env, pat)
+        const extendedEnv = extendTypeEnvFromPattern(env, pat, patTy)
+        const [expTy, expConstraints] = hindleyMilner(extendedEnv, exp)
+
+        constraints.push(
+          ...patConstraints,
+          ...expConstraints,
+          { type1: parameterType, type2: patTy },
+          { type1: returnType, type2: expTy }
+        )
+      }
+      return [funTy, constraints]
+    }
+
+    /* Patterns */
+    // For wildcard and variables, we are not able to infer any more information
+    case 'Wildcard':
+    case 'PatVariable': {
+      const t = freshTypeVariable()
+      return [t, []]
+    }
+    case 'InfixConstruction': {
+      // we only support ::
+      if (node.id !== '::') {
+        throw new Error(`${node.id} is not a supported constructor`)
+      }
+      const t = freshTypeVariable()
+      const [t1, C1] = hindleyMilner(env, node.pat1)
+      const [t2, C2] = hindleyMilner(env, node.pat2)
+      const tList = { elementType: t }
+      return [tList, [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]]
+    }
+    case 'ListPattern': {
+      const t = freshTypeVariable()
+      const tList = { elementType: t }
+      const constraints: TypeConstraint[] = []
+      for (const pat of node.elements) {
+        const [elementTy, elementConstraints] = hindleyMilner(env, pat)
+        constraints.push(...elementConstraints, { type1: elementTy, type2: t })
+      }
+      return [tList, constraints]
     }
 
     /* Programs */
@@ -99,7 +146,9 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const _ = extendTypeEnv(env, node.body)
       return [UNIT_TY, []]
     }
-  }
 
-  return [UNIT_TY, []]
+    default: {
+      throw new Error(`${node.tag} not implemented`)
+    }
+  }
 }
