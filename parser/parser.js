@@ -243,6 +243,14 @@ class NodeGenerator {
     visitPatParentheses(ctx) {
         return this.visit(ctx.pat());
     }
+    visitPatList(ctx) {
+        const elements = ctx.pat();
+        return {
+            tag: 'ListPattern',
+            elements: elements.map(e => this.visit(e)),
+            arity: elements.length
+        };
+    }
     visitPatTypeAnnotation(ctx) {
         const pat = this.visit(ctx.pat());
         pat.annotated_type = this.visit(ctx.typ());

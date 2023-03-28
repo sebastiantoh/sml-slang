@@ -389,6 +389,18 @@ export declare class PatParenthesesContext extends PatContext {
     exitRule(listener: SmlListener): void;
     accept<Result>(visitor: SmlVisitor<Result>): Result;
 }
+export declare class PatListContext extends PatContext {
+    LSQUARE(): TerminalNode;
+    RSQUARE(): TerminalNode;
+    pat(): PatContext[];
+    pat(i: number): PatContext;
+    COMMA(): TerminalNode[];
+    COMMA(i: number): TerminalNode;
+    constructor(ctx: PatContext);
+    enterRule(listener: SmlListener): void;
+    exitRule(listener: SmlListener): void;
+    accept<Result>(visitor: SmlVisitor<Result>): Result;
+}
 export declare class PatTypeAnnotationContext extends PatContext {
     pat(): PatContext;
     COLON(): TerminalNode;
