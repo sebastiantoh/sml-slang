@@ -90,6 +90,28 @@ let
   end;
   `)
     ).toBe(`int`))
+
+  test('let expression with infix construction patterns', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val a::b = [1,2,3]
+in
+  b
+end;
+  `)
+    ).toBe(`int list`))
+
+  test('let expression with list literal patterns', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val [a,b,c] =[[1,2],[3,4],[5,6]]
+in
+  a
+end;
+  `)
+    ).toBe(`int list`))
 })
 
 describe('Function', () => {

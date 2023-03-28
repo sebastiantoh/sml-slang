@@ -128,11 +128,21 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
               env = generalize(C, env, valbind.pat.id, t)
               break
             }
-            case 'InfixConstruction': {
-              throw new Error(`TODO: add support for infix`)
-            }
+            // Intentional fallthrough
+            case 'InfixConstruction':
             case 'ListPattern': {
-              throw new Error('TODO')
+              const [t, C] = hindleyMilner(env, valbind.exp)
+              const typeSubsts = unify(C)
+              const solvedType = substituteIntoType(t, typeSubsts)
+              env = extendTypeEnvFromPattern(env, valbind.pat, solvedType)
+              break
+            }
+
+            default: {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore: The following line will throw a compile error if all the
+              // case statements are implemented (i.e. this branch is never taken).
+              throw new Error(`unimplemented for ${valbind.pat.tag}`)
             }
           }
         }
