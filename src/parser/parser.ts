@@ -520,6 +520,12 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
 }
 
+function getStdlibSourceCode(): string {
+  const fs = require('fs')
+  const file = 'src/stdlib.sml'
+  return fs.readFileSync(file, { encoding: 'utf8', flag: 'r' })
+}
+
 function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Node {
   const inputStream = CharStreams.fromString(source)
   const lexer = new SmlLexer(inputStream)
@@ -533,7 +539,8 @@ function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Nod
 }
 
 export function parseProg(source: string): Node {
-  return parse(source, (parser: SmlParser) => parser.prog())
+  const stdlibSourceCode = getStdlibSourceCode()
+  return parse(stdlibSourceCode + source, (parser: SmlParser) => parser.prog())
 }
 
 export function parseExp(source: string): Node {
