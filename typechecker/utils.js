@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.hasTypeVariable = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
+const console_1 = require("console");
+const lodash_1 = require("lodash");
 exports.INT_TY = 'int';
 exports.REAL_TY = 'real';
 exports.STR_TY = 'string';
@@ -100,23 +102,51 @@ function curryFunctionTypes(paramTypes, returnType) {
     return tmpType;
 }
 exports.curryFunctionTypes = curryFunctionTypes;
-/* Prettifiers */
-function stringifyType(type) {
+function collectTypeVars(type) {
     if (isPrimitiveType(type)) {
-        return type.toString();
+        return [];
+    }
+    if (isFunctionType(type)) {
+        return [...collectTypeVars(type.parameterType), ...collectTypeVars(type.returnType)];
     }
     if (isListType(type)) {
-        return `${stringifyType(type.elementType)} list`;
+        return collectTypeVars(type.elementType);
     }
-    if (isTypeVariableType(type)) {
-        // TODO: change this to 'a, 'b, ....
-        return `t${type.id}`;
+    return [type];
+}
+/* Prettifiers */
+// t0 -> 'a, t1 -> 'b, ... t25 -> 'z, t26 -> 'a1, t27 -> 'b1, ... t51 -> 'z1, t52 -> 'a2, ...
+function stringifyTypeVariable(tv, id) {
+    const ASCII_START = 97; // 'a'
+    const NUM_LETTERS = 26;
+    const letter = String.fromCharCode(ASCII_START + (id % NUM_LETTERS));
+    const number = Math.floor(id / 26);
+    return `'${letter}${number === 0 ? '' : number}`;
+}
+// we support downcasting types to the smallest identifiers
+function stringifyType(type) {
+    // collect all the type variables in the type and
+    // assign first type in result to 'a and so on
+    const tvs = (0, lodash_1.uniqBy)(collectTypeVars(type), tv => tv.id);
+    const tvsToStringifiedTvs = new Map(tvs.sort(tv => tv.id).map((tv, idx) => [tv, stringifyTypeVariable(tv, idx)]));
+    function _stringifyType(type) {
+        if (isPrimitiveType(type)) {
+            return type.toString();
+        }
+        if (isListType(type)) {
+            return `${_stringifyType(type.elementType)} list`;
+        }
+        if (isTypeVariableType(type)) {
+            (0, console_1.assert)(tvsToStringifiedTvs.has(type));
+            return tvsToStringifiedTvs.get(type);
+        }
+        let parameterType = _stringifyType(type.parameterType);
+        if (isFunctionType(type.parameterType)) {
+            parameterType = `(${parameterType})`;
+        }
+        return `${parameterType} -> ${_stringifyType(type.returnType)}`;
     }
-    let parameterType = stringifyType(type.parameterType);
-    if (isFunctionType(type.parameterType)) {
-        parameterType = `(${parameterType})`;
-    }
-    return `${parameterType} -> ${stringifyType(type.returnType)}`;
+    return _stringifyType(type);
 }
 exports.stringifyType = stringifyType;
 //# sourceMappingURL=utils.js.map
