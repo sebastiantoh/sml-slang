@@ -90,47 +90,47 @@ let
   end;
   `)
     ).toBe(`int`))
+})
 
-  describe('Function', () => {
-    test('function with type variables in parameter and return type', () =>
-      expect(parseAndTypeCheckExp('fn x => x')).toBe(`'a -> 'a`))
+describe('Function', () => {
+  test('function with type variables in parameter and return type', () =>
+    expect(parseAndTypeCheckExp('fn x => x')).toBe(`'a -> 'a`))
 
-    test('function with no type variables in parameter and return type', () =>
-      expect(parseAndTypeCheckExp('fn 3 => 3 | x => x')).toBe('int -> int'))
+  test('function with no type variables in parameter and return type', () =>
+    expect(parseAndTypeCheckExp('fn 3 => 3 | x => x')).toBe('int -> int'))
 
-    test('function with type variables in parameter type, but not return type', () =>
-      expect(parseAndTypeCheckExp('fn [] => 1 | [x] => 2 | x => 3')).toBe(`'a list -> int`))
+  test('function with type variables in parameter type, but not return type', () =>
+    expect(parseAndTypeCheckExp('fn [] => 1 | [x] => 2 | x => 3')).toBe(`'a list -> int`))
 
-    test('function that requires inference from multiple matches', () =>
-      expect(parseAndTypeCheckExp(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(
-        `int list -> int list`
-      ))
+  test('function that requires inference from multiple matches', () =>
+    expect(parseAndTypeCheckExp(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(
+      `int list -> int list`
+    ))
 
-    test('nested function types', () =>
-      expect(
-        parseAndTypeCheckExp(`
+  test('nested function types', () =>
+    expect(
+      parseAndTypeCheckExp(`
 let
   fun compose f g x = f (g x)
 in
   compose
 end
 `)
-      ).toBe(`('a -> 'b) -> ('c -> 'a) -> 'c -> 'b`))
+    ).toBe(`('a -> 'b) -> ('c -> 'a) -> 'c -> 'b`))
 
-    test('function type inferred from :: operator', () =>
-      expect(parseAndTypeCheckExp(`fn lists_of_list => [1,2,3]::[4,5,6]::lists_of_list`)).toBe(
-        `int list list -> int list list`
-      ))
+  test('function type inferred from :: operator', () =>
+    expect(parseAndTypeCheckExp(`fn lists_of_list => [1,2,3]::[4,5,6]::lists_of_list`)).toBe(
+      `int list list -> int list list`
+    ))
 
-    test('function type inferred from :: operator in pattern', () =>
-      expect(parseAndTypeCheckExp(`fn fst::snd::tl => (fst+snd)::tl`)).toBe(`int list -> int list`))
+  test('function type inferred from :: operator in pattern', () =>
+    expect(parseAndTypeCheckExp(`fn fst::snd::tl => (fst+snd)::tl`)).toBe(`int list -> int list`))
 
-    test('function type inferred from :: operator in pattern with type variable in param and return type', () =>
-      expect(parseAndTypeCheckExp(`fn fst::snd::tl => fst::tl`)).toBe(`'a list -> 'a list`))
+  test('function type inferred from :: operator in pattern with type variable in param and return type', () =>
+    expect(parseAndTypeCheckExp(`fn fst::snd::tl => fst::tl`)).toBe(`'a list -> 'a list`))
 
-    test('function type inferred from @ operator', () =>
-      expect(parseAndTypeCheckExp(`fn lists_of_list => lists_of_list @ [[1,2,3],[4,5,6]]`)).toBe(
-        `int list list -> int list list`
-      ))
-  })
+  test('function type inferred from @ operator', () =>
+    expect(parseAndTypeCheckExp(`fn lists_of_list => lists_of_list @ [[1,2,3],[4,5,6]]`)).toBe(
+      `int list list -> int list list`
+    ))
 })
