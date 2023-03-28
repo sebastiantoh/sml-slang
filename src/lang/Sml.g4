@@ -127,7 +127,7 @@ pat
     | id=ID                                                           # PatVariable
     | <assoc=right> pat1=pat CONS pat2=pat                            # PatInfixConstruction
     | LPAREN pat RPAREN                                               # PatParentheses
-    // TODO: add list
+    | LSQUARE (pat (COMMA pat)*)? RSQUARE                             # PatList
     | pat COLON typ 	                                              # PatTypeAnnotation
     ;
 

@@ -33,6 +33,7 @@ import {
   ParenthesesContext,
   PatConstantContext,
   PatInfixConstructionContext,
+  PatListContext,
   PatmatchContext,
   PatParenthesesContext,
   PatTypeAnnotationContext,
@@ -69,6 +70,7 @@ import {
   IntConstant,
   LetExpression,
   ListLiteral,
+  ListPattern,
   LocalDeclaration,
   Match,
   Matches,
@@ -329,6 +331,14 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitPatParentheses(ctx: PatParenthesesContext): Pattern {
     return this.visit(ctx.pat()) as Pattern
+  }
+  visitPatList(ctx: PatListContext): ListPattern {
+    const elements = ctx.pat()
+    return {
+      tag: 'ListPattern',
+      elements: elements.map(e => this.visit(e)) as Pattern[],
+      arity: elements.length
+    }
   }
   visitPatTypeAnnotation(ctx: PatTypeAnnotationContext): Pattern {
     const pat = this.visit(ctx.pat()) as Pattern

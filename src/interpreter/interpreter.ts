@@ -130,6 +130,48 @@ const tryMatch = (originalEnv: Environment, value: Value, pat: Pattern): [boolea
       return [true, envWithPat1AndPat2]
     }
     return [false, originalEnv]
+  } else if (pat.tag === 'ListPattern') {
+    // List pattern does not match with non-list values
+    if (value.tag !== 'list') {
+      return [false, originalEnv]
+    }
+
+    const pats = pat.elements
+    const vals = value.jsVal
+
+    // Lists of different length does not match
+    if (vals.length !== pats.length) {
+      return [false, originalEnv]
+    }
+
+    // Cannot have two of the same variable in one list pattern
+    const patVarSet = new Set()
+    let numVars = 0
+    pat.elements.forEach(e => {
+      if (e.tag === 'PatVariable') {
+        numVars++
+        patVarSet.add(e.id)
+      }
+    })
+
+    // Throw error if there is a duplicate variable
+    // TODO: we might want to change this into a parsing error
+    if (patVarSet.size !== numVars) {
+      throw new Error('Cannot have two of the same variable in one list pattern')
+    }
+
+    let updatedEnv = { ...E }
+    for (let i = 0; i < pat.arity; i++) {
+      const [matched, env] = tryMatch(updatedEnv, vals[i], pats[i])
+      if (!matched) {
+        // If match fails on pattern, stop matching with later patterns a
+        // and return original env
+        return [false, originalEnv]
+      }
+      updatedEnv = env
+    }
+
+    return [true, updatedEnv]
   } else {
     // TODO: handle more complicated patterns here.
     throw new Error(`TODO: unimplemented ${pat}`)
