@@ -1,3 +1,6 @@
+import { assert } from 'console'
+import { uniqBy } from 'lodash'
+
 import { FunctionType, ListType, PrimitiveType, Type, TypeVariable } from './types'
 
 export const INT_TY: PrimitiveType = 'int'
@@ -102,21 +105,54 @@ export function curryFunctionTypes(paramTypes: Type[], returnType: Type): Functi
   return tmpType as FunctionType
 }
 
-/* Prettifiers */
-export function stringifyType(type: Type): string {
+function collectTypeVars(type: Type): TypeVariable[] {
   if (isPrimitiveType(type)) {
-    return type.toString()
+    return []
+  }
+  if (isFunctionType(type)) {
+    return [...collectTypeVars(type.parameterType), ...collectTypeVars(type.returnType)]
   }
   if (isListType(type)) {
-    return `${stringifyType(type.elementType)} list`
+    return collectTypeVars(type.elementType)
   }
-  if (isTypeVariableType(type)) {
-    // TODO: change this to 'a, 'b, ....
-    return `t${type.id}`
+  return [type]
+}
+
+/* Prettifiers */
+// t0 -> 'a, t1 -> 'b, ... t25 -> 'z, t26 -> 'a1, t27 -> 'b1, ... t51 -> 'z1, t52 -> 'a2, ...
+function stringifyTypeVariable(tv: TypeVariable, id: number): string {
+  const ASCII_START = 97 // 'a'
+  const NUM_LETTERS = 26
+  const letter = String.fromCharCode(ASCII_START + (id % NUM_LETTERS))
+  const number = Math.floor(id / 26)
+  return `'${letter}${number === 0 ? '' : number}`
+}
+
+// we support downcasting types to the smallest identifiers
+export function stringifyType(type: Type): string {
+  // collect all the type variables in the type and
+  // assign first type in result to 'a and so on
+  const tvs = uniqBy(collectTypeVars(type), tv => tv.id)
+  const tvsToStringifiedTvs = new Map(
+    tvs.sort(tv => tv.id).map((tv, idx) => [tv, stringifyTypeVariable(tv, idx)])
+  )
+
+  function _stringifyType(type: Type): string {
+    if (isPrimitiveType(type)) {
+      return type.toString()
+    }
+    if (isListType(type)) {
+      return `${_stringifyType(type.elementType)} list`
+    }
+    if (isTypeVariableType(type)) {
+      assert(tvsToStringifiedTvs.has(type))
+      return tvsToStringifiedTvs.get(type) as string
+    }
+    let parameterType = _stringifyType(type.parameterType)
+    if (isFunctionType(type.parameterType)) {
+      parameterType = `(${parameterType})`
+    }
+    return `${parameterType} -> ${_stringifyType(type.returnType)}`
   }
-  let parameterType = stringifyType(type.parameterType)
-  if (isFunctionType(type.parameterType)) {
-    parameterType = `(${parameterType})`
-  }
-  return `${parameterType} -> ${stringifyType(type.returnType)}`
+  return _stringifyType(type)
 }
