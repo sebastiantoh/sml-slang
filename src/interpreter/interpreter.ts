@@ -423,7 +423,7 @@ const execMicrocode = (cmd: Microcode) => {
         break
       }
 
-      assert(fn.tag === 'fn')
+      assert(fn.tag === 'fn', `received ${fn.tag} instead`)
 
       if (A.length === 0 || peek(A)?.tag === 'RestoreEnvI') {
         // Implies no more agenda items that needs to be evaluated with the current env.
