@@ -2,6 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./utils");
 describe('InfixConstruction', () => {
+    test('infix construction pattern matching in value binding', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  val fst::snd::tl = [1,2,3]
+in
+  [fst,snd]
+end
+`)).toBe(`[1,2]`));
     test('infix construction pattern matching', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
   fun begins_with_one lst =
@@ -44,9 +51,16 @@ end
 `)).toBe(`0`));
 });
 describe('ListPattern', () => {
+    test('list pattern matching in value binding', () => expect((0, utils_1.parseAndEvaluateExp)(`
+let
+  val [a, b, c] = [[1,2,3],[4,5,6],[7,8]]
+in
+  a @ b
+end
+`)).toBe(`[1,2,3,4,5,6]`));
     test('list pattern matching with variables', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
-  fun length_three xs = 
+  fun length_three xs =
     case xs of
       [x] => 1
     | [x,y] => 2
@@ -58,7 +72,7 @@ end
 `)).toBe(`3`));
     test('list pattern matching with matching constants', () => expect((0, utils_1.parseAndEvaluateExp)(`
   let
-    fun one_two_three xs = 
+    fun one_two_three xs =
       case xs of
         [1,2,3] => 6
       | _ => 0
@@ -68,7 +82,7 @@ end
   `)).toBe(`6`));
     test('list pattern matching with non-matching constants', () => expect((0, utils_1.parseAndEvaluateExp)(`
   let
-    fun one_two_five xs = 
+    fun one_two_five xs =
       case xs of
         [1,2,3] => 3
       | [1,2,5] => 5
@@ -79,7 +93,7 @@ end
   `)).toBe(`5`));
     test('list pattern matching with constants and variables', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
-  fun one_var_three xs = 
+  fun one_var_three xs =
     case xs of
       [1,y,3] => y
     | _ => 0
@@ -89,7 +103,7 @@ end
 `)).toBe(`5`));
     test('list pattern matching with an identical variable', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`
 let
-  fun one_x_x xs = 
+  fun one_x_x xs =
     case xs of
       [1,x,x] => x
     | _ => 0
@@ -99,7 +113,7 @@ end
 `)).toThrow('Cannot have two of the same variable in one list pattern'));
     test('list pattern matching with infix construction', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
-  fun inner_lists_head xs = 
+  fun inner_lists_head xs =
     case xs of
       [x::xs,y::ys] => x + y
     | _ => 0
@@ -109,7 +123,7 @@ end
 `)).toBe(`4`));
     test('list pattern matching with infix construction', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
-  fun inner_list_tail xs = 
+  fun inner_list_tail xs =
     case xs of
       [x::xs,y::ys] => ys
     | _ => []
@@ -119,7 +133,7 @@ end
 `)).toBe(`[4]`));
     test('list pattern matching with nested list', () => expect((0, utils_1.parseAndEvaluateExp)(`
 let
-  fun nested_list xs = 
+  fun nested_list xs =
     case xs of
       [[1], [2,3,4]] => false
     | [[1,2], [3,4]] => true

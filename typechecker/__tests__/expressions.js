@@ -73,22 +73,36 @@ let
     x
   end;
   `)).toBe(`int`));
-    describe('Function', () => {
-        test('function with type variables in parameter and return type', () => expect((0, utils_1.parseAndTypeCheckExp)('fn x => x')).toBe(`'a -> 'a`));
-        test('function with no type variables in parameter and return type', () => expect((0, utils_1.parseAndTypeCheckExp)('fn 3 => 3 | x => x')).toBe('int -> int'));
-        test('function with type variables in parameter type, but not return type', () => expect((0, utils_1.parseAndTypeCheckExp)('fn [] => 1 | [x] => 2 | x => 3')).toBe(`'a list -> int`));
-        test('function that requires inference from multiple matches', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(`int list -> int list`));
-        test('nested function types', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+    test('let expression with infix construction patterns', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val a::b = [1,2,3]
+in
+  b
+end;
+  `)).toBe(`int list`));
+    test('let expression with list literal patterns', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val [a,b,c] =[[1,2],[3,4],[5,6]]
+in
+  a
+end;
+  `)).toBe(`int list`));
+});
+describe('Function', () => {
+    test('function with type variables in parameter and return type', () => expect((0, utils_1.parseAndTypeCheckExp)('fn x => x')).toBe(`'a -> 'a`));
+    test('function with no type variables in parameter and return type', () => expect((0, utils_1.parseAndTypeCheckExp)('fn 3 => 3 | x => x')).toBe('int -> int'));
+    test('function with type variables in parameter type, but not return type', () => expect((0, utils_1.parseAndTypeCheckExp)('fn [] => 1 | [x] => 2 | x => 3')).toBe(`'a list -> int`));
+    test('function that requires inference from multiple matches', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(`int list -> int list`));
+    test('nested function types', () => expect((0, utils_1.parseAndTypeCheckExp)(`
 let
   fun compose f g x = f (g x)
 in
   compose
 end
 `)).toBe(`('a -> 'b) -> ('c -> 'a) -> 'c -> 'b`));
-        test('function type inferred from :: operator', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn lists_of_list => [1,2,3]::[4,5,6]::lists_of_list`)).toBe(`int list list -> int list list`));
-        test('function type inferred from :: operator in pattern', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn fst::snd::tl => (fst+snd)::tl`)).toBe(`int list -> int list`));
-        test('function type inferred from :: operator in pattern with type variable in param and return type', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn fst::snd::tl => fst::tl`)).toBe(`'a list -> 'a list`));
-        test('function type inferred from @ operator', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn lists_of_list => lists_of_list @ [[1,2,3],[4,5,6]]`)).toBe(`int list list -> int list list`));
-    });
+    test('function type inferred from :: operator', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn lists_of_list => [1,2,3]::[4,5,6]::lists_of_list`)).toBe(`int list list -> int list list`));
+    test('function type inferred from :: operator in pattern', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn fst::snd::tl => (fst+snd)::tl`)).toBe(`int list -> int list`));
+    test('function type inferred from :: operator in pattern with type variable in param and return type', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn fst::snd::tl => fst::tl`)).toBe(`'a list -> 'a list`));
+    test('function type inferred from @ operator', () => expect((0, utils_1.parseAndTypeCheckExp)(`fn lists_of_list => lists_of_list @ [[1,2,3],[4,5,6]]`)).toBe(`int list list -> int list list`));
 });
 //# sourceMappingURL=expressions.js.map
