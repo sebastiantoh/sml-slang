@@ -1,4 +1,4 @@
-import { assert } from 'console'
+import * as assert from 'assert'
 import { uniqBy } from 'lodash'
 
 import { FunctionType, ListType, PrimitiveType, Type, TypeVariable } from './types'
@@ -134,7 +134,7 @@ export function stringifyType(type: Type): string {
   // assign first type in result to 'a and so on
   const tvs = uniqBy(collectTypeVars(type), tv => tv.id)
   const tvsToStringifiedTvs = new Map(
-    tvs.sort(tv => tv.id).map((tv, idx) => [tv, stringifyTypeVariable(tv, idx)])
+    tvs.sort(tv => tv.id).map((tv, idx) => [tv.id, stringifyTypeVariable(tv, idx)])
   )
 
   function _stringifyType(type: Type): string {
@@ -145,8 +145,8 @@ export function stringifyType(type: Type): string {
       return `${_stringifyType(type.elementType)} list`
     }
     if (isTypeVariableType(type)) {
-      assert(tvsToStringifiedTvs.has(type))
-      return tvsToStringifiedTvs.get(type) as string
+      assert(tvsToStringifiedTvs.has(type.id))
+      return tvsToStringifiedTvs.get(type.id) as string
     }
     let parameterType = _stringifyType(type.parameterType)
     if (isFunctionType(type.parameterType)) {
