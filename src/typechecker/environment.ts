@@ -38,6 +38,22 @@ const primitiveFuncs: [string, TypeScheme][] = [
   ['*', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['-', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['^', { type: makeFunctionType(STR_TY, STR_TY, STR_TY), typeVariables: [] }],
+  [
+    '::',
+    (function (): TypeScheme {
+      const t = freshTypeVariable()
+      const tList = { elementType: t }
+      return { type: makeFunctionType(t, tList, tList), typeVariables: [t] }
+    })()
+  ],
+  [
+    '@',
+    (function (): TypeScheme {
+      const t = freshTypeVariable()
+      const tList = { elementType: t }
+      return { type: makeFunctionType(tList, tList, tList), typeVariables: [t] }
+    })()
+  ],
   ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => {
     const t = freshTypeVariable()
     // TODO: might need to update these to equality type variables (''a, ''b, etc.)
