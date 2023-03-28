@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { head, tail, take, takeRight } from 'lodash'
+import { isEqual, head, tail, take, takeRight } from 'lodash'
 
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
@@ -83,7 +83,7 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
   ) {
     // Since both pat and value are constants, we don't need to update env
     // e.g. case 1 of 1 => ...
-    return pat.val === value.jsVal
+    return isEqual(pat.val, value.jsVal)
   } else if (pat.tag === 'UnitConstant') {
     return value.tag === 'unit'
   } else if (pat.tag === 'Wildcard') {
@@ -107,7 +107,7 @@ const tryMatch = (value: Value, pat: Pattern): boolean => {
     // guaranteed by typechecker
     assert(value.tag === 'list')
 
-    // Attempting to unify something like
+    // Attempting to match something like
     // e.g. case value of hd::tl => ...
 
     // value must be a non-empty list for match to succeed
@@ -326,7 +326,7 @@ const execMicrocode = (cmd: Microcode) => {
     }
     case 'SetEnvParentI': {
       let tmp: Environment | undefined = E
-      while (tmp && tmp.parent !== cmd.oldParent) {
+      while (tmp && !isEqual(tmp.parent, cmd.oldParent)) {
         tmp = tmp.parent
       }
       assert(tmp !== undefined)
