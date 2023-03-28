@@ -42,7 +42,7 @@ function hindleyMilner(env, node) {
                 const [tmp_ty, tmp_C] = hindleyMilner(env, el);
                 C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }];
             }
-            return [t, C];
+            return [{ elementType: t }, C];
         }
         // Let Expression
         case 'LetExpression': {
@@ -85,7 +85,45 @@ function hindleyMilner(env, node) {
         }
         // Function
         case 'Function': {
-            throw new Error('TODO');
+            const parameterType = (0, environment_1.freshTypeVariable)();
+            const returnType = (0, environment_1.freshTypeVariable)();
+            const funTy = { parameterType, returnType };
+            const constraints = [];
+            for (const { pat, exp } of node.matches) {
+                const [patTy, patConstraints] = hindleyMilner(env, pat);
+                const extendedEnv = (0, environment_1.extendTypeEnvFromPattern)(env, pat, patTy);
+                const [expTy, expConstraints] = hindleyMilner(extendedEnv, exp);
+                constraints.push(...patConstraints, ...expConstraints, { type1: parameterType, type2: patTy }, { type1: returnType, type2: expTy });
+            }
+            return [funTy, constraints];
+        }
+        /* Patterns */
+        // For wildcard and variables, we are not able to infer any more information
+        case 'Wildcard':
+        case 'PatVariable': {
+            const t = (0, environment_1.freshTypeVariable)();
+            return [t, []];
+        }
+        case 'InfixConstruction': {
+            // we only support ::
+            if (node.id !== '::') {
+                throw new Error(`${node.id} is not a supported constructor`);
+            }
+            const t = (0, environment_1.freshTypeVariable)();
+            const [t1, C1] = hindleyMilner(env, node.pat1);
+            const [t2, C2] = hindleyMilner(env, node.pat2);
+            const tList = { elementType: t };
+            return [tList, [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]];
+        }
+        case 'ListPattern': {
+            const t = (0, environment_1.freshTypeVariable)();
+            const tList = { elementType: t };
+            const constraints = [];
+            for (const pat of node.elements) {
+                const [elementTy, elementConstraints] = hindleyMilner(env, pat);
+                constraints.push(...elementConstraints, { type1: elementTy, type2: t });
+            }
+            return [tList, constraints];
         }
         /* Programs */
         case 'Program': {
@@ -93,8 +131,10 @@ function hindleyMilner(env, node) {
             const _ = (0, environment_1.extendTypeEnv)(env, node.body);
             return [utils_1.UNIT_TY, []];
         }
+        default: {
+            throw new Error(`${node.tag} not implemented`);
+        }
     }
-    return [utils_1.UNIT_TY, []];
 }
 exports.hindleyMilner = hindleyMilner;
 //# sourceMappingURL=index.js.map

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.substituteIntoType = exports.unify = exports.instantiate = exports.getPrimitiveFuncTypes = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = exports.freshTypeVariable = void 0;
+exports.substituteIntoType = exports.unify = exports.instantiate = exports.getPrimitiveFuncTypes = exports.extendTypeEnvFromPattern = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = exports.freshTypeVariable = void 0;
+const assert = require("assert");
 const lodash_1 = require("lodash");
 const _1 = require(".");
 const errors_1 = require("./errors");
@@ -19,6 +20,22 @@ const primitiveFuncs = [
     ['*', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
     ['-', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
     ['^', { type: (0, utils_1.makeFunctionType)(utils_1.STR_TY, utils_1.STR_TY, utils_1.STR_TY), typeVariables: [] }],
+    [
+        '::',
+        (function () {
+            const t = freshTypeVariable();
+            const tList = { elementType: t };
+            return { type: (0, utils_1.makeFunctionType)(t, tList, tList), typeVariables: [t] };
+        })()
+    ],
+    [
+        '@',
+        (function () {
+            const t = freshTypeVariable();
+            const tList = { elementType: t };
+            return { type: (0, utils_1.makeFunctionType)(tList, tList, tList), typeVariables: [t] };
+        })()
+    ],
     ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => {
         const t = freshTypeVariable();
         // TODO: might need to update these to equality type variables (''a, ''b, etc.)
@@ -93,7 +110,9 @@ function extendTypeEnv(env, decs) {
                         case 'InfixConstruction': {
                             throw new Error(`TODO: add support for infix`);
                         }
-                        // TODO: add support for lists.
+                        case 'ListPattern': {
+                            throw new Error('TODO');
+                        }
                     }
                 }
                 break;
@@ -116,6 +135,50 @@ function extendTypeEnv(env, decs) {
     return env;
 }
 exports.extendTypeEnv = extendTypeEnv;
+function extendTypeEnvFromPattern(originalEnv, pat, patType) {
+    switch (pat.tag) {
+        // Do nothing for the case of constants / wildcards
+        case 'IntConstant':
+        case 'RealConstant':
+        case 'StringConstant':
+        case 'CharConstant':
+        case 'BoolConstant':
+        case 'Wildcard': {
+            return originalEnv;
+        }
+        case 'PatVariable': {
+            const newEnv = (0, lodash_1.cloneDeep)(originalEnv);
+            newEnv[pat.id] = {
+                type: patType,
+                typeVariables: []
+            };
+            return newEnv;
+        }
+        case 'InfixConstruction': {
+            // we only support ::
+            if (pat.id !== '::') {
+                throw new Error(`${pat.id} is not a supported constructor`);
+            }
+            assert((0, utils_1.isListType)(patType));
+            const { elementType } = patType;
+            const envExtendedFromPat1 = extendTypeEnvFromPattern(originalEnv, pat.pat1, elementType);
+            return extendTypeEnvFromPattern(envExtendedFromPat1, pat.pat2, patType);
+        }
+        case 'ListPattern': {
+            assert((0, utils_1.isListType)(patType));
+            const { elementType } = patType;
+            let env = originalEnv;
+            for (const elePat of pat.elements) {
+                env = extendTypeEnvFromPattern(env, elePat, elementType);
+            }
+            return env;
+        }
+        default: {
+            throw new Error(`${pat.tag} not implemented`);
+        }
+    }
+}
+exports.extendTypeEnvFromPattern = extendTypeEnvFromPattern;
 function getPrimitiveFuncTypes(env, id) {
     if (!env.hasOwnProperty(id)) {
         throw new Error(`Unsupported infix operator "${id}".`);
