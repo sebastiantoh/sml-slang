@@ -116,7 +116,7 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
               throw new Error(`TODO: add support for infix`)
             }
             case 'ListPattern': {
-              throw new Error("TODO")
+              throw new Error('TODO')
             }
           }
         }

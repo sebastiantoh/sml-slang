@@ -98,9 +98,12 @@ let
     test('function with no type variables in parameter and return type', () =>
       expect(parseAndTypeCheckExp('fn 3 => 3 | x => x')).toBe('int -> int'))
 
-    test('function with type variables in parameter type, but not return type', () => expect(parseAndTypeCheckExp('fn [] => 1 | [x] => 2 | x => 3')).toBe('t16 list -> int'))
+    test('function with type variables in parameter type, but not return type', () =>
+      expect(parseAndTypeCheckExp('fn [] => 1 | [x] => 2 | x => 3')).toBe('t16 list -> int'))
 
-    test('function that requires inference from multiple matches', () => expect(
-      parseAndTypeCheckExp(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(`int list -> int list`))
+    test('function that requires inference from multiple matches', () =>
+      expect(parseAndTypeCheckExp(`fn (hd::tl) => [hd] | [x] => [1,2,3]`)).toBe(
+        `int list -> int list`
+      ))
   })
 })
