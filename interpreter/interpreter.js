@@ -398,7 +398,7 @@ const execMicrocode = (cmd) => {
                 S.push(fn.apply(arg));
                 break;
             }
-            assert(fn.tag === 'fn');
+            assert(fn.tag === 'fn', `received ${fn.tag} instead`);
             if (A.length === 0 || ((_a = peek(A)) === null || _a === void 0 ? void 0 : _a.tag) === 'RestoreEnvI') {
                 // Implies no more agenda items that needs to be evaluated with the current env.
                 // Just push mark, and not RestoreEnvI

@@ -417,6 +417,11 @@ class NodeGenerator {
         throw new Error('Method not implemented.');
     }
 }
+function getStdlibSourceCode() {
+    const fs = require('fs');
+    const file = 'src/stdlib.sml';
+    return fs.readFileSync(file, { encoding: 'utf8', flag: 'r' });
+}
 function parse(source, f) {
     const inputStream = antlr4ts_1.CharStreams.fromString(source);
     const lexer = new SmlLexer_1.SmlLexer(inputStream);
@@ -428,7 +433,8 @@ function parse(source, f) {
     return generator.visit(tree);
 }
 function parseProg(source) {
-    return parse(source, (parser) => parser.prog());
+    const stdlibSourceCode = getStdlibSourceCode();
+    return parse(stdlibSourceCode + source, (parser) => parser.prog());
 }
 exports.parseProg = parseProg;
 function parseExp(source) {
