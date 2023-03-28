@@ -106,6 +106,17 @@ let
         `int list -> int list`
       ))
 
+    test('nested function types', () =>
+      expect(
+        parseAndTypeCheckExp(`
+let
+  fun compose f g x = f (g x)
+in
+  compose
+end
+`)
+      ).toBe(`(t41 -> t42) -> (t43 -> t41) -> t43 -> t42`))
+
     test('function type inferred from :: operator', () =>
       expect(parseAndTypeCheckExp(`fn lists_of_list => [1,2,3]::[4,5,6]::lists_of_list`)).toBe(
         `int list list -> int list list`
