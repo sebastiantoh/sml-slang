@@ -36,7 +36,7 @@ const primitiveFuncs = [
             return { type: (0, utils_1.makeFunctionType)(tList, tList, tList), typeVariables: [t] };
         })()
     ],
-    ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => {
+    ...['=', '<>', '<', '>', '<=', '>='].map(comp => {
         const t = freshTypeVariable();
         // TODO: might need to update these to equality type variables (''a, ''b, etc.)
         return [
@@ -46,7 +46,22 @@ const primitiveFuncs = [
                 typeVariables: [t]
             }
         ];
-    })
+    }),
+    [
+        'print',
+        (function () {
+            const t = freshTypeVariable();
+            return { type: (0, utils_1.makeFunctionType)(t, utils_1.UNIT_TY), typeVariables: [t] };
+        })()
+    ],
+    [
+        'size',
+        { type: (0, utils_1.makeFunctionType)(utils_1.STR_TY, utils_1.INT_TY), typeVariables: [] }
+    ],
+    [
+        'not',
+        { type: (0, utils_1.makeFunctionType)(utils_1.BOOL_TY, utils_1.BOOL_TY), typeVariables: [] }
+    ],
 ];
 function createInitialTypeEnvironment() {
     // initial type env only contains inbuilt funcs

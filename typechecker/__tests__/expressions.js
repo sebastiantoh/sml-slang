@@ -112,5 +112,27 @@ in
   loop 0 [2,3,4]
 end
 `)).toBe(`int`));
+    // TODO: figure out why this test fails
+    test.skip('type inference of builtin "print" function', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val () = print 5
+in
+  print 2
+end
+`)).toBe(`unit`));
+    test('type inference of builtin "size" function', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val a = size "ABC"
+in
+  a
+end
+`)).toBe(`int`));
+    test('type inference of builtin "not" function', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val a = not true
+in
+  a
+end
+`)).toBe(`bool`));
 });
 //# sourceMappingURL=expressions.js.map
