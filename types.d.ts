@@ -1,5 +1,6 @@
 import { Match } from './parser/ast';
 import { TypeEnvironment } from './typechecker/environment';
+import { Type } from './typechecker/types';
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List;
 export interface Int {
     tag: 'int';
@@ -51,8 +52,9 @@ export interface Errored {
 }
 export interface Finished {
     status: 'finished';
-    value: any;
-    type: any;
+    stdout: string[];
+    value?: Value;
+    type?: Type;
     name?: string;
 }
 export type Result = Finished | Errored;

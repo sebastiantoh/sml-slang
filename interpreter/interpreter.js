@@ -4,7 +4,8 @@ exports.evaluateProg = exports.evaluateExp = exports.evaluate = exports.stdout =
 const assert = require("assert");
 const lodash_1 = require("lodash");
 const Sml = require("../sml");
-// TODO: integrate this with frontend's output
+const typechecker_1 = require("../typechecker");
+const environment_1 = require("../typechecker/environment");
 exports.stdout = [];
 let A = [];
 let S = [];
@@ -465,12 +466,23 @@ function evaluate(node) {
     }
 }
 exports.evaluate = evaluate;
-function evaluateExp(exp) {
+function evaluateExp(exp, outputWithType) {
     evaluate(exp);
     if (S.length !== 1) {
         throw new Error(`internal error: stash must be singleton but is: ${S}`);
     }
-    return S[0];
+    let type = undefined;
+    if (outputWithType) {
+        const [unsolvedType, typeConstraints] = (0, typechecker_1.hindleyMilner)((0, environment_1.createInitialTypeEnvironment)(), exp);
+        const substitutions = (0, environment_1.unify)(typeConstraints);
+        type = (0, environment_1.substituteIntoType)(unsolvedType, substitutions);
+    }
+    return {
+        status: 'finished',
+        stdout: exports.stdout,
+        value: S[0],
+        type: type
+    };
 }
 exports.evaluateExp = evaluateExp;
 function evaluateProg(prog) {
@@ -478,7 +490,10 @@ function evaluateProg(prog) {
     if (S.length !== 0) {
         throw new Error(`internal error: stash must be empty but is: ${S}`);
     }
-    return exports.stdout.join('');
+    return {
+        status: 'finished',
+        stdout: exports.stdout
+    };
 }
 exports.evaluateProg = evaluateProg;
 //# sourceMappingURL=interpreter.js.map
