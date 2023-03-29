@@ -6,6 +6,7 @@ import { hindleyMilner } from '.'
 import { TypeMismatchError } from './errors'
 import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types'
 import {
+  BOOL_TY,
   hasTypeVariable,
   INT_TY,
   isFunctionType,
@@ -18,8 +19,7 @@ import {
   REAL_TY,
   STR_TY,
   stringifyType,
-  UNIT_TY,
-  BOOL_TY
+  UNIT_TY
 } from './utils'
 
 export type TypeEnvironment = { [k: string]: TypeScheme }
@@ -73,14 +73,8 @@ const primitiveFuncs: [string, TypeScheme][] = [
       return { type: makeFunctionType(t, UNIT_TY), typeVariables: [t] }
     })()
   ],
-  [
-    'size',
-    { type: makeFunctionType(STR_TY, INT_TY), typeVariables: [] }
-  ],
-  [
-    'not',
-    { type: makeFunctionType(BOOL_TY, BOOL_TY), typeVariables: [] }
-  ],
+  ['size', { type: makeFunctionType(STR_TY, INT_TY), typeVariables: [] }],
+  ['not', { type: makeFunctionType(BOOL_TY, BOOL_TY), typeVariables: [] }]
 ]
 
 export function createInitialTypeEnvironment(): TypeEnvironment {
