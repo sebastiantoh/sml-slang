@@ -1,5 +1,6 @@
 import { Match } from './parser/ast'
 import { TypeEnvironment } from './typechecker/environment'
+import { Type } from './typechecker/types'
 
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List
 
@@ -67,9 +68,9 @@ export interface Errored {
 
 export interface Finished {
   status: 'finished'
-  // TODO: update this to sml Value and Type
-  value: any
-  type: any
+  stdout: string[]
+  value?: Value // value may be absence in the case of a program evaluation (instead of an expression)
+  type?: Type
   name?: string
 }
 

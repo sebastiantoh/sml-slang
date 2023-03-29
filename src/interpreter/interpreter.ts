@@ -3,13 +3,14 @@ import { head, isEqual, tail, take, takeRight } from 'lodash'
 
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
-import { Environment, Value } from '../types'
+import { hindleyMilner } from '../typechecker'
+import { createInitialTypeEnvironment, substituteIntoType, unify } from '../typechecker/environment'
+import { Environment, Result, Value } from '../types'
 import { Instruction } from './instructions'
 
 type Microcode = Node | Instruction
 
-// TODO: integrate this with frontend's output
-export let stdout: Array<String> = []
+export let stdout: Array<string> = []
 let A: Array<Microcode> = []
 let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
@@ -493,18 +494,35 @@ export function evaluate(node: Node) {
   }
 }
 
-export function evaluateExp(exp: Expression): Value {
+export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
   evaluate(exp)
   if (S.length !== 1) {
     throw new Error(`internal error: stash must be singleton but is: ${S}`)
   }
-  return S[0]
+
+  let type = undefined
+  if (outputWithType) {
+    const [unsolvedType, typeConstraints] = hindleyMilner(createInitialTypeEnvironment(), exp)
+    const substitutions = unify(typeConstraints)
+    type = substituteIntoType(unsolvedType, substitutions)
+  }
+
+  return {
+    status: 'finished',
+    stdout: stdout,
+    value: S[0],
+    type: type
+  }
 }
 
-export function evaluateProg(prog: Program): string {
+export function evaluateProg(prog: Program): Result {
   evaluate(prog)
   if (S.length !== 0) {
     throw new Error(`internal error: stash must be empty but is: ${S}`)
   }
-  return stdout.join('')
+
+  return {
+    status: 'finished',
+    stdout: stdout
+  }
 }
