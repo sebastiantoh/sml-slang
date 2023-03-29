@@ -124,7 +124,19 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
               break
             }
             case 'PatVariable': {
-              const [t, C] = hindleyMilner(env, valbind.exp)
+              // Create new type variable for the pattern type and assign it to env
+              const patTy = freshTypeVariable()
+              const newEnv = cloneDeep(env)
+              newEnv[valbind.pat.id] = {
+                type: patTy,
+                typeVariables: []
+              }
+
+              // Since the RHS may refer to this pattern ID (e.g. in the case of recursive functions)
+              // we need to infer type of RHS in this new env
+              const [t, C] = hindleyMilner(newEnv, valbind.exp)
+              // Now that we've solved the type of the RHS, we add a constraint to the pat type
+              C.push({ type1: patTy, type2: t })
               env = generalize(C, env, valbind.pat.id, t)
               break
             }

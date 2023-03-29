@@ -156,8 +156,7 @@ end
       `int list list -> int list list`
     ))
 
-  // TODO fix this case
-  test.skip('function with acc', () =>
+  test('type inference of recursive functions', () =>
     expect(
       parseAndTypeCheckExp(`
 let
