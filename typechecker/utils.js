@@ -128,7 +128,7 @@ function stringifyType(type) {
     // collect all the type variables in the type and
     // assign first type in result to 'a and so on
     const tvs = (0, lodash_1.uniqBy)(collectTypeVars(type), tv => tv.id);
-    const tvsToStringifiedTvs = new Map(tvs.sort(tv => tv.id).map((tv, idx) => [tv.id, stringifyTypeVariable(tv, idx)]));
+    const tvsToStringifiedTvs = new Map(tvs.map((tv, idx) => [tv.id, stringifyTypeVariable(tv, idx)]));
     function _stringifyType(type) {
         if (isPrimitiveType(type)) {
             return type.toString();
