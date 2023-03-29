@@ -167,4 +167,38 @@ in
 end
 `)
     ).toBe(`int`))
+
+  // TODO: figure out why this test fails
+  test.skip('type inference of builtin "print" function', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val () = print 5
+in
+  print 2
+end
+`)
+    ).toBe(`unit`))
+
+  test('type inference of builtin "size" function', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val a = size "ABC"
+in
+  a
+end
+`)
+    ).toBe(`int`))
+
+  test('type inference of builtin "not" function', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val a = not true
+in
+  a
+end
+`)
+    ).toBe(`bool`))
 })

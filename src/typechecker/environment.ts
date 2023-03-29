@@ -18,7 +18,8 @@ import {
   REAL_TY,
   STR_TY,
   stringifyType,
-  UNIT_TY
+  UNIT_TY,
+  BOOL_TY
 } from './utils'
 
 export type TypeEnvironment = { [k: string]: TypeScheme }
@@ -54,7 +55,7 @@ const primitiveFuncs: [string, TypeScheme][] = [
       return { type: makeFunctionType(tList, tList, tList), typeVariables: [t] }
     })()
   ],
-  ...['=', '<>', '<', '>', '<=', '>=', 'print'].map(comp => {
+  ...['=', '<>', '<', '>', '<=', '>='].map(comp => {
     const t = freshTypeVariable()
     // TODO: might need to update these to equality type variables (''a, ''b, etc.)
     return [
@@ -64,7 +65,22 @@ const primitiveFuncs: [string, TypeScheme][] = [
         typeVariables: [t]
       }
     ] as [string, TypeScheme]
-  })
+  }),
+  [
+    'print',
+    (function (): TypeScheme {
+      const t = freshTypeVariable()
+      return { type: makeFunctionType(t, UNIT_TY), typeVariables: [t] }
+    })()
+  ],
+  [
+    'size',
+    { type: makeFunctionType(STR_TY, INT_TY), typeVariables: [] }
+  ],
+  [
+    'not',
+    { type: makeFunctionType(BOOL_TY, BOOL_TY), typeVariables: [] }
+  ],
 ]
 
 export function createInitialTypeEnvironment(): TypeEnvironment {
