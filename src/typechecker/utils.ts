@@ -134,7 +134,7 @@ export function stringifyType(type: Type): string {
   // assign first type in result to 'a and so on
   const tvs = uniqBy(collectTypeVars(type), tv => tv.id)
   const tvsToStringifiedTvs = new Map(
-    tvs.sort(tv => tv.id).map((tv, idx) => [tv.id, stringifyTypeVariable(tv, idx)])
+    tvs.map((tv, idx) => [tv.id, stringifyTypeVariable(tv, idx)])
   )
 
   function _stringifyType(type: Type): string {
