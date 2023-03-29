@@ -155,4 +155,17 @@ end
     expect(parseAndTypeCheckExp(`fn lists_of_list => lists_of_list @ [[1,2,3],[4,5,6]]`)).toBe(
       `int list list -> int list list`
     ))
+
+  // TODO fix this case
+  test.skip('function with acc', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  fun loop acc lst =
+    case lst of [] => acc | x::xs => loop (acc + 1) (xs)
+in
+  loop 0 [2,3,4]
+end
+`)
+    ).toBe(`int`))
 })
