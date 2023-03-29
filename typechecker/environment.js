@@ -54,14 +54,8 @@ const primitiveFuncs = [
             return { type: (0, utils_1.makeFunctionType)(t, utils_1.UNIT_TY), typeVariables: [t] };
         })()
     ],
-    [
-        'size',
-        { type: (0, utils_1.makeFunctionType)(utils_1.STR_TY, utils_1.INT_TY), typeVariables: [] }
-    ],
-    [
-        'not',
-        { type: (0, utils_1.makeFunctionType)(utils_1.BOOL_TY, utils_1.BOOL_TY), typeVariables: [] }
-    ],
+    ['size', { type: (0, utils_1.makeFunctionType)(utils_1.STR_TY, utils_1.INT_TY), typeVariables: [] }],
+    ['not', { type: (0, utils_1.makeFunctionType)(utils_1.BOOL_TY, utils_1.BOOL_TY), typeVariables: [] }]
 ];
 function createInitialTypeEnvironment() {
     // initial type env only contains inbuilt funcs
