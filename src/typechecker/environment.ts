@@ -154,8 +154,7 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
             case 'InfixConstruction':
             case 'ListPattern': {
               const [t, C] = hindleyMilner(env, valbind.exp)
-              const typeSubsts = unify(C)
-              const solvedType = substituteIntoType(t, typeSubsts)
+              const solvedType = unifyAndSubstitute(t, C)
               env = extendTypeEnvFromPattern(env, valbind.pat, solvedType)
               break
             }
@@ -306,8 +305,7 @@ function generalize(
   type: Type
 ): TypeEnvironment {
   // solve constraints C and get a type t
-  const S = unify(C)
-  const t = substituteIntoType(type, S)
+  const t = unifyAndSubstitute(type, C)
 
   const newEnv = cloneDeep(env)
   newEnv[id] = {
@@ -419,4 +417,9 @@ export function substituteIntoType(type: Type, S: TypeSubstitution[]): Type {
     type = _subsIntoType(type, ts)
   }
   return type
+}
+
+export function unifyAndSubstitute(type: Type, typeConstraints: TypeConstraint[]): Type {
+  const S = unify(typeConstraints)
+  return substituteIntoType(type, S)
 }

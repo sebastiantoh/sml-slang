@@ -4,7 +4,10 @@ import { head, isEqual, tail, take, takeRight } from 'lodash'
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { hindleyMilner } from '../typechecker'
-import { createInitialTypeEnvironment, substituteIntoType, unify } from '../typechecker/environment'
+import {
+  createInitialTypeEnvironment,
+  unifyAndSubstitute
+} from '../typechecker/environment'
 import { Environment, Result, Value } from '../types'
 import { Instruction } from './instructions'
 
@@ -503,8 +506,7 @@ export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
   let type = undefined
   if (outputWithType) {
     const [unsolvedType, typeConstraints] = hindleyMilner(createInitialTypeEnvironment(), exp)
-    const substitutions = unify(typeConstraints)
-    type = substituteIntoType(unsolvedType, substitutions)
+    type = unifyAndSubstitute(unsolvedType, typeConstraints)
   }
 
   return {
