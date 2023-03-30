@@ -9,8 +9,8 @@ const INIT_ENV = (0, environment_1.createInitialTypeEnvironment)();
 const parseAndTypeCheckExp = (exp) => {
     const node = (0, parser_1.parseExp)(exp);
     const [type, typeConstraints] = (0, __1.hindleyMilner)(INIT_ENV, node);
-    const S = (0, environment_1.unify)(typeConstraints);
-    return (0, utils_1.stringifyType)((0, environment_1.substituteIntoType)(type, S));
+    const solvedType = (0, environment_1.unifyAndSubstitute)(type, typeConstraints);
+    return (0, utils_1.stringifyType)(solvedType);
 };
 exports.parseAndTypeCheckExp = parseAndTypeCheckExp;
 //# sourceMappingURL=utils.js.map

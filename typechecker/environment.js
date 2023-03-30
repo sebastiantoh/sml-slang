@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.substituteIntoType = exports.unify = exports.instantiate = exports.getPrimitiveFuncTypes = exports.extendTypeEnvFromPattern = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = exports.freshTypeVariable = void 0;
+exports.unifyAndSubstitute = exports.substituteIntoType = exports.unify = exports.instantiate = exports.getPrimitiveFuncTypes = exports.extendTypeEnvFromPattern = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = exports.freshTypeVariable = void 0;
 const assert = require("assert");
 const lodash_1 = require("lodash");
 const _1 = require(".");
@@ -94,20 +94,10 @@ function extendTypeEnv(env, decs) {
                         case 'StringConstant':
                         case 'CharConstant':
                         case 'BoolConstant': {
-                            /*
-                              TODO: make this more sophisticated - rn jus checks same num of both side.
-              
-                              support things like:
-                              val 2 = 1 + 1;
-              
-                              (or)
-              
-                              val x = 1;
-                              val 2 = 1 + x
-                            */
-                            if (valbind.exp.tag !== valbind.pat.tag || valbind.exp.val != valbind.pat.val) {
-                                // TODO: add support for Constant type errors
-                                throw new Error(`Invalid constant binding. Expected type ${valbind.pat.tag} with value ${valbind.pat.val}, got ${valbind.exp.tag}.`);
+                            const [expType, _] = (0, _1.hindleyMilner)(env, valbind.exp);
+                            const [patType, __] = (0, _1.hindleyMilner)(env, valbind.pat);
+                            if (patType !== expType) {
+                                throw new Error(`Invalid constant binding. Expected type ${patType}, got ${expType}.`);
                             }
                             break;
                         }
@@ -130,10 +120,8 @@ function extendTypeEnv(env, decs) {
                         // Intentional fallthrough
                         case 'InfixConstruction':
                         case 'ListPattern': {
-                            const [t, C] = (0, _1.hindleyMilner)(env, valbind.exp);
-                            const typeSubsts = unify(C);
-                            const solvedType = substituteIntoType(t, typeSubsts);
-                            env = extendTypeEnvFromPattern(env, valbind.pat, solvedType);
+                            const [t, _] = (0, _1.hindleyMilner)(env, valbind.exp);
+                            env = extendTypeEnvFromPattern(env, valbind.pat, t);
                             break;
                         }
                         default: {
@@ -269,8 +257,7 @@ function unsolvedEnv(env) {
 // inefficient way of generalizing. TODO: make this more efficient?
 function generalize(C, env, id, type) {
     // solve constraints C and get a type t
-    const S = unify(C);
-    const t = substituteIntoType(type, S);
+    const t = unifyAndSubstitute(type, C);
     const newEnv = (0, lodash_1.cloneDeep)(env);
     newEnv[id] = {
         type: t,
@@ -369,4 +356,9 @@ function substituteIntoType(type, S) {
     return type;
 }
 exports.substituteIntoType = substituteIntoType;
+function unifyAndSubstitute(type, typeConstraints) {
+    const S = unify(typeConstraints);
+    return substituteIntoType(type, S);
+}
+exports.unifyAndSubstitute = unifyAndSubstitute;
 //# sourceMappingURL=environment.js.map

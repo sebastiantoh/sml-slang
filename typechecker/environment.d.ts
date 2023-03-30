@@ -12,3 +12,4 @@ export declare function getPrimitiveFuncTypes(env: TypeEnvironment, id: string):
 export declare function instantiate(typeScheme: TypeScheme): Type;
 export declare function unify(C: TypeConstraint[]): TypeSubstitution[];
 export declare function substituteIntoType(type: Type, S: TypeSubstitution[]): Type;
+export declare function unifyAndSubstitute(type: Type, typeConstraints: TypeConstraint[]): Type;

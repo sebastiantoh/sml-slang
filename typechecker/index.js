@@ -25,14 +25,18 @@ function hindleyMilner(env, node) {
             const t = (0, environment_1.freshTypeVariable)();
             const [t1, C1] = hindleyMilner(env, node.fn);
             const [t2, C2] = hindleyMilner(env, node.arg);
-            return [t, [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }]];
+            const constraints = [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(t, constraints);
+            return [solvedType, constraints];
         }
         // Infix Application
         case 'InfixApplication': {
             const [t1, t2, t3] = (0, environment_1.getPrimitiveFuncTypes)(env, node.id);
             const [t4, C1] = hindleyMilner(env, node.operand1);
             const [t5, C2] = hindleyMilner(env, node.operand2);
-            return [t3, [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }]];
+            const constraints = [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(t3, constraints);
+            return [solvedType, constraints];
         }
         // List
         case 'ListLiteral': {
@@ -42,7 +46,8 @@ function hindleyMilner(env, node) {
                 const [tmp_ty, tmp_C] = hindleyMilner(env, el);
                 C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }];
             }
-            return [{ elementType: t }, C];
+            const solvedType = (0, environment_1.unifyAndSubstitute)({ elementType: t }, C);
+            return [solvedType, C];
         }
         // Let Expression
         case 'LetExpression': {
@@ -53,7 +58,8 @@ function hindleyMilner(env, node) {
                 ;
                 [t, C] = hindleyMilner(extendedEnv, exp);
             }
-            return [t, C];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(t, C);
+            return [solvedType, C];
         }
         // Expression Sequence
         case 'ExpSequence': {
@@ -63,7 +69,8 @@ function hindleyMilner(env, node) {
                 ;
                 [t, C] = hindleyMilner(env, exp);
             }
-            return [t, C];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(t, C);
+            return [solvedType, C];
         }
         // Conditional
         case 'ConditionalExpression': {
@@ -71,17 +78,16 @@ function hindleyMilner(env, node) {
             const [t1, C1] = hindleyMilner(env, node.pred);
             const [t2, C2] = hindleyMilner(env, node.consequent);
             const [t3, C3] = hindleyMilner(env, node.alternative);
-            return [
-                t,
-                [
-                    ...C1,
-                    ...C2,
-                    ...C3,
-                    { type1: t1, type2: utils_1.BOOL_TY },
-                    { type1: t, type2: t2 },
-                    { type1: t, type2: t3 }
-                ]
+            const constraints = [
+                ...C1,
+                ...C2,
+                ...C3,
+                { type1: t1, type2: utils_1.BOOL_TY },
+                { type1: t, type2: t2 },
+                { type1: t, type2: t3 }
             ];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(t, constraints);
+            return [solvedType, constraints];
         }
         // Function
         case 'Function': {
@@ -95,7 +101,8 @@ function hindleyMilner(env, node) {
                 const [expTy, expConstraints] = hindleyMilner(extendedEnv, exp);
                 constraints.push(...patConstraints, ...expConstraints, { type1: parameterType, type2: patTy }, { type1: returnType, type2: expTy });
             }
-            return [funTy, constraints];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(funTy, constraints);
+            return [solvedType, constraints];
         }
         /* Patterns */
         // For wildcard and variables, we are not able to infer any more information
@@ -113,7 +120,9 @@ function hindleyMilner(env, node) {
             const [t1, C1] = hindleyMilner(env, node.pat1);
             const [t2, C2] = hindleyMilner(env, node.pat2);
             const tList = { elementType: t };
-            return [tList, [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]];
+            const constraints = [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(tList, constraints);
+            return [solvedType, constraints];
         }
         case 'ListPattern': {
             const t = (0, environment_1.freshTypeVariable)();
@@ -123,7 +132,8 @@ function hindleyMilner(env, node) {
                 const [elementTy, elementConstraints] = hindleyMilner(env, pat);
                 constraints.push(...elementConstraints, { type1: elementTy, type2: t });
             }
-            return [tList, constraints];
+            const solvedType = (0, environment_1.unifyAndSubstitute)(tList, constraints);
+            return [solvedType, constraints];
         }
         /* Programs */
         case 'Program': {

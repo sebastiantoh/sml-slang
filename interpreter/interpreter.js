@@ -474,8 +474,7 @@ function evaluateExp(exp, outputWithType) {
     let type = undefined;
     if (outputWithType) {
         const [unsolvedType, typeConstraints] = (0, typechecker_1.hindleyMilner)((0, environment_1.createInitialTypeEnvironment)(), exp);
-        const substitutions = (0, environment_1.unify)(typeConstraints);
-        type = (0, environment_1.substituteIntoType)(unsolvedType, substitutions);
+        type = (0, environment_1.unifyAndSubstitute)(unsolvedType, typeConstraints);
     }
     return {
         status: 'finished',
