@@ -6,7 +6,8 @@ import {
   getPrimitiveFuncTypes,
   getTypeSchemeFromEnv,
   instantiate,
-  TypeEnvironment
+  TypeEnvironment,
+  unifyAndSubstitute
 } from './environment'
 import { Type, TypeConstraint } from './types'
 import { BOOL_TY, UNIT_TY } from './utils'
@@ -33,14 +34,18 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const t = freshTypeVariable()
       const [t1, C1] = hindleyMilner(env, node.fn)
       const [t2, C2] = hindleyMilner(env, node.arg)
-      return [t, [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }]]
+      const constraints = [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }]
+      const solvedType = unifyAndSubstitute(t, constraints)
+      return [solvedType, constraints]
     }
     // Infix Application
     case 'InfixApplication': {
       const [t1, t2, t3] = getPrimitiveFuncTypes(env, node.id)
       const [t4, C1] = hindleyMilner(env, node.operand1)
       const [t5, C2] = hindleyMilner(env, node.operand2)
-      return [t3, [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }]]
+      const constraints = [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }]
+      const solvedType = unifyAndSubstitute(t3, constraints)
+      return [solvedType, constraints]
     }
     // List
     case 'ListLiteral': {
@@ -50,7 +55,8 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         const [tmp_ty, tmp_C] = hindleyMilner(env, el)
         C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }]
       }
-      return [{ elementType: t }, C]
+      const solvedType = unifyAndSubstitute({ elementType: t }, C)
+      return [solvedType, C]
     }
     // Let Expression
     case 'LetExpression': {
@@ -60,7 +66,8 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       for (const exp of node.exps) {
         ;[t, C] = hindleyMilner(extendedEnv, exp)
       }
-      return [t, C]
+      const solvedType = unifyAndSubstitute(t, C)
+      return [solvedType, C]
     }
     // Expression Sequence
     case 'ExpSequence': {
@@ -69,7 +76,8 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       for (const exp of node.exps) {
         ;[t, C] = hindleyMilner(env, exp)
       }
-      return [t, C]
+      const solvedType = unifyAndSubstitute(t, C)
+      return [solvedType, C]
     }
     // Conditional
     case 'ConditionalExpression': {
@@ -77,17 +85,16 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const [t1, C1] = hindleyMilner(env, node.pred)
       const [t2, C2] = hindleyMilner(env, node.consequent)
       const [t3, C3] = hindleyMilner(env, node.alternative)
-      return [
-        t,
-        [
-          ...C1,
-          ...C2,
-          ...C3,
-          { type1: t1, type2: BOOL_TY },
-          { type1: t, type2: t2 },
-          { type1: t, type2: t3 }
-        ]
+      const constraints = [
+        ...C1,
+        ...C2,
+        ...C3,
+        { type1: t1, type2: BOOL_TY },
+        { type1: t, type2: t2 },
+        { type1: t, type2: t3 }
       ]
+      const solvedType = unifyAndSubstitute(t, constraints)
+      return [solvedType, constraints]
     }
     // Function
     case 'Function': {
@@ -108,7 +115,8 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
           { type1: returnType, type2: expTy }
         )
       }
-      return [funTy, constraints]
+      const solvedType = unifyAndSubstitute(funTy, constraints)
+      return [solvedType, constraints]
     }
 
     /* Patterns */
@@ -127,7 +135,10 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const [t1, C1] = hindleyMilner(env, node.pat1)
       const [t2, C2] = hindleyMilner(env, node.pat2)
       const tList = { elementType: t }
-      return [tList, [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]]
+
+      const constraints = [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]
+      const solvedType = unifyAndSubstitute(tList, constraints)
+      return [solvedType, constraints]
     }
     case 'ListPattern': {
       const t = freshTypeVariable()
@@ -137,7 +148,8 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         const [elementTy, elementConstraints] = hindleyMilner(env, pat)
         constraints.push(...elementConstraints, { type1: elementTy, type2: t })
       }
-      return [tList, constraints]
+      const solvedType = unifyAndSubstitute(tList, constraints)
+      return [solvedType, constraints]
     }
 
     /* Programs */

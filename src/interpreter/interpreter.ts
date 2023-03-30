@@ -4,10 +4,7 @@ import { head, isEqual, tail, take, takeRight } from 'lodash'
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { hindleyMilner } from '../typechecker'
-import {
-  createInitialTypeEnvironment,
-  unifyAndSubstitute
-} from '../typechecker/environment'
+import { createInitialTypeEnvironment, unifyAndSubstitute } from '../typechecker/environment'
 import { Environment, Result, Value } from '../types'
 import { Instruction } from './instructions'
 

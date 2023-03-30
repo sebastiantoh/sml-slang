@@ -114,21 +114,12 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
             case 'StringConstant':
             case 'CharConstant':
             case 'BoolConstant': {
-              /*
-                TODO: make this more sophisticated - rn jus checks same num of both side.
+              const [expType, _] = hindleyMilner(env, valbind.exp)
+              const [patType, __] = hindleyMilner(env, valbind.pat)
 
-                support things like:
-                val 2 = 1 + 1;
-
-                (or)
-
-                val x = 1;
-                val 2 = 1 + x
-              */
-              if (valbind.exp.tag !== valbind.pat.tag || valbind.exp.val != valbind.pat.val) {
-                // TODO: add support for Constant type errors
+              if (patType !== expType) {
                 throw new Error(
-                  `Invalid constant binding. Expected type ${valbind.pat.tag} with value ${valbind.pat.val}, got ${valbind.exp.tag}.`
+                  `Invalid constant binding. Expected type ${patType}, got ${expType}.`
                 )
               }
               break
@@ -153,9 +144,8 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
             // Intentional fallthrough
             case 'InfixConstruction':
             case 'ListPattern': {
-              const [t, C] = hindleyMilner(env, valbind.exp)
-              const solvedType = unifyAndSubstitute(t, C)
-              env = extendTypeEnvFromPattern(env, valbind.pat, solvedType)
+              const [t, _] = hindleyMilner(env, valbind.exp)
+              env = extendTypeEnvFromPattern(env, valbind.pat, t)
               break
             }
 

@@ -168,8 +168,7 @@ end
 `)
     ).toBe(`int`))
 
-  // TODO: figure out why this test fails
-  test.skip('type inference of builtin "print" function', () =>
+  test('type inference of builtin "print" function', () =>
     expect(
       parseAndTypeCheckExp(`
 let
@@ -201,4 +200,26 @@ in
 end
 `)
     ).toBe(`bool`))
+
+  test('type inference with valid constant valbind - should not throw', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val 1 = 1 + 3
+in
+  "ABC"
+end
+`)
+    ).toBe(`string`))
+
+  test('type inference with invalid constant valbind - should throw', () =>
+    expect(() =>
+      parseAndTypeCheckExp(`
+let
+  val 1 = "abc"
+in
+  "ABC"
+end
+`)
+    ).toThrow(/Invalid constant binding. Expected type int, got string./))
 })
