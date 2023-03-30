@@ -26,8 +26,6 @@ const valueToString = (val) => {
         case 'list':
             return `[${val.jsVal.map(e => (0, exports.valueToString)(e)).toString()}]`;
         case 'fn':
-            // TODO: once we have a typechecker, we can
-            // include more info in the string repr, e.g param types and return types
             return 'fn';
         case 'builtin_fn':
             return `${val.id}: builtin_fn`;

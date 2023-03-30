@@ -104,17 +104,23 @@ function extendTypeEnv(env, decs) {
                         case 'PatVariable': {
                             // Create new type variable for the pattern type and assign it to env
                             const patTy = freshTypeVariable();
-                            const newEnv = (0, lodash_1.cloneDeep)(env);
-                            newEnv[valbind.pat.id] = {
-                                type: patTy,
-                                typeVariables: []
-                            };
-                            // Since the RHS may refer to this pattern ID (e.g. in the case of recursive functions)
-                            // we need to infer type of RHS in this new env
-                            const [t, C] = (0, _1.hindleyMilner)(newEnv, valbind.exp);
-                            // Now that we've solved the type of the RHS, we add a constraint to the pat type
-                            C.push({ type1: patTy, type2: t });
-                            env = generalize(C, env, valbind.pat.id, t);
+                            if (valbind.isRec) {
+                                const newEnv = (0, lodash_1.cloneDeep)(env);
+                                newEnv[valbind.pat.id] = {
+                                    type: patTy,
+                                    typeVariables: []
+                                };
+                                // Since the RHS may refer to this pattern ID in the case of recursive functions
+                                // we need to infer type of RHS in this new env
+                                const [t, C] = (0, _1.hindleyMilner)(newEnv, valbind.exp);
+                                // Now that we've solved the type of the RHS, we add a constraint to the pat type
+                                C.push({ type1: patTy, type2: t });
+                                env = generalize(C, env, valbind.pat.id, t);
+                            }
+                            else {
+                                const [t, C] = (0, _1.hindleyMilner)(env, valbind.exp);
+                                env = generalize(C, env, valbind.pat.id, t);
+                            }
                             break;
                         }
                         // Intentional fallthrough
