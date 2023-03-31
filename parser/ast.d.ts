@@ -2,7 +2,7 @@ import { SourceLocation } from '../types';
 export type Node = Expression | Match | Matches | Pattern | TypeAstNode | Declaration | DeclarationSequence | Valbind | Program;
 interface BaseNode {
     tag: string;
-    loc?: SourceLocation;
+    loc: SourceLocation;
 }
 interface BaseTypeAnnotatableNode extends BaseNode {
     annotated_type?: TypeAstNode;

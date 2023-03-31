@@ -28,7 +28,8 @@ class NodeGenerator {
         return {
             tag: 'IntConstant',
             val: val,
-            type: 'int'
+            type: 'int',
+            loc: contextToLocation(ctx)
         };
     }
     visitReal(ctx) {
@@ -37,7 +38,8 @@ class NodeGenerator {
         return {
             tag: 'RealConstant',
             val: val,
-            type: 'real'
+            type: 'real',
+            loc: contextToLocation(ctx)
         };
     }
     visitCharacter(ctx) {
@@ -45,7 +47,8 @@ class NodeGenerator {
             tag: 'CharConstant',
             // remove leading hash and double quote, and also trailing double quotes
             val: ctx.text.slice(2, ctx.text.length - 1),
-            type: 'char'
+            type: 'char',
+            loc: contextToLocation(ctx)
         };
     }
     visitString(ctx) {
@@ -53,20 +56,23 @@ class NodeGenerator {
             tag: 'StringConstant',
             // remove leading and trailing double quotes
             val: ctx.text.slice(1, ctx.text.length - 1),
-            type: 'string'
+            type: 'string',
+            loc: contextToLocation(ctx)
         };
     }
     visitBoolean(ctx) {
         return {
             tag: 'BoolConstant',
             val: ctx.TRUE() !== undefined ? true : false,
-            type: 'bool'
+            type: 'bool',
+            loc: contextToLocation(ctx)
         };
     }
     visitUnit(_ctx) {
         return {
             tag: 'UnitConstant',
-            type: 'unit'
+            type: 'unit',
+            loc: contextToLocation(_ctx)
         };
     }
     /**
@@ -104,13 +110,15 @@ class NodeGenerator {
         return {
             tag: 'ListLiteral',
             elements: elements.map(e => this.visit(e)),
-            arity: elements.length
+            arity: elements.length,
+            loc: contextToLocation(ctx)
         };
     }
     visitExpSequence(ctx) {
         return {
             tag: 'ExpSequence',
-            exps: ctx.exp().map((ec) => this.visit(ec))
+            exps: ctx.exp().map((ec) => this.visit(ec)),
+            loc: contextToLocation(ctx)
         };
     }
     visitParentheses(ctx) {
@@ -139,7 +147,8 @@ class NodeGenerator {
             alternative: {
                 tag: 'BoolConstant',
                 val: false,
-                type: 'bool'
+                type: 'bool',
+                loc: contextToLocation(ctx)
             },
             loc: contextToLocation(ctx)
         };
@@ -153,7 +162,8 @@ class NodeGenerator {
             consequent: {
                 tag: 'BoolConstant',
                 val: true,
-                type: 'bool'
+                type: 'bool',
+                loc: contextToLocation(ctx)
             },
             alternative: this.visit(ctx._op2),
             loc: contextToLocation(ctx)
@@ -215,13 +225,15 @@ class NodeGenerator {
     }
     visitPatWildcard(_ctx) {
         return {
-            tag: 'Wildcard'
+            tag: 'Wildcard',
+            loc: contextToLocation(_ctx)
         };
     }
     visitPatUnit(_ctx) {
         return {
             tag: 'UnitConstant',
-            type: 'unit'
+            type: 'unit',
+            loc: contextToLocation(_ctx)
         };
     }
     visitPatVariable(ctx) {
@@ -248,7 +260,8 @@ class NodeGenerator {
         return {
             tag: 'ListPattern',
             elements: elements.map(e => this.visit(e)),
-            arity: elements.length
+            arity: elements.length,
+            loc: contextToLocation(ctx)
         };
     }
     visitPatTypeAnnotation(ctx) {
@@ -262,21 +275,24 @@ class NodeGenerator {
     visitTypeVariable(ctx) {
         return {
             tag: 'TypeVariable',
-            id: ctx.VAR().text
+            id: ctx.VAR().text,
+            loc: contextToLocation(ctx)
         };
     }
     visitTypeConstructor(ctx) {
         return {
             tag: 'TypeConstructor',
             typeParameters: ctx.typ().map(tc => this.visit(tc)),
-            id: ctx.ID().text
+            id: ctx.ID().text,
+            loc: contextToLocation(ctx)
         };
     }
     visitTypeFunction(ctx) {
         return {
             tag: 'TypeFunction',
             argTy: this.visit(ctx._argTy),
-            retTy: this.visit(ctx._retTy)
+            retTy: this.visit(ctx._retTy),
+            loc: contextToLocation(ctx)
         };
     }
     /**
@@ -390,8 +406,8 @@ class NodeGenerator {
         return {
             tag: 'Valbind',
             isRec: true,
-            pat: { tag: 'PatVariable', id: fnName },
-            exp: { tag: 'Function', matches },
+            pat: { tag: 'PatVariable', id: fnName, loc: contextToLocation(ctx) },
+            exp: { tag: 'Function', matches, loc: contextToLocation(ctx) },
             loc: contextToLocation(ctx)
         };
     }
@@ -401,7 +417,8 @@ class NodeGenerator {
     visitProg(ctx) {
         return {
             tag: 'Program',
-            body: this.visit(ctx.decSequence()).decs
+            body: this.visit(ctx.decSequence()).decs,
+            loc: contextToLocation(ctx)
         };
     }
     visit(tree) {
