@@ -13,10 +13,7 @@ export type Node =
 
 interface BaseNode {
   tag: string
-  // TODO: shd this be compulsory?
-  // imo maybe dont need cause we only need to know where some things are?
-  // like we dont rly care where the constants are?
-  loc?: SourceLocation
+  loc: SourceLocation
 }
 
 interface BaseTypeAnnotatableNode extends BaseNode {

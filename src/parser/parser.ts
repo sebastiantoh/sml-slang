@@ -114,7 +114,8 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'IntConstant',
       val: val,
-      type: 'int'
+      type: 'int',
+      loc: contextToLocation(ctx)
     }
   }
   visitReal(ctx: RealContext): RealConstant {
@@ -123,7 +124,8 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'RealConstant',
       val: val,
-      type: 'real'
+      type: 'real',
+      loc: contextToLocation(ctx)
     }
   }
   visitCharacter(ctx: CharacterContext): CharConstant {
@@ -131,7 +133,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'CharConstant',
       // remove leading hash and double quote, and also trailing double quotes
       val: ctx.text.slice(2, ctx.text.length - 1),
-      type: 'char'
+      type: 'char',
+      loc: contextToLocation(ctx)
     }
   }
   visitString(ctx: StringContext): StringConstant {
@@ -139,20 +142,23 @@ class NodeGenerator implements SmlVisitor<Node> {
       tag: 'StringConstant',
       // remove leading and trailing double quotes
       val: ctx.text.slice(1, ctx.text.length - 1),
-      type: 'string'
+      type: 'string',
+      loc: contextToLocation(ctx)
     }
   }
   visitBoolean(ctx: BooleanContext): BoolConstant {
     return {
       tag: 'BoolConstant',
       val: ctx.TRUE() !== undefined ? true : false,
-      type: 'bool'
+      type: 'bool',
+      loc: contextToLocation(ctx)
     }
   }
   visitUnit(_ctx: UnitContext): UnitConstant {
     return {
       tag: 'UnitConstant',
-      type: 'unit'
+      type: 'unit',
+      loc: contextToLocation(_ctx)
     }
   }
 
@@ -191,13 +197,15 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'ListLiteral',
       elements: elements.map(e => this.visit(e)) as Expression[],
-      arity: elements.length
+      arity: elements.length,
+      loc: contextToLocation(ctx)
     }
   }
   visitExpSequence(ctx: ExpSequenceContext): ExpSequence {
     return {
       tag: 'ExpSequence',
-      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression)
+      exps: ctx.exp().map((ec: ExpContext) => this.visit(ec) as Expression),
+      loc: contextToLocation(ctx)
     }
   }
   visitParentheses(ctx: ParenthesesContext): Expression {
@@ -226,7 +234,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       alternative: {
         tag: 'BoolConstant',
         val: false,
-        type: 'bool'
+        type: 'bool',
+        loc: contextToLocation(ctx)
       },
       loc: contextToLocation(ctx)
     }
@@ -240,7 +249,8 @@ class NodeGenerator implements SmlVisitor<Node> {
       consequent: {
         tag: 'BoolConstant',
         val: true,
-        type: 'bool'
+        type: 'bool',
+        loc: contextToLocation(ctx)
       },
       alternative: this.visit(ctx._op2) as Expression,
       loc: contextToLocation(ctx)
@@ -304,13 +314,15 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
   visitPatWildcard(_ctx: PatWildcardContext): Wildcard {
     return {
-      tag: 'Wildcard'
+      tag: 'Wildcard',
+      loc: contextToLocation(_ctx)
     }
   }
   visitPatUnit(_ctx: PatUnitContext): UnitConstant {
     return {
       tag: 'UnitConstant',
-      type: 'unit'
+      type: 'unit',
+      loc: contextToLocation(_ctx)
     }
   }
   visitPatVariable(ctx: PatVariableContext): PatVariable {
@@ -337,7 +349,8 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'ListPattern',
       elements: elements.map(e => this.visit(e)) as Pattern[],
-      arity: elements.length
+      arity: elements.length,
+      loc: contextToLocation(ctx)
     }
   }
   visitPatTypeAnnotation(ctx: PatTypeAnnotationContext): Pattern {
@@ -352,21 +365,24 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitTypeVariable(ctx: TypeVariableContext): TypeVariable {
     return {
       tag: 'TypeVariable',
-      id: ctx.VAR().text
+      id: ctx.VAR().text,
+      loc: contextToLocation(ctx)
     }
   }
   visitTypeConstructor(ctx: TypeConstructorContext): TypeConstructor {
     return {
       tag: 'TypeConstructor',
       typeParameters: ctx.typ().map(tc => this.visit(tc) as TypeAstNode),
-      id: ctx.ID().text
+      id: ctx.ID().text,
+      loc: contextToLocation(ctx)
     }
   }
   visitTypeFunction(ctx: TypeFunctionContext): TypeFunction {
     return {
       tag: 'TypeFunction',
       argTy: this.visit(ctx._argTy) as TypeAstNode,
-      retTy: this.visit(ctx._retTy) as TypeAstNode
+      retTy: this.visit(ctx._retTy) as TypeAstNode,
+      loc: contextToLocation(ctx)
     }
   }
 
@@ -490,8 +506,8 @@ class NodeGenerator implements SmlVisitor<Node> {
     return {
       tag: 'Valbind',
       isRec: true,
-      pat: { tag: 'PatVariable', id: fnName },
-      exp: { tag: 'Function', matches },
+      pat: { tag: 'PatVariable', id: fnName, loc: contextToLocation(ctx) },
+      exp: { tag: 'Function', matches, loc: contextToLocation(ctx) },
       loc: contextToLocation(ctx)
     }
   }
@@ -502,7 +518,8 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitProg(ctx: ProgContext): Program {
     return {
       tag: 'Program',
-      body: (this.visit(ctx.decSequence()) as DeclarationSequence).decs
+      body: (this.visit(ctx.decSequence()) as DeclarationSequence).decs,
+      loc: contextToLocation(ctx)
     }
   }
 
