@@ -48,3 +48,22 @@ export class TypeMismatchError extends TypeError {
     return this.explain()
   }
 }
+
+export class CustomSourceError implements SourceError {
+  public type = ErrorType.TYPE
+  public severity = ErrorSeverity.ERROR
+
+  constructor(public node: Node, public message: string) {}
+
+  get location(): SourceLocation {
+    return this.node.loc ?? UNKNOWN_LOCATION
+  }
+
+  public explain(): string {
+    return this.message ?? 'Unexpected error has occurred :('
+  }
+
+  public elaborate(): string {
+    return this.explain()
+  }
+}

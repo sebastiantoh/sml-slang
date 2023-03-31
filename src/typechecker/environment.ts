@@ -1,9 +1,9 @@
 import * as assert from 'assert'
 import { cloneDeep, difference } from 'lodash'
 
-import { Declaration, Pattern } from '../parser/ast'
+import { Declaration, ExpVariable, InfixApplication, Pattern } from '../parser/ast'
 import { hindleyMilner } from '.'
-import { TypeMismatchError } from './errors'
+import { CustomSourceError, TypeMismatchError } from './errors'
 import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types'
 import {
   BOOL_TY,
@@ -82,11 +82,11 @@ export function createInitialTypeEnvironment(): TypeEnvironment {
   return Object.fromEntries(primitiveFuncs)
 }
 
-export function getTypeSchemeFromEnv(env: TypeEnvironment, id: string): TypeScheme {
-  if (!env.hasOwnProperty(id)) {
-    throw new Error(`Unbound value identifier "${id}".`)
+export function getTypeSchemeFromEnv(env: TypeEnvironment, expVar: ExpVariable): TypeScheme {
+  if (!env.hasOwnProperty(expVar.id)) {
+    throw new CustomSourceError(expVar, `Unbound value identifier "${expVar.id}".`)
   }
-  return env[id]
+  return env[expVar.id]
 }
 
 export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEnvironment {
@@ -104,7 +104,7 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
             case 'UnitConstant': {
               const [t, _] = hindleyMilner(env, valbind.exp)
               if (!isUnit(t)) {
-                throw new TypeMismatchError(valbind, UNIT_TY, t)
+                throw new TypeMismatchError(valbind.exp, UNIT_TY, t)
               }
               break
             }
@@ -118,7 +118,8 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
               const [patType, __] = hindleyMilner(env, valbind.pat)
 
               if (patType !== expType) {
-                throw new Error(
+                throw new CustomSourceError(
+                  valbind,
                   `Invalid constant binding. Expected type ${patType}, got ${expType}.`
                 )
               }
@@ -159,7 +160,7 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore: The following line will throw a compile error if all the
               // case statements are implemented (i.e. this branch is never taken).
-              throw new Error(`unimplemented for ${valbind.pat.tag}`)
+              throw new CustomSourceError(valbind.pat, `unimplemented for ${valbind.pat.tag}`)
             }
           }
         }
@@ -210,7 +211,7 @@ export function extendTypeEnvFromPattern(
     case 'InfixConstruction': {
       // we only support ::
       if (pat.id !== '::') {
-        throw new Error(`${pat.id} is not a supported constructor`)
+        throw new CustomSourceError(pat, `${pat.id} is not a supported constructor`)
       }
 
       assert(isListType(patType))
@@ -228,18 +229,24 @@ export function extendTypeEnvFromPattern(
       return env
     }
     default: {
-      throw new Error(`${pat.tag} not implemented`)
+      throw new CustomSourceError(pat, `${pat.tag} not implemented`)
     }
   }
 }
 
-export function getPrimitiveFuncTypes(env: TypeEnvironment, id: string): [Type, Type, Type] {
-  if (!env.hasOwnProperty(id)) {
-    throw new Error(`Unsupported infix operator "${id}".`)
+export function getPrimitiveFuncTypes(
+  env: TypeEnvironment,
+  infixApp: InfixApplication
+): [Type, Type, Type] {
+  if (!env.hasOwnProperty(infixApp.id)) {
+    throw new CustomSourceError(infixApp, `Unsupported infix operator "${infixApp.id}".`)
   }
-  const type = env[id].type
+  const type = env[infixApp.id].type
   if (!isFunctionType(type) || !isFunctionType(type.returnType)) {
-    throw new Error(`Infix operator "${id}" declared as non fun -> fun type.`)
+    throw new CustomSourceError(
+      infixApp,
+      `Infix operator "${infixApp.id}" declared as non fun -> fun type.`
+    )
   }
   return [type.parameterType, type.returnType.parameterType, type.returnType.returnType]
 }

@@ -9,6 +9,7 @@ import {
   TypeEnvironment,
   unifyAndSubstitute
 } from './environment'
+import { CustomSourceError } from './errors'
 import { Type, TypeConstraint } from './types'
 import { BOOL_TY, UNIT_TY } from './utils'
 
@@ -26,7 +27,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     }
     // Variable
     case 'ExpVariable': {
-      const ts = getTypeSchemeFromEnv(env, node.id)
+      const ts = getTypeSchemeFromEnv(env, node)
       return [instantiate(ts), []]
     }
     // Application
@@ -40,7 +41,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     }
     // Infix Application
     case 'InfixApplication': {
-      const [t1, t2, t3] = getPrimitiveFuncTypes(env, node.id)
+      const [t1, t2, t3] = getPrimitiveFuncTypes(env, node)
       const [t4, C1] = hindleyMilner(env, node.operand1)
       const [t5, C2] = hindleyMilner(env, node.operand2)
       const constraints = [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }]
@@ -129,7 +130,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     case 'InfixConstruction': {
       // we only support ::
       if (node.id !== '::') {
-        throw new Error(`${node.id} is not a supported constructor`)
+        throw new CustomSourceError(node, `${node.id} is not a supported constructor`)
       }
       const t = freshTypeVariable()
       const [t1, C1] = hindleyMilner(env, node.pat1)
@@ -160,7 +161,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     }
 
     default: {
-      throw new Error(`${node.tag} not implemented`)
+      throw new CustomSourceError(node, `${node.tag} not implemented`)
     }
   }
 }
