@@ -3,7 +3,7 @@ import { ErrorSeverity, ErrorType, SourceError, SourceLocation } from '../types'
 import { Type } from './types'
 import { stringifyType } from './utils'
 
-const UNKNOWN_LOCATION: SourceLocation = {
+export const UNKNOWN_LOCATION: SourceLocation = {
   start: {
     line: -1,
     column: -1
@@ -57,6 +57,44 @@ export class CustomSourceError implements SourceError {
 
   get location(): SourceLocation {
     return this.node.loc ?? UNKNOWN_LOCATION
+  }
+
+  public explain(): string {
+    return this.message ?? 'Unexpected error has occurred :('
+  }
+
+  public elaborate(): string {
+    return this.explain()
+  }
+}
+
+export class RuntimeError implements SourceError {
+  public type = ErrorType.TYPE
+  public severity = ErrorSeverity.ERROR
+
+  constructor(public message: string) {}
+
+  get location(): SourceLocation {
+    return UNKNOWN_LOCATION
+  }
+
+  public explain(): string {
+    return this.message ?? 'Unexpected error has occurred :('
+  }
+
+  public elaborate(): string {
+    return this.explain()
+  }
+}
+
+export class ParseError implements SourceError {
+  public type = ErrorType.TYPE
+  public severity = ErrorSeverity.ERROR
+
+  constructor(public loc: SourceLocation, public message: string) {}
+
+  get location(): SourceLocation {
+    return this.loc ?? UNKNOWN_LOCATION
   }
 
   public explain(): string {

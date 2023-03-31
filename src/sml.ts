@@ -2,6 +2,7 @@ import * as assert from 'assert'
 import { isEqual } from 'lodash'
 
 import { stdout } from './interpreter/interpreter'
+import { RuntimeError } from './typechecker/errors'
 import { BuiltinFn, Value } from './types'
 
 export const valueToString = (val: Value): string => {
@@ -39,7 +40,7 @@ export const builtinBinOperators = {
   '/': (a: Value, b: Value) => {
     if (a.tag === 'real' && b.tag === 'real') {
       if (b.jsVal === 0) {
-        throw new Error('division by zero')
+        throw new RuntimeError(`division by zero - ${a.jsVal} / ${b.jsVal}`)
       }
       return {
         tag: 'real',
@@ -51,7 +52,7 @@ export const builtinBinOperators = {
   div: (a: Value, b: Value) => {
     if (a.tag === 'int' && b.tag === 'int') {
       if (b.jsVal === 0) {
-        throw new Error('division by zero')
+        throw new RuntimeError(`division by zero - ${a.jsVal} div ${b.jsVal}`)
       }
       return {
         tag: 'int',

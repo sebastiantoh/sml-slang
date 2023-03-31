@@ -4,6 +4,7 @@ import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
+import * as assert from 'assert'
 
 import { SmlLexer } from '../lang/SmlLexer'
 import {
@@ -52,6 +53,7 @@ import {
   ValueDeclContext
 } from '../lang/SmlParser'
 import { SmlVisitor } from '../lang/SmlVisitor'
+import { ParseError, UNKNOWN_LOCATION } from '../typechecker/errors'
 import { SourceLocation } from '../types'
 import {
   Application,
@@ -427,6 +429,11 @@ class NodeGenerator implements SmlVisitor<Node> {
    * Valbind
    */
   visitValbind(ctx: ValbindContext): Valbind {
+    const isRec = ctx.REC() !== undefined
+    const exp = this.visit(ctx.exp()) as Expression
+    if (isRec && exp.tag !== 'Function') {
+      throw new ParseError(exp.loc, 'using rec requires binding a function')
+    }
     return {
       tag: 'Valbind',
       isRec: ctx.REC() !== undefined,
@@ -474,6 +481,11 @@ class NodeGenerator implements SmlVisitor<Node> {
       } as Match
       matches.push(match)
     } else {
+      throw new ParseError(
+        contextToLocation(ctx),
+        "TODO: multiple cases for functions not yet implemented. Consider using 'case (...) of ...' instead"
+      )
+
       // Each funmatch correspond to a separate case. Each case can contain >= 1 parameter (or patterns)
       for (const funMatch of funMatches) {
         const id = funMatch.ID().text
@@ -487,19 +499,21 @@ class NodeGenerator implements SmlVisitor<Node> {
           fun f 1 = 2
             | x 2 = 3
           */
-          throw new Error(`Different function names in different cases ("${fnName}" vs. "${id}")`)
+          throw new ParseError(
+            contextToLocation(ctx),
+            `Different function names in different cases ("${fnName}" vs. "${id}")`
+          )
         } else if (tmpNumParams !== nParams) {
           /*
           Example where number of params are different:
           fun f 1 = 2
             | f = 3
           */
-          throw new Error(`Different number of params in different cases`)
+          throw new ParseError(
+            contextToLocation(ctx),
+            `Different number of params in different cases`
+          )
         }
-
-        throw new Error(
-          "TODO: multiple cases for functions not yet implemented. Implement this once 'case (...) of ...' has been implemeneted"
-        )
       }
     }
 
@@ -527,13 +541,13 @@ class NodeGenerator implements SmlVisitor<Node> {
     return tree.accept(this)
   }
   visitChildren(_node: RuleNode): Node {
-    throw new Error('Method not implemented.')
+    assert(false)
   }
   visitTerminal(_node: TerminalNode): Node {
-    throw new Error('Method not implemented.')
+    assert(false)
   }
   visitErrorNode(_node: ErrorNode): Node {
-    throw new Error('Method not implemented.')
+    assert(false)
   }
 }
 
@@ -544,15 +558,22 @@ function getStdlibSourceCode(): string {
 }
 
 function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Node {
-  const inputStream = CharStreams.fromString(source)
-  const lexer = new SmlLexer(inputStream)
-  const tokenStream = new CommonTokenStream(lexer)
-  const parser = new SmlParser(tokenStream)
-  parser.buildParseTree = true
+  try {
+    const inputStream = CharStreams.fromString(source)
+    const lexer = new SmlLexer(inputStream)
+    const tokenStream = new CommonTokenStream(lexer)
+    const parser = new SmlParser(tokenStream)
+    parser.buildParseTree = true
 
-  const tree = f(parser)
-  const generator = new NodeGenerator()
-  return generator.visit(tree)
+    const tree = f(parser)
+    const generator = new NodeGenerator()
+    return generator.visit(tree)
+  } catch (err) {
+    if (err instanceof ParseError) {
+      throw err
+    }
+    throw new ParseError(UNKNOWN_LOCATION, err)
+  }
 }
 
 export function parseProg(source: string): Node {

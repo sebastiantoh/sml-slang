@@ -5,6 +5,7 @@ import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { hindleyMilner } from '../typechecker'
 import { createInitialTypeEnvironment, unifyAndSubstitute } from '../typechecker/environment'
+import { RuntimeError } from '../typechecker/errors'
 import { Environment, Result, Value } from '../types'
 import { Instruction } from './instructions'
 
@@ -28,7 +29,9 @@ const extendEnv = (env: Environment): Environment => {
 }
 const lookupEnv = (env: Environment | undefined, k: string): Value => {
   if (env === undefined) {
-    throw new Error(`${k} not found in env`)
+    // Should never happen since typechecker will catch it, but we still
+    // throw an error since our test cases may skip the typechecking phase
+    throw new RuntimeError(`${k} not found in env`)
   }
   if (env.frame[k] === undefined) {
     return lookupEnv(env.parent, k)
@@ -105,7 +108,9 @@ const tryMatch = (originalEnv: Environment, value: Value, pat: Pattern): [boolea
   } else if (pat.tag === 'InfixConstruction') {
     // we only support ::
     if (pat.id !== '::') {
-      throw new Error(`${pat.id} is not a supported constructor`)
+      // Should never happen since typechecker will catch it, but we still
+      // throw an error since our test cases may skip the typechecking phase
+      throw new RuntimeError(`${pat.id} is not a supported constructor`)
     }
 
     // guaranteed by typechecker
@@ -158,7 +163,7 @@ const tryMatch = (originalEnv: Environment, value: Value, pat: Pattern): [boolea
     // Throw error if there is a duplicate variable
     // TODO: we might want to change this into a parsing error
     if (patVarSet.size !== numVars) {
-      throw new Error('Cannot have two of the same variable in one list pattern')
+      throw new RuntimeError(`'Cannot have two of the same variable in one list pattern'`)
     }
 
     let updatedEnv = { ...E }
@@ -175,7 +180,7 @@ const tryMatch = (originalEnv: Environment, value: Value, pat: Pattern): [boolea
     return [true, updatedEnv]
   } else {
     // TODO: handle more complicated patterns here.
-    throw new Error(`TODO: unimplemented ${pat}`)
+    throw new RuntimeError(`TODO: unimplemented ${pat}`)
   }
 }
 
@@ -325,9 +330,10 @@ const execMicrocode = (cmd: Microcode) => {
       // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
       // Each declaration are in their own env frame
       if (cmd.isRec) {
-        if (cmd.exp.tag !== 'Function') {
-          throw new Error('using rec requires binding a function')
-        }
+        assert(
+          cmd.exp.tag === 'Function',
+          'using rec requires binding a function - any violations should have been caught by parser'
+        )
         E = extendEnv(E)
         A.push({ tag: 'AssignI', pat: cmd.pat }, cmd.exp)
       } else {
@@ -396,7 +402,7 @@ const execMicrocode = (cmd: Microcode) => {
       // Examples of non-valid constant assignment: 1=2, true=false
       const [matched, updatedEnv] = tryMatch(E, rhs, cmd.pat)
       if (!matched) {
-        throw new Error(`cannot assign ${cmd.pat} to ${rhs}`)
+        throw new RuntimeError(`cannot assign ${cmd.pat} to ${rhs}`)
       }
       E = updatedEnv
       break
@@ -457,7 +463,7 @@ const execMicrocode = (cmd: Microcode) => {
       }
 
       if (!foundMatch) {
-        throw new Error(`no match found for ${arg}`)
+        throw new RuntimeError(`no match found for ${arg}`)
       }
 
       break
@@ -470,7 +476,7 @@ const execMicrocode = (cmd: Microcode) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore: The following line will throw a compile error if all the
       // case statements are implemented (i.e. this branch is never taken).
-      throw new Error(`unknown microcode: ${cmd.tag}`)
+      throw new RuntimeError(`unknown microcode: ${cmd.tag}`)
     }
   }
 }
@@ -490,7 +496,7 @@ export function evaluate(node: Node) {
     i++
   }
   if (i === stepLimit) {
-    throw new Error(`step limit ${stepLimit} exceeded`)
+    throw new RuntimeError(`step limit ${stepLimit} exceeded`)
   }
 }
 
