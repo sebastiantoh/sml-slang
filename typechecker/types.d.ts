@@ -1,3 +1,4 @@
+import { Node } from '../parser/ast';
 export type Type = PrimitiveType | FunctionType | ListType | TypeVariable;
 export type PrimitiveType = 'int' | 'real' | 'string' | 'char' | 'bool' | 'unit';
 export interface FunctionType {
@@ -17,6 +18,7 @@ export interface TypeScheme {
 export interface TypeConstraint {
     type1: Type;
     type2: Type;
+    node: Node;
 }
 export interface TypeSubstitution {
     from: Type;
