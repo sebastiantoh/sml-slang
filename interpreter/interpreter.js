@@ -6,6 +6,7 @@ const lodash_1 = require("lodash");
 const Sml = require("../sml");
 const typechecker_1 = require("../typechecker");
 const environment_1 = require("../typechecker/environment");
+const errors_1 = require("../typechecker/errors");
 exports.stdout = [];
 let A = [];
 let S = [];
@@ -22,7 +23,9 @@ const extendEnv = (env) => {
 };
 const lookupEnv = (env, k) => {
     if (env === undefined) {
-        throw new Error(`${k} not found in env`);
+        // Should never happen since typechecker will catch it, but we still
+        // throw an error since our test cases may skip the typechecking phase
+        throw new errors_1.RuntimeError(`${k} not found in env`);
     }
     if (env.frame[k] === undefined) {
         return lookupEnv(env.parent, k);
@@ -97,7 +100,9 @@ const tryMatch = (originalEnv, value, pat) => {
     else if (pat.tag === 'InfixConstruction') {
         // we only support ::
         if (pat.id !== '::') {
-            throw new Error(`${pat.id} is not a supported constructor`);
+            // Should never happen since typechecker will catch it, but we still
+            // throw an error since our test cases may skip the typechecking phase
+            throw new errors_1.RuntimeError(`${pat.id} is not a supported constructor`);
         }
         // guaranteed by typechecker
         assert(value.tag === 'list');
@@ -143,7 +148,7 @@ const tryMatch = (originalEnv, value, pat) => {
         // Throw error if there is a duplicate variable
         // TODO: we might want to change this into a parsing error
         if (patVarSet.size !== numVars) {
-            throw new Error('Cannot have two of the same variable in one list pattern');
+            throw new errors_1.RuntimeError(`'Cannot have two of the same variable in one list pattern'`);
         }
         let updatedEnv = Object.assign({}, E);
         for (let i = 0; i < pat.arity; i++) {
@@ -159,7 +164,7 @@ const tryMatch = (originalEnv, value, pat) => {
     }
     else {
         // TODO: handle more complicated patterns here.
-        throw new Error(`TODO: unimplemented ${pat}`);
+        throw new errors_1.RuntimeError(`TODO: unimplemented ${pat}`);
     }
 };
 // All the case statements are wrapped in a { }. This is to prevent scopes
@@ -304,9 +309,7 @@ const execMicrocode = (cmd) => {
             // https://www.cs.cornell.edu/courses/cs312/2004fa/lectures/rec21.html
             // Each declaration are in their own env frame
             if (cmd.isRec) {
-                if (cmd.exp.tag !== 'Function') {
-                    throw new Error('using rec requires binding a function');
-                }
+                assert(cmd.exp.tag === 'Function', 'using rec requires binding a function - any violations should have been caught by parser');
                 E = extendEnv(E);
                 A.push({ tag: 'AssignI', pat: cmd.pat }, cmd.exp);
             }
@@ -373,7 +376,7 @@ const execMicrocode = (cmd) => {
             // Examples of non-valid constant assignment: 1=2, true=false
             const [matched, updatedEnv] = tryMatch(E, rhs, cmd.pat);
             if (!matched) {
-                throw new Error(`cannot assign ${cmd.pat} to ${rhs}`);
+                throw new errors_1.RuntimeError(`cannot assign ${cmd.pat} to ${rhs}`);
             }
             E = updatedEnv;
             break;
@@ -431,7 +434,7 @@ const execMicrocode = (cmd) => {
                 }
             }
             if (!foundMatch) {
-                throw new Error(`no match found for ${arg}`);
+                throw new errors_1.RuntimeError(`no match found for ${arg}`);
             }
             break;
         }
@@ -443,7 +446,7 @@ const execMicrocode = (cmd) => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: The following line will throw a compile error if all the
             // case statements are implemented (i.e. this branch is never taken).
-            throw new Error(`unknown microcode: ${cmd.tag}`);
+            throw new errors_1.RuntimeError(`unknown microcode: ${cmd.tag}`);
         }
     }
 };
@@ -462,7 +465,7 @@ function evaluate(node) {
         i++;
     }
     if (i === stepLimit) {
-        throw new Error(`step limit ${stepLimit} exceeded`);
+        throw new errors_1.RuntimeError(`step limit ${stepLimit} exceeded`);
     }
 }
 exports.evaluate = evaluate;
@@ -474,9 +477,7 @@ function evaluateExp(exp, outputWithType) {
         type = (0, environment_1.unifyAndSubstitute)(unsolvedType, typeConstraints);
     }
     evaluate(exp);
-    if (S.length !== 1) {
-        throw new Error(`internal error: stash must be singleton but is: ${S}`);
-    }
+    assert(S.length === 1, `internal error: stash must be singleton but is: ${S}`);
     return {
         status: 'finished',
         stdout: exports.stdout,
@@ -487,9 +488,7 @@ function evaluateExp(exp, outputWithType) {
 exports.evaluateExp = evaluateExp;
 function evaluateProg(prog) {
     evaluate(prog);
-    if (S.length !== 0) {
-        throw new Error(`internal error: stash must be empty but is: ${S}`);
-    }
+    assert(S.length === 0, `internal error: stash must be empty but is: ${S}`);
     return {
         status: 'finished',
         stdout: exports.stdout

@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.builtinFns = exports.builtinBinOperators = exports.valueToString = void 0;
+const assert = require("assert");
 const lodash_1 = require("lodash");
 const interpreter_1 = require("./interpreter/interpreter");
+const errors_1 = require("./typechecker/errors");
 const valueToString = (val) => {
     switch (val.tag) {
         case 'int':
@@ -38,26 +40,26 @@ exports.builtinBinOperators = {
     '/': (a, b) => {
         if (a.tag === 'real' && b.tag === 'real') {
             if (b.jsVal === 0) {
-                throw new Error('division by zero');
+                throw new errors_1.RuntimeError(`division by zero - ${a.jsVal} / ${b.jsVal}`);
             }
             return {
                 tag: 'real',
                 jsVal: a.jsVal / b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     div: (a, b) => {
         if (a.tag === 'int' && b.tag === 'int') {
             if (b.jsVal === 0) {
-                throw new Error('division by zero');
+                throw new errors_1.RuntimeError(`division by zero - ${a.jsVal} div ${b.jsVal}`);
             }
             return {
                 tag: 'int',
                 jsVal: Math.floor(a.jsVal / b.jsVal)
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     mod: (a, b) => {
         if (a.tag === 'int' && b.tag === 'int') {
@@ -66,7 +68,7 @@ exports.builtinBinOperators = {
                 jsVal: ((a.jsVal % b.jsVal) + b.jsVal) % b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '*': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
@@ -75,7 +77,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal * b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '+': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
@@ -84,7 +86,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal + b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '-': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
@@ -93,7 +95,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal - b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '^': (a, b) => {
         if (a.tag === 'string' && b.tag === 'string') {
@@ -102,7 +104,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal.concat(b.jsVal)
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '::': (a, b) => {
         if (b.tag === 'list') {
@@ -112,7 +114,7 @@ exports.builtinBinOperators = {
                 jsVal: [a, ...b.jsVal]
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '@': (a, b) => {
         if (a.tag === 'list' && b.tag === 'list') {
@@ -122,7 +124,7 @@ exports.builtinBinOperators = {
                 jsVal: [...a.jsVal, ...b.jsVal]
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '=': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') ||
@@ -145,7 +147,7 @@ exports.builtinBinOperators = {
                 jsVal: true
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '<>': (a, b) => {
         const isEq = exports.builtinBinOperators['='](a, b);
@@ -164,7 +166,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal < b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '>': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') ||
@@ -176,7 +178,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal > b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '<=': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') ||
@@ -188,7 +190,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal <= b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '>=': (a, b) => {
         if ((a.tag === 'int' && b.tag === 'int') ||
@@ -200,7 +202,7 @@ exports.builtinBinOperators = {
                 jsVal: a.jsVal >= b.jsVal
             };
         }
-        throw new Error(`invalid types - received ${a.tag} and ${b.tag}`);
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     }
 };
 exports.builtinFns = [
@@ -224,7 +226,7 @@ exports.builtinFns = [
                     jsVal: arg.jsVal.length
                 };
             }
-            throw new Error(`invalid types - received ${arg.tag}`);
+            assert(false, `invalid types - received ${arg.tag}`);
         }
     },
     {
@@ -237,7 +239,7 @@ exports.builtinFns = [
                     jsVal: !arg.jsVal
                 };
             }
-            throw new Error(`invalid types - received ${arg.tag}`);
+            assert(false, `invalid types - received ${arg.tag}`);
         }
     }
 ];

@@ -3,8 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseExp = exports.parseProg = void 0;
 /* tslint:disable:max-classes-per-file */
 const antlr4ts_1 = require("antlr4ts");
+const assert = require("assert");
 const SmlLexer_1 = require("../lang/SmlLexer");
 const SmlParser_1 = require("../lang/SmlParser");
+const errors_1 = require("../typechecker/errors");
 // TODO: move to parser/utils.ts?
 function contextToLocation(ctx) {
     return {
@@ -335,6 +337,11 @@ class NodeGenerator {
      * Valbind
      */
     visitValbind(ctx) {
+        const isRec = ctx.REC() !== undefined;
+        const exp = this.visit(ctx.exp());
+        if (isRec && exp.tag !== 'Function') {
+            throw new errors_1.ParseError(exp.loc, 'using rec requires binding a function');
+        }
         return {
             tag: 'Valbind',
             isRec: ctx.REC() !== undefined,
@@ -378,6 +385,7 @@ class NodeGenerator {
             matches.push(match);
         }
         else {
+            throw new errors_1.ParseError(contextToLocation(ctx), "TODO: multiple cases for functions not yet implemented. Consider using 'case (...) of ...' instead");
             // Each funmatch correspond to a separate case. Each case can contain >= 1 parameter (or patterns)
             for (const funMatch of funMatches) {
                 const id = funMatch.ID().text;
@@ -390,7 +398,7 @@ class NodeGenerator {
                     fun f 1 = 2
                       | x 2 = 3
                     */
-                    throw new Error(`Different function names in different cases ("${fnName}" vs. "${id}")`);
+                    throw new errors_1.ParseError(contextToLocation(ctx), `Different function names in different cases ("${fnName}" vs. "${id}")`);
                 }
                 else if (tmpNumParams !== nParams) {
                     /*
@@ -398,9 +406,8 @@ class NodeGenerator {
                     fun f 1 = 2
                       | f = 3
                     */
-                    throw new Error(`Different number of params in different cases`);
+                    throw new errors_1.ParseError(contextToLocation(ctx), `Different number of params in different cases`);
                 }
-                throw new Error("TODO: multiple cases for functions not yet implemented. Implement this once 'case (...) of ...' has been implemeneted");
             }
         }
         return {
@@ -425,13 +432,13 @@ class NodeGenerator {
         return tree.accept(this);
     }
     visitChildren(_node) {
-        throw new Error('Method not implemented.');
+        assert(false);
     }
     visitTerminal(_node) {
-        throw new Error('Method not implemented.');
+        assert(false);
     }
     visitErrorNode(_node) {
-        throw new Error('Method not implemented.');
+        assert(false);
     }
 }
 function getStdlibSourceCode() {
@@ -440,14 +447,22 @@ function getStdlibSourceCode() {
     return fs.readFileSync(file, { encoding: 'utf8', flag: 'r' });
 }
 function parse(source, f) {
-    const inputStream = antlr4ts_1.CharStreams.fromString(source);
-    const lexer = new SmlLexer_1.SmlLexer(inputStream);
-    const tokenStream = new antlr4ts_1.CommonTokenStream(lexer);
-    const parser = new SmlParser_1.SmlParser(tokenStream);
-    parser.buildParseTree = true;
-    const tree = f(parser);
-    const generator = new NodeGenerator();
-    return generator.visit(tree);
+    try {
+        const inputStream = antlr4ts_1.CharStreams.fromString(source);
+        const lexer = new SmlLexer_1.SmlLexer(inputStream);
+        const tokenStream = new antlr4ts_1.CommonTokenStream(lexer);
+        const parser = new SmlParser_1.SmlParser(tokenStream);
+        parser.buildParseTree = true;
+        const tree = f(parser);
+        const generator = new NodeGenerator();
+        return generator.visit(tree);
+    }
+    catch (err) {
+        if (err instanceof errors_1.ParseError) {
+            throw err;
+        }
+        throw new errors_1.ParseError(errors_1.UNKNOWN_LOCATION, err);
+    }
 }
 function parseProg(source) {
     const stdlibSourceCode = getStdlibSourceCode();
