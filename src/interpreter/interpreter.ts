@@ -494,16 +494,18 @@ export function evaluate(node: Node) {
   }
 }
 
+const INIT_TYPE_ENV = createInitialTypeEnvironment()
+
 export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
+  let type = undefined
+  if (outputWithType) {
+    const [unsolvedType, typeConstraints] = hindleyMilner(INIT_TYPE_ENV, exp)
+    type = unifyAndSubstitute(unsolvedType, typeConstraints)
+  }
+
   evaluate(exp)
   if (S.length !== 1) {
     throw new Error(`internal error: stash must be singleton but is: ${S}`)
-  }
-
-  let type = undefined
-  if (outputWithType) {
-    const [unsolvedType, typeConstraints] = hindleyMilner(createInitialTypeEnvironment(), exp)
-    type = unifyAndSubstitute(unsolvedType, typeConstraints)
   }
 
   return {
