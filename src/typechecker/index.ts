@@ -35,7 +35,11 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const t = freshTypeVariable()
       const [t1, C1] = hindleyMilner(env, node.fn)
       const [t2, C2] = hindleyMilner(env, node.arg)
-      const constraints = [...C1, ...C2, { type1: t1, type2: { parameterType: t2, returnType: t } }]
+      const constraints = [
+        ...C1,
+        ...C2,
+        { type1: t1, type2: { parameterType: t2, returnType: t }, node }
+      ]
       const solvedType = unifyAndSubstitute(t, constraints)
       return [solvedType, constraints]
     }
@@ -44,7 +48,12 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const [t1, t2, t3] = getPrimitiveFuncTypes(env, node)
       const [t4, C1] = hindleyMilner(env, node.operand1)
       const [t5, C2] = hindleyMilner(env, node.operand2)
-      const constraints = [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }]
+      const constraints = [
+        ...C1,
+        ...C2,
+        { type1: t1, type2: t4, node: node.operand1 },
+        { type1: t2, type2: t5, node: node.operand2 }
+      ]
       const solvedType = unifyAndSubstitute(t3, constraints)
       return [solvedType, constraints]
     }
@@ -54,7 +63,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       let C: TypeConstraint[] = []
       for (const el of node.elements) {
         const [tmp_ty, tmp_C] = hindleyMilner(env, el)
-        C = [...C, ...tmp_C, { type1: t, type2: tmp_ty }]
+        C = [...C, ...tmp_C, { type1: t, type2: tmp_ty, node: el }]
       }
       const solvedType = unifyAndSubstitute({ elementType: t }, C)
       return [solvedType, C]
@@ -90,9 +99,9 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         ...C1,
         ...C2,
         ...C3,
-        { type1: t1, type2: BOOL_TY },
-        { type1: t, type2: t2 },
-        { type1: t, type2: t3 }
+        { type1: t1, type2: BOOL_TY, node: node.pred },
+        { type1: t, type2: t2, node: node.consequent },
+        { type1: t, type2: t3, node: node.alternative }
       ]
       const solvedType = unifyAndSubstitute(t, constraints)
       return [solvedType, constraints]
@@ -112,8 +121,8 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         constraints.push(
           ...patConstraints,
           ...expConstraints,
-          { type1: parameterType, type2: patTy },
-          { type1: returnType, type2: expTy }
+          { type1: parameterType, type2: patTy, node: pat },
+          { type1: returnType, type2: expTy, node: exp }
         )
       }
       const solvedType = unifyAndSubstitute(funTy, constraints)
@@ -137,7 +146,12 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const [t2, C2] = hindleyMilner(env, node.pat2)
       const tList = { elementType: t }
 
-      const constraints = [...C1, ...C2, { type1: t1, type2: t }, { type1: t2, type2: tList }]
+      const constraints = [
+        ...C1,
+        ...C2,
+        { type1: t1, type2: t, node: node.pat1 },
+        { type1: t2, type2: tList, node: node.pat2 }
+      ]
       const solvedType = unifyAndSubstitute(tList, constraints)
       return [solvedType, constraints]
     }
@@ -147,7 +161,7 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       const constraints: TypeConstraint[] = []
       for (const pat of node.elements) {
         const [elementTy, elementConstraints] = hindleyMilner(env, pat)
-        constraints.push(...elementConstraints, { type1: elementTy, type2: t })
+        constraints.push(...elementConstraints, { type1: elementTy, type2: t, node: pat })
       }
       const solvedType = unifyAndSubstitute(tList, constraints)
       return [solvedType, constraints]

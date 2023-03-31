@@ -140,7 +140,7 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
                 // we need to infer type of RHS in this new env
                 const [t, C] = hindleyMilner(newEnv, valbind.exp)
                 // Now that we've solved the type of the RHS, we add a constraint to the pat type
-                C.push({ type1: patTy, type2: t })
+                C.push({ type1: patTy, type2: t, node: valbind })
                 env = generalize(C, env, valbind.pat.id, t)
               } else {
                 const [t, C] = hindleyMilner(env, valbind.exp)
@@ -341,9 +341,10 @@ function substituteTypeVarIntoConstraints(
   typeVar: TypeVariable,
   type: Type
 ): TypeConstraint[] {
-  return C.map(({ type1: t1, type2: t2 }) => ({
+  return C.map(({ type1: t1, type2: t2, node: node }) => ({
     type1: substituteTypeVarIntoType(t1, typeVar, type),
-    type2: substituteTypeVarIntoType(t2, typeVar, type)
+    type2: substituteTypeVarIntoType(t2, typeVar, type),
+    node: node
   }))
 }
 
@@ -352,7 +353,7 @@ export function unify(C: TypeConstraint[]): TypeSubstitution[] {
   if (C.length === 0) {
     return []
   }
-  const [{ type1: t1, type2: t2 }, ...C2] = C
+  const [{ type1: t1, type2: t2, node: curNode }, ...C2] = C
   // both t1 and t2 are the same simple types
   // - throw away constraint (no useful info)
   if (
@@ -378,21 +379,21 @@ export function unify(C: TypeConstraint[]): TypeSubstitution[] {
   // t1 and t2 are function types
   if (isFunctionType(t1) && isFunctionType(t2)) {
     return unify([
-      { type1: t1.parameterType, type2: t2.parameterType },
-      { type1: t1.returnType, type2: t2.returnType },
+      { type1: t1.parameterType, type2: t2.parameterType, node: curNode },
+      { type1: t1.returnType, type2: t2.returnType, node: curNode },
       ...C2
     ])
   }
 
   // t1 and t2 are list types
   if (isListType(t1) && isListType(t2)) {
-    return unify([{ type1: t1.elementType, type2: t2.elementType }, ...C2])
+    return unify([{ type1: t1.elementType, type2: t2.elementType, node: curNode }, ...C2])
   }
 
-  // TODO: make errors better - can include line number etc.
-  // to support that we will need to additionally inlcude node in our type constraints
-  // (or) simply include the line and col nums in the type constraints
-  throw new Error(`Failed to unify type constraint ${stringifyType(t1)} = ${stringifyType(t2)}.`)
+  throw new CustomSourceError(
+    curNode,
+    `Failed to unify type constraint ${stringifyType(t1)} = ${stringifyType(t2)}.`
+  )
 }
 
 export function substituteIntoType(type: Type, S: TypeSubstitution[]): Type {
