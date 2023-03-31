@@ -466,15 +466,16 @@ function evaluate(node) {
     }
 }
 exports.evaluate = evaluate;
+const INIT_TYPE_ENV = (0, environment_1.createInitialTypeEnvironment)();
 function evaluateExp(exp, outputWithType) {
+    let type = undefined;
+    if (outputWithType) {
+        const [unsolvedType, typeConstraints] = (0, typechecker_1.hindleyMilner)(INIT_TYPE_ENV, exp);
+        type = (0, environment_1.unifyAndSubstitute)(unsolvedType, typeConstraints);
+    }
     evaluate(exp);
     if (S.length !== 1) {
         throw new Error(`internal error: stash must be singleton but is: ${S}`);
-    }
-    let type = undefined;
-    if (outputWithType) {
-        const [unsolvedType, typeConstraints] = (0, typechecker_1.hindleyMilner)((0, environment_1.createInitialTypeEnvironment)(), exp);
-        type = (0, environment_1.unifyAndSubstitute)(unsolvedType, typeConstraints);
     }
     return {
         status: 'finished',
