@@ -62,11 +62,11 @@ function createInitialTypeEnvironment() {
     return Object.fromEntries(primitiveFuncs);
 }
 exports.createInitialTypeEnvironment = createInitialTypeEnvironment;
-function getTypeSchemeFromEnv(env, id) {
-    if (!env.hasOwnProperty(id)) {
-        throw new Error(`Unbound value identifier "${id}".`);
+function getTypeSchemeFromEnv(env, expVar) {
+    if (!env.hasOwnProperty(expVar.id)) {
+        throw new errors_1.CustomSourceError(expVar, `Unbound value identifier "${expVar.id}".`);
     }
-    return env[id];
+    return env[expVar.id];
 }
 exports.getTypeSchemeFromEnv = getTypeSchemeFromEnv;
 function extendTypeEnv(env, decs) {
@@ -84,7 +84,7 @@ function extendTypeEnv(env, decs) {
                         case 'UnitConstant': {
                             const [t, _] = (0, _1.hindleyMilner)(env, valbind.exp);
                             if (!(0, utils_1.isUnit)(t)) {
-                                throw new errors_1.TypeMismatchError(valbind, utils_1.UNIT_TY, t);
+                                throw new errors_1.TypeMismatchError(valbind.exp, utils_1.UNIT_TY, t);
                             }
                             break;
                         }
@@ -97,7 +97,7 @@ function extendTypeEnv(env, decs) {
                             const [expType, _] = (0, _1.hindleyMilner)(env, valbind.exp);
                             const [patType, __] = (0, _1.hindleyMilner)(env, valbind.pat);
                             if (patType !== expType) {
-                                throw new Error(`Invalid constant binding. Expected type ${patType}, got ${expType}.`);
+                                throw new errors_1.CustomSourceError(valbind, `Invalid constant binding. Expected type ${patType}, got ${expType}.`);
                             }
                             break;
                         }
@@ -134,7 +134,7 @@ function extendTypeEnv(env, decs) {
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore: The following line will throw a compile error if all the
                             // case statements are implemented (i.e. this branch is never taken).
-                            throw new Error(`unimplemented for ${valbind.pat.tag}`);
+                            throw new errors_1.CustomSourceError(valbind.pat, `unimplemented for ${valbind.pat.tag}`);
                         }
                     }
                 }
@@ -180,7 +180,7 @@ function extendTypeEnvFromPattern(originalEnv, pat, patType) {
         case 'InfixConstruction': {
             // we only support ::
             if (pat.id !== '::') {
-                throw new Error(`${pat.id} is not a supported constructor`);
+                throw new errors_1.CustomSourceError(pat, `${pat.id} is not a supported constructor`);
             }
             assert((0, utils_1.isListType)(patType));
             const { elementType } = patType;
@@ -197,18 +197,18 @@ function extendTypeEnvFromPattern(originalEnv, pat, patType) {
             return env;
         }
         default: {
-            throw new Error(`${pat.tag} not implemented`);
+            throw new errors_1.CustomSourceError(pat, `${pat.tag} not implemented`);
         }
     }
 }
 exports.extendTypeEnvFromPattern = extendTypeEnvFromPattern;
-function getPrimitiveFuncTypes(env, id) {
-    if (!env.hasOwnProperty(id)) {
-        throw new Error(`Unsupported infix operator "${id}".`);
+function getPrimitiveFuncTypes(env, infixApp) {
+    if (!env.hasOwnProperty(infixApp.id)) {
+        throw new errors_1.CustomSourceError(infixApp, `Unsupported infix operator "${infixApp.id}".`);
     }
-    const type = env[id].type;
+    const type = env[infixApp.id].type;
     if (!(0, utils_1.isFunctionType)(type) || !(0, utils_1.isFunctionType)(type.returnType)) {
-        throw new Error(`Infix operator "${id}" declared as non fun -> fun type.`);
+        throw new errors_1.CustomSourceError(infixApp, `Infix operator "${infixApp.id}" declared as non fun -> fun type.`);
     }
     return [type.parameterType, type.returnType.parameterType, type.returnType.returnType];
 }

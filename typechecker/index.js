@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hindleyMilner = void 0;
 const environment_1 = require("./environment");
+const errors_1 = require("./errors");
 const utils_1 = require("./utils");
 function hindleyMilner(env, node) {
     switch (node.tag) {
@@ -17,7 +18,7 @@ function hindleyMilner(env, node) {
         }
         // Variable
         case 'ExpVariable': {
-            const ts = (0, environment_1.getTypeSchemeFromEnv)(env, node.id);
+            const ts = (0, environment_1.getTypeSchemeFromEnv)(env, node);
             return [(0, environment_1.instantiate)(ts), []];
         }
         // Application
@@ -31,7 +32,7 @@ function hindleyMilner(env, node) {
         }
         // Infix Application
         case 'InfixApplication': {
-            const [t1, t2, t3] = (0, environment_1.getPrimitiveFuncTypes)(env, node.id);
+            const [t1, t2, t3] = (0, environment_1.getPrimitiveFuncTypes)(env, node);
             const [t4, C1] = hindleyMilner(env, node.operand1);
             const [t5, C2] = hindleyMilner(env, node.operand2);
             const constraints = [...C1, ...C2, { type1: t1, type2: t4 }, { type1: t2, type2: t5 }];
@@ -114,7 +115,7 @@ function hindleyMilner(env, node) {
         case 'InfixConstruction': {
             // we only support ::
             if (node.id !== '::') {
-                throw new Error(`${node.id} is not a supported constructor`);
+                throw new errors_1.CustomSourceError(node, `${node.id} is not a supported constructor`);
             }
             const t = (0, environment_1.freshTypeVariable)();
             const [t1, C1] = hindleyMilner(env, node.pat1);
@@ -142,7 +143,7 @@ function hindleyMilner(env, node) {
             return [utils_1.UNIT_TY, []];
         }
         default: {
-            throw new Error(`${node.tag} not implemented`);
+            throw new errors_1.CustomSourceError(node, `${node.tag} not implemented`);
         }
     }
 }

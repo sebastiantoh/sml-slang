@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TypeMismatchError = exports.TypeError = void 0;
+exports.CustomSourceError = exports.TypeMismatchError = exports.TypeError = void 0;
 const types_1 = require("../types");
 const utils_1 = require("./utils");
 const UNKNOWN_LOCATION = {
@@ -46,4 +46,24 @@ class TypeMismatchError extends TypeError {
     }
 }
 exports.TypeMismatchError = TypeMismatchError;
+class CustomSourceError {
+    constructor(node, message) {
+        this.node = node;
+        this.message = message;
+        this.type = types_1.ErrorType.TYPE;
+        this.severity = types_1.ErrorSeverity.ERROR;
+    }
+    get location() {
+        var _a;
+        return (_a = this.node.loc) !== null && _a !== void 0 ? _a : UNKNOWN_LOCATION;
+    }
+    explain() {
+        var _a;
+        return (_a = this.message) !== null && _a !== void 0 ? _a : 'Unexpected error has occurred :(';
+    }
+    elaborate() {
+        return this.explain();
+    }
+}
+exports.CustomSourceError = CustomSourceError;
 //# sourceMappingURL=errors.js.map

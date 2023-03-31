@@ -18,3 +18,13 @@ export declare class TypeMismatchError extends TypeError {
     explain(): string;
     elaborate(): string;
 }
+export declare class CustomSourceError implements SourceError {
+    node: Node;
+    message: string;
+    type: ErrorType;
+    severity: ErrorSeverity;
+    constructor(node: Node, message: string);
+    get location(): SourceLocation;
+    explain(): string;
+    elaborate(): string;
+}
