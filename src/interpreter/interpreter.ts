@@ -504,9 +504,8 @@ export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
   }
 
   evaluate(exp)
-  if (S.length !== 1) {
-    throw new Error(`internal error: stash must be singleton but is: ${S}`)
-  }
+
+  assert(S.length === 1, `internal error: stash must be singleton but is: ${S}`)
 
   return {
     status: 'finished',
@@ -518,9 +517,8 @@ export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
 
 export function evaluateProg(prog: Program): Result {
   evaluate(prog)
-  if (S.length !== 0) {
-    throw new Error(`internal error: stash must be empty but is: ${S}`)
-  }
+
+  assert(S.length === 0, `internal error: stash must be empty but is: ${S}`)
 
   return {
     status: 'finished',
