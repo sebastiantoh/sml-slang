@@ -61,7 +61,7 @@ const primitiveFuncs: [string, TypeScheme][] = [
     return [
       comp,
       {
-        type: makeFunctionType(t, t, t),
+        type: makeFunctionType(t, t, BOOL_TY),
         typeVariables: [t]
       }
     ] as [string, TypeScheme]
