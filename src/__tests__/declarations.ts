@@ -1,9 +1,9 @@
-import { parseTypeCheckAndEvaluateExp } from '..'
+import { parseTypeCheckAndEvaluateExpToString } from './utils'
 
 describe('ValueDeclaration', () => {
   test('rec function without rec keyword', () =>
     expect(() =>
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   val f = fn n => if n = 0 then 1 else n * f (n - 1)
 in
@@ -14,7 +14,7 @@ end
 
   test('rec function with rec keyword', () =>
     expect(
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   val rec f = fn n => if n = 0 then 1 else n * f (n - 1)
 in
@@ -25,7 +25,7 @@ end
 
   test('rec binding on a non-function', () =>
     expect(() =>
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   val rec f = 2
 in
@@ -36,7 +36,7 @@ end
 
   test('funbind with multiple params', () =>
     expect(
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   fun add x y = x + y
 in
@@ -47,7 +47,7 @@ end
 
   test('funbind with multiple params and partial application', () =>
     expect(
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   fun add x y = x + y
   val add_two = add 2
@@ -62,7 +62,7 @@ end
 describe('LocalDeclaration', () => {
   test('local declarations are accessible in subsequent declarations', () =>
     expect(
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   local
     val x = 1
@@ -78,7 +78,7 @@ end
 
   test('local declaration - accessing variable outside of scope', () =>
     expect(() =>
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   local
     val x = 1
@@ -94,7 +94,7 @@ end
 
   test('nested local declarations', () =>
     expect(
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   local
     val x = 1
@@ -115,7 +115,7 @@ end
 
   test('nested local declarations - accessing variable outside of scope', () =>
     expect(() =>
-      parseTypeCheckAndEvaluateExp(`
+      parseTypeCheckAndEvaluateExpToString(`
 let
   local
     val x = 1

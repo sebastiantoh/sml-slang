@@ -1,4 +1,4 @@
-import { parseTypeCheckAndEvaluateProg } from '..'
+import { parseTypeCheckAndEvaluateProgToString } from './utils'
 
 const path = require('path')
 const fs = require('fs')
@@ -15,7 +15,7 @@ programNames.forEach((filename: string) => {
   const filepath = path.join(programsDir, filename)
   const sourceCode = fs.readFileSync(filepath, { encoding: 'utf8', flag: 'r' })
   test(filename, () =>
-    expect(parseTypeCheckAndEvaluateProg(sourceCode)).toMatchSpecificSnapshot(
+    expect(parseTypeCheckAndEvaluateProgToString(sourceCode)).toMatchSpecificSnapshot(
       `programs/${filename}.out`
     )
   )

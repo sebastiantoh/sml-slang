@@ -3,7 +3,6 @@ import { Expression, Program } from './parser/ast'
 import { parseExp, parseProg } from './parser/parser'
 import { hindleyMilner } from './typechecker'
 import { createInitialTypeEnvironment, unifyAndSubstitute } from './typechecker/environment'
-import { resToString } from './utils/formatters'
 
 export const INIT_ENV = createInitialTypeEnvironment()
 
@@ -12,7 +11,7 @@ export const parseTypeCheckAndEvaluateExp = (exp: string, outputWithType: boolea
   const [type, typeConstraints] = hindleyMilner(INIT_ENV, node)
   const _solvedType = unifyAndSubstitute(type, typeConstraints)
   const res = evaluateExp(node, outputWithType)
-  return resToString(res)
+  return res
 }
 
 export const parseTypeCheckAndEvaluateProg = (prog: string) => {
@@ -20,5 +19,5 @@ export const parseTypeCheckAndEvaluateProg = (prog: string) => {
   const [type, typeConstraints] = hindleyMilner(INIT_ENV, node)
   const _solvedType = unifyAndSubstitute(type, typeConstraints)
   const res = evaluateProg(node)
-  return resToString(res)
+  return res
 }

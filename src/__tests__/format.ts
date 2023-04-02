@@ -1,18 +1,21 @@
-import { parseTypeCheckAndEvaluateExp } from '..'
+import { parseTypeCheckAndEvaluateExpToString } from './utils'
 
-test('no whitespace between tokens', () => expect(parseTypeCheckAndEvaluateExp('2+3')).toBe('5'))
+test('no whitespace between tokens', () =>
+  expect(parseTypeCheckAndEvaluateExpToString('2+3')).toBe('5'))
 
 test('multiple spaces between tokens', () =>
-  expect(parseTypeCheckAndEvaluateExp('2    + 3')).toBe('5'))
+  expect(parseTypeCheckAndEvaluateExpToString('2    + 3')).toBe('5'))
 
 test('new line between tokens', () =>
   expect(
-    parseTypeCheckAndEvaluateExp(`2
+    parseTypeCheckAndEvaluateExpToString(`2
 +
 3`)
   ).toBe('5'))
 
 test('comments are ignored', () =>
   expect(
-    parseTypeCheckAndEvaluateExp(`(* this is a comment *) 2 + (*this is another comment*) 3`)
+    parseTypeCheckAndEvaluateExpToString(
+      `(* this is a comment *) 2 + (*this is another comment*) 3`
+    )
   ).toBe('5'))
