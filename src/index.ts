@@ -7,11 +7,11 @@ import { resToString } from './utils/formatters'
 
 export const INIT_ENV = createInitialTypeEnvironment()
 
-export const parseTypeCheckAndEvaluateExp = (exp: string) => {
+export const parseTypeCheckAndEvaluateExp = (exp: string, outputWithType: boolean = false) => {
   const node = parseExp(exp) as Expression
   const [type, typeConstraints] = hindleyMilner(INIT_ENV, node)
   const _solvedType = unifyAndSubstitute(type, typeConstraints)
-  const res = evaluateExp(node, false)
+  const res = evaluateExp(node, outputWithType)
   return resToString(res)
 }
 
