@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 import { head, isEqual, tail, take, takeRight } from 'lodash'
 
+import { INIT_ENV } from '..'
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { hindleyMilner } from '../typechecker'
@@ -8,7 +9,6 @@ import { unifyAndSubstitute } from '../typechecker/environment'
 import { RuntimeError } from '../typechecker/errors'
 import { Environment, Result, Value } from '../types'
 import { Instruction } from './instructions'
-import { INIT_ENV } from '..'
 
 type Microcode = Node | Instruction
 
@@ -501,7 +501,6 @@ export function evaluate(node: Node) {
     throw new RuntimeError(`step limit ${stepLimit} exceeded`)
   }
 }
-
 
 export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
   let type = undefined

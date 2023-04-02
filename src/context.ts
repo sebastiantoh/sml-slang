@@ -1,5 +1,4 @@
 import { INIT_ENV } from '.'
-import { createInitialTypeEnvironment } from './typechecker/environment'
 import { Context } from './types'
 
 const createEmptyRuntime = (): Context['runtime'] => ({
