@@ -4,10 +4,6 @@ import { Type } from './typechecker/types'
 
 export type Value = Int | Real | String | Char | Bool | Unit | Fn | BuiltinFn | List
 
-// TODO: eventually these types can be removed?
-// ast typechecking wld have ensure type safety alr
-// so shd be fine to remove all types here and all
-// type assertions in the interpreter
 export interface Int {
   tag: 'int'
   jsVal: Readonly<number>
@@ -79,19 +75,6 @@ export type Result = Finished | Errored
 // used for tracking non-finished results during runtime
 export type RuntimeResult = Omit<Finished, 'status'>
 
-// TODO: merge frame and env temp types with
-// EnvironmentFrame and Environment respectively
-export interface FrameTemp {
-  [name: string]: RuntimeResult
-}
-
-export interface EnvironmentTemp {
-  id: string
-  name?: string
-  tail: EnvironmentTemp | null
-  head: FrameTemp
-}
-
 export interface Context<T = any> {
   /** The external symbols that exist in the Context. */
   externalSymbols: string[]
@@ -99,7 +82,7 @@ export interface Context<T = any> {
   /** Runtime specific state */
   runtime: {
     isRunning: boolean
-    environments: EnvironmentTemp[]
+    environments: Environment[]
     // TODO: udpate to sml value?
     value: any
     nodes: Node[]

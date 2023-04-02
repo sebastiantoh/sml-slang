@@ -179,8 +179,7 @@ const tryMatch = (originalEnv: Environment, value: Value, pat: Pattern): [boolea
 
     return [true, updatedEnv]
   } else {
-    // TODO: handle more complicated patterns here.
-    throw new RuntimeError(`TODO: unimplemented ${pat}`)
+    throw new RuntimeError(`unimplemented ${pat}`)
   }
 }
 
@@ -303,6 +302,9 @@ const execMicrocode = (cmd: Microcode) => {
     case 'LocalDeclaration': {
       // Each dec will create their own env:
       // currEnv <- localDec1 <- ... <- localDecN <- dec1 <- ... <- decM
+      //   ▲                                           │
+      //   │                                           │
+      //   └───────────────────────────────────────────┘
       // We want to set the parent of dec1 to point to the currEnv
       // after all the declarations have been completed
 
@@ -315,7 +317,6 @@ const execMicrocode = (cmd: Microcode) => {
       // - Will be executed when E=decM
       // - Will traverse up from env=decM until env.parent === oldParent (or localDecN),
       //   before setting env.parent = newParent (currEnv)
-      // TODO: is there a better way to do this?
       revPush(A, [
         ...cmd.localDecs,
         {

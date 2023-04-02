@@ -10,7 +10,6 @@ export function resToString(result: Result): string {
   }
 }
 
-// TODO: update formatter
 export function formatFinishedForRepl(result: Finished): string {
   const stdout = result.stdout.join('')
   if (result.value === undefined) {

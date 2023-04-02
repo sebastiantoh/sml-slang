@@ -1,5 +1,3 @@
-(* TODO: add tests for negative cases, e.g. when lst is empty. Add tests for other lists stdlib functions here*)
-
 fun test_hd () = (
   print (hd [1,2,3])
 )
