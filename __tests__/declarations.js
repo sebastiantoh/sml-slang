@@ -1,36 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const __1 = require("..");
+const utils_1 = require("./utils");
 describe('ValueDeclaration', () => {
-    test('rec function without rec keyword', () => expect(() => (0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('rec function without rec keyword', () => expect(() => (0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   val f = fn n => if n = 0 then 1 else n * f (n - 1)
 in
   f 3
 end
 `)).toThrow(/Unbound value identifier \"f\"./));
-    test('rec function with rec keyword', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('rec function with rec keyword', () => expect((0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   val rec f = fn n => if n = 0 then 1 else n * f (n - 1)
 in
   f(3)
 end
 `)).toEqual(`6`));
-    test('rec binding on a non-function', () => expect(() => (0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('rec binding on a non-function', () => expect(() => (0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   val rec f = 2
 in
   f
 end
 `)).toThrow(/using rec requires binding a function/));
-    test('funbind with multiple params', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('funbind with multiple params', () => expect((0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   fun add x y = x + y
 in
   add 2 3
 end
 `)).toBe(`5`));
-    test('funbind with multiple params and partial application', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('funbind with multiple params and partial application', () => expect((0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   fun add x y = x + y
   val add_two = add 2
@@ -41,7 +41,7 @@ end
 `)).toBe(`8`));
 });
 describe('LocalDeclaration', () => {
-    test('local declarations are accessible in subsequent declarations', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('local declarations are accessible in subsequent declarations', () => expect((0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   local
     val x = 1
@@ -53,7 +53,7 @@ in
   x
 end
 `)).toBe(`3`));
-    test('local declaration - accessing variable outside of scope', () => expect(() => (0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('local declaration - accessing variable outside of scope', () => expect(() => (0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   local
     val x = 1
@@ -65,7 +65,7 @@ in
   y
 end
 `)).toThrow(/y not found in env/));
-    test('nested local declarations', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('nested local declarations', () => expect((0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   local
     val x = 1
@@ -82,7 +82,7 @@ in
   x
 end
 `)).toBe(`6`));
-    test('nested local declarations - accessing variable outside of scope', () => expect(() => (0, __1.parseTypeCheckAndEvaluateExp)(`
+    test('nested local declarations - accessing variable outside of scope', () => expect(() => (0, utils_1.parseTypeCheckAndEvaluateExpToString)(`
 let
   local
     val x = 1
