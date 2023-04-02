@@ -12,7 +12,6 @@ function resToString(result) {
     }
 }
 exports.resToString = resToString;
-// TODO: update formatter
 function formatFinishedForRepl(result) {
     const stdout = result.stdout.join('');
     if (result.value === undefined) {

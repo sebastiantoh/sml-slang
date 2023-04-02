@@ -59,22 +59,13 @@ export interface Finished {
 }
 export type Result = Finished | Errored;
 export type RuntimeResult = Omit<Finished, 'status'>;
-export interface FrameTemp {
-    [name: string]: RuntimeResult;
-}
-export interface EnvironmentTemp {
-    id: string;
-    name?: string;
-    tail: EnvironmentTemp | null;
-    head: FrameTemp;
-}
 export interface Context<T = any> {
     /** The external symbols that exist in the Context. */
     externalSymbols: string[];
     /** Runtime specific state */
     runtime: {
         isRunning: boolean;
-        environments: EnvironmentTemp[];
+        environments: Environment[];
         value: any;
         nodes: Node[];
     };

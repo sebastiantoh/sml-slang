@@ -371,9 +371,9 @@ class NodeGenerator {
                 .reverse()
                 .forEach(p => {
                 const fn = {
-                    // TODO: do we want to keep track of the locations of each of these functions?
                     tag: 'Function',
-                    matches: [{ tag: 'Match', pat: p, exp }]
+                    matches: [{ tag: 'Match', pat: p, exp }],
+                    loc: contextToLocation(ctx)
                 };
                 exp = fn;
             });

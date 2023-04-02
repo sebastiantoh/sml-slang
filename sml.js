@@ -132,9 +132,7 @@ exports.builtinBinOperators = {
             (a.tag === 'string' && b.tag === 'string') ||
             (a.tag === 'char' && b.tag === 'char') ||
             (a.tag === 'bool' && b.tag === 'bool') ||
-            (a.tag === 'list' && b.tag === 'list')
-        // TODO: add more tags, e.g. lists
-        ) {
+            (a.tag === 'list' && b.tag === 'list')) {
             return {
                 tag: 'bool',
                 // isEqual supports list (structural) equality, which javascript's builtin == or === does not

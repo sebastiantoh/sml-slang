@@ -163,8 +163,7 @@ const tryMatch = (originalEnv, value, pat) => {
         return [true, updatedEnv];
     }
     else {
-        // TODO: handle more complicated patterns here.
-        throw new errors_1.RuntimeError(`TODO: unimplemented ${pat}`);
+        throw new errors_1.RuntimeError(`unimplemented ${pat}`);
     }
 };
 // All the case statements are wrapped in a { }. This is to prevent scopes
@@ -283,6 +282,9 @@ const execMicrocode = (cmd) => {
         case 'LocalDeclaration': {
             // Each dec will create their own env:
             // currEnv <- localDec1 <- ... <- localDecN <- dec1 <- ... <- decM
+            //   ▲                                           │
+            //   │                                           │
+            //   └───────────────────────────────────────────┘
             // We want to set the parent of dec1 to point to the currEnv
             // after all the declarations have been completed
             // {tag: "DecsAfterLocalDecsI", decs, envBeforeLocalDecs=currEnv}
@@ -294,7 +296,6 @@ const execMicrocode = (cmd) => {
             // - Will be executed when E=decM
             // - Will traverse up from env=decM until env.parent === oldParent (or localDecN),
             //   before setting env.parent = newParent (currEnv)
-            // TODO: is there a better way to do this?
             revPush(A, [
                 ...cmd.localDecs,
                 {
