@@ -4,10 +4,11 @@ import { head, isEqual, tail, take, takeRight } from 'lodash'
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
 import { hindleyMilner } from '../typechecker'
-import { createInitialTypeEnvironment, unifyAndSubstitute } from '../typechecker/environment'
+import { unifyAndSubstitute } from '../typechecker/environment'
 import { RuntimeError } from '../typechecker/errors'
 import { Environment, Result, Value } from '../types'
 import { Instruction } from './instructions'
+import { INIT_ENV } from '..'
 
 type Microcode = Node | Instruction
 
@@ -501,12 +502,11 @@ export function evaluate(node: Node) {
   }
 }
 
-const INIT_TYPE_ENV = createInitialTypeEnvironment()
 
 export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
   let type = undefined
   if (outputWithType) {
-    const [unsolvedType, typeConstraints] = hindleyMilner(INIT_TYPE_ENV, exp)
+    const [unsolvedType, typeConstraints] = hindleyMilner(INIT_ENV, exp)
     type = unifyAndSubstitute(unsolvedType, typeConstraints)
   }
 

@@ -1,4 +1,4 @@
-import { parseTypeCheckAndEvaluateExp } from './utils'
+import { parseTypeCheckAndEvaluateExp } from '..'
 
 test('no whitespace between tokens', () => expect(parseTypeCheckAndEvaluateExp('2+3')).toBe('5'))
 

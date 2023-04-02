@@ -1,11 +1,11 @@
-import { evaluateExp, evaluateProg } from '../interpreter/interpreter'
-import { Expression, Program } from '../parser/ast'
-import { parseExp, parseProg } from '../parser/parser'
-import { hindleyMilner } from '../typechecker'
-import { createInitialTypeEnvironment, unifyAndSubstitute } from '../typechecker/environment'
-import { resToString } from '../utils/formatters'
+import { evaluateExp, evaluateProg } from './interpreter/interpreter'
+import { Expression, Program } from './parser/ast'
+import { parseExp, parseProg } from './parser/parser'
+import { hindleyMilner } from './typechecker'
+import { createInitialTypeEnvironment, unifyAndSubstitute } from './typechecker/environment'
+import { resToString } from './utils/formatters'
 
-const INIT_ENV = createInitialTypeEnvironment()
+export const INIT_ENV = createInitialTypeEnvironment()
 
 export const parseTypeCheckAndEvaluateExp = (exp: string) => {
   const node = parseExp(exp) as Expression

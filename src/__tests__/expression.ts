@@ -1,4 +1,4 @@
-import { parseTypeCheckAndEvaluateExp } from './utils'
+import { parseTypeCheckAndEvaluateExp } from '..'
 
 describe('Constant', () => {
   describe('IntConstant', () => {

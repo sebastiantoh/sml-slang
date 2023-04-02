@@ -1,10 +1,9 @@
 import { Expression } from '../../parser/ast'
 import { parseExp } from '../../parser/parser'
 import { hindleyMilner } from '..'
-import { createInitialTypeEnvironment, unifyAndSubstitute } from '../environment'
+import { unifyAndSubstitute } from '../environment'
 import { stringifyType } from '../utils'
-
-const INIT_ENV = createInitialTypeEnvironment()
+import { INIT_ENV } from '../..'
 
 export const parseAndTypeCheckExp = (exp: string) => {
   const node = parseExp(exp) as Expression

@@ -1,4 +1,4 @@
-import { parseTypeCheckAndEvaluateExp } from './utils'
+import { parseTypeCheckAndEvaluateExp } from '..'
 
 describe('ValueDeclaration', () => {
   test('rec function without rec keyword', () =>

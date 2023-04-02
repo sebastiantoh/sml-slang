@@ -1,4 +1,4 @@
-import { parseTypeCheckAndEvaluateExp } from './utils'
+import { parseTypeCheckAndEvaluateExp } from '..'
 
 describe('InfixConstruction', () => {
   test('infix construction pattern matching in value binding', () =>
