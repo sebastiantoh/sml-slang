@@ -42,7 +42,7 @@ const primitiveFuncs = [
         return [
             comp,
             {
-                type: (0, utils_1.makeFunctionType)(t, t, t),
+                type: (0, utils_1.makeFunctionType)(t, t, utils_1.BOOL_TY),
                 typeVariables: [t]
             }
         ];
