@@ -14,15 +14,27 @@ export declare const builtinBinOperators: {
         jsVal: number;
     };
     '*': (a: Value, b: Value) => {
-        tag: "int" | "real";
+        tag: "int";
+        jsVal: number;
+    };
+    '*.': (a: Value, b: Value) => {
+        tag: "real";
         jsVal: number;
     };
     '+': (a: Value, b: Value) => {
-        tag: "int" | "real";
+        tag: "int";
+        jsVal: number;
+    };
+    '+.': (a: Value, b: Value) => {
+        tag: "real";
         jsVal: number;
     };
     '-': (a: Value, b: Value) => {
-        tag: "int" | "real";
+        tag: "int";
+        jsVal: number;
+    };
+    '-.': (a: Value, b: Value) => {
+        tag: "real";
         jsVal: number;
     };
     '^': (a: Value, b: Value) => {

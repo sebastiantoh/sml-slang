@@ -71,7 +71,16 @@ exports.builtinBinOperators = {
         assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '*': (a, b) => {
-        if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
+        if (a.tag === 'int' && b.tag === 'int') {
+            return {
+                tag: a.tag,
+                jsVal: a.jsVal * b.jsVal
+            };
+        }
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
+    },
+    '*.': (a, b) => {
+        if (a.tag === 'real' && b.tag === 'real') {
             return {
                 tag: a.tag,
                 jsVal: a.jsVal * b.jsVal
@@ -80,7 +89,16 @@ exports.builtinBinOperators = {
         assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '+': (a, b) => {
-        if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
+        if (a.tag === 'int' && b.tag === 'int') {
+            return {
+                tag: a.tag,
+                jsVal: a.jsVal + b.jsVal
+            };
+        }
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
+    },
+    '+.': (a, b) => {
+        if (a.tag === 'real' && b.tag === 'real') {
             return {
                 tag: a.tag,
                 jsVal: a.jsVal + b.jsVal
@@ -89,7 +107,16 @@ exports.builtinBinOperators = {
         assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
     },
     '-': (a, b) => {
-        if ((a.tag === 'int' && b.tag === 'int') || (a.tag === 'real' && b.tag === 'real')) {
+        if (a.tag === 'int' && b.tag === 'int') {
+            return {
+                tag: a.tag,
+                jsVal: a.jsVal - b.jsVal
+            };
+        }
+        assert(false, `invalid types - received ${a.tag} and ${b.tag}`);
+    },
+    '-.': (a, b) => {
+        if (a.tag === 'real' && b.tag === 'real') {
             return {
                 tag: a.tag,
                 jsVal: a.jsVal - b.jsVal

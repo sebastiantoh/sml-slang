@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("./utils");
+const __1 = require("..");
 describe('InfixConstruction', () => {
-    test('infix construction pattern matching in value binding', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('infix construction pattern matching in value binding', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   val fst::snd::tl = [1,2,3]
 in
   [fst,snd]
 end
 `)).toBe(`[1,2]`));
-    test('infix construction pattern matching', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('infix construction pattern matching', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun begins_with_one lst =
     case lst of
@@ -19,7 +19,7 @@ in
   begins_with_one [1,2,3]
 end
 `)).toBe(`true`));
-    test('multiple infix construction pattern matching', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('multiple infix construction pattern matching', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun begins_with_one_and_two lst =
     case lst of
@@ -29,7 +29,7 @@ in
   begins_with_one_and_two [1,2,3]
 end
 `)).toBe(`true`));
-    test('infix construction pattern matching with variable', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('infix construction pattern matching with variable', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun hd lst =
     case lst of
@@ -39,7 +39,7 @@ in
   hd [123, 456]
 end
 `)).toBe(`123`));
-    test('infix construction pattern matching with partial match', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('infix construction pattern matching with partial match', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun f lst =
     case lst of
@@ -51,14 +51,14 @@ end
 `)).toBe(`0`));
 });
 describe('ListPattern', () => {
-    test('list pattern matching in value binding', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching in value binding', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   val [a, b, c] = [[1,2,3],[4,5,6],[7,8]]
 in
   a @ b
 end
 `)).toBe(`[1,2,3,4,5,6]`));
-    test('list pattern matching with variables', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with variables', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun length_three xs =
     case xs of
@@ -70,7 +70,7 @@ in
   length_three [1,2,3]
 end
 `)).toBe(`3`));
-    test('list pattern matching with matching constants', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with matching constants', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
   let
     fun one_two_three xs =
       case xs of
@@ -80,7 +80,7 @@ end
     one_two_three [1,2,3]
   end
   `)).toBe(`6`));
-    test('list pattern matching with non-matching constants', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with non-matching constants', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
   let
     fun one_two_five xs =
       case xs of
@@ -91,7 +91,7 @@ end
     one_two_five [1,2,5]
   end
   `)).toBe(`5`));
-    test('list pattern matching with constants and variables', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with constants and variables', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun one_var_three xs =
     case xs of
@@ -101,7 +101,7 @@ in
   one_var_three [1,5,3]
 end
 `)).toBe(`5`));
-    test('list pattern matching with an identical variable', () => expect(() => (0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with an identical variable', () => expect(() => (0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun one_x_x xs =
     case xs of
@@ -111,7 +111,7 @@ in
   one_x_x [1,2,3]
 end
 `)).toThrow('Cannot have two of the same variable in one list pattern'));
-    test('list pattern matching with infix construction', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with infix construction', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun inner_lists_head xs =
     case xs of
@@ -121,7 +121,7 @@ in
   inner_lists_head [[1,2],[3,4]]
 end
 `)).toBe(`4`));
-    test('list pattern matching with infix construction', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with infix construction', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun inner_list_tail xs =
     case xs of
@@ -131,7 +131,7 @@ in
   inner_list_tail [[1,2],[3,4]]
 end
 `)).toBe(`[4]`));
-    test('list pattern matching with nested list', () => expect((0, utils_1.parseAndEvaluateExp)(`
+    test('list pattern matching with nested list', () => expect((0, __1.parseTypeCheckAndEvaluateExp)(`
 let
   fun nested_list xs =
     case xs of

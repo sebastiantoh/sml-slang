@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const environment_1 = require("./typechecker/environment");
+const _1 = require(".");
 const createEmptyRuntime = () => ({
     isRunning: false,
     environments: [],
@@ -14,7 +14,7 @@ const createEmptyContext = (externalSymbols, externalContext) => {
         runtime: createEmptyRuntime(),
         numberOfOuterEnvironments: 1,
         prelude: null,
-        typeEnvironments: (0, environment_1.createInitialTypeEnvironment)()
+        typeEnvironments: _1.INIT_ENV
     };
 };
 // TODO: cleanup this function.

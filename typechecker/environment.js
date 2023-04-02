@@ -17,8 +17,11 @@ const primitiveFuncs = [
     ['mod', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
     ['div', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
     ['+', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
+    ['+.', { type: (0, utils_1.makeFunctionType)(utils_1.REAL_TY, utils_1.REAL_TY, utils_1.REAL_TY), typeVariables: [] }],
     ['*', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
+    ['*.', { type: (0, utils_1.makeFunctionType)(utils_1.REAL_TY, utils_1.REAL_TY, utils_1.REAL_TY), typeVariables: [] }],
     ['-', { type: (0, utils_1.makeFunctionType)(utils_1.INT_TY, utils_1.INT_TY, utils_1.INT_TY), typeVariables: [] }],
+    ['-.', { type: (0, utils_1.makeFunctionType)(utils_1.REAL_TY, utils_1.REAL_TY, utils_1.REAL_TY), typeVariables: [] }],
     ['^', { type: (0, utils_1.makeFunctionType)(utils_1.STR_TY, utils_1.STR_TY, utils_1.STR_TY), typeVariables: [] }],
     [
         '::',
@@ -166,6 +169,7 @@ function extendTypeEnvFromPattern(originalEnv, pat, patType) {
         case 'StringConstant':
         case 'CharConstant':
         case 'BoolConstant':
+        case 'UnitConstant':
         case 'Wildcard': {
             return originalEnv;
         }
@@ -197,6 +201,9 @@ function extendTypeEnvFromPattern(originalEnv, pat, patType) {
             return env;
         }
         default: {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore: The following line will throw a compile error if all the
+            // case statements are implemented (i.e. this branch is never taken).
             throw new errors_1.CustomSourceError(pat, `${pat.tag} not implemented`);
         }
     }

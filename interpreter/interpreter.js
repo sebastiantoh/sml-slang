@@ -7,6 +7,7 @@ const Sml = require("../sml");
 const typechecker_1 = require("../typechecker");
 const environment_1 = require("../typechecker/environment");
 const errors_1 = require("../typechecker/errors");
+const __1 = require("..");
 exports.stdout = [];
 let A = [];
 let S = [];
@@ -470,11 +471,10 @@ function evaluate(node) {
     }
 }
 exports.evaluate = evaluate;
-const INIT_TYPE_ENV = (0, environment_1.createInitialTypeEnvironment)();
 function evaluateExp(exp, outputWithType) {
     let type = undefined;
     if (outputWithType) {
-        const [unsolvedType, typeConstraints] = (0, typechecker_1.hindleyMilner)(INIT_TYPE_ENV, exp);
+        const [unsolvedType, typeConstraints] = (0, typechecker_1.hindleyMilner)(__1.INIT_ENV, exp);
         type = (0, environment_1.unifyAndSubstitute)(unsolvedType, typeConstraints);
     }
     evaluate(exp);
