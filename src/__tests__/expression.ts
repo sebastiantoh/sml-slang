@@ -112,7 +112,7 @@ in
   (fact 5 1) + acc
 end
 `)
-    ).toThrow(/acc not found in env/))
+    ).toThrow(/Unbound value identifier \"acc\"./))
 
   test('case analysis exp ', () =>
     expect(
@@ -192,19 +192,19 @@ describe('InfixApplication', () => {
   describe('*', () => {
     test('integers: multiplication', () => expect(parseTypeCheckAndEvaluateExp('6 * 7')).toBe('42'))
     test('real numbers: multiplication', () =>
-      expect(parseTypeCheckAndEvaluateExp('1.2 * 3.4')).toBe('4.08'))
+      expect(parseTypeCheckAndEvaluateExp('1.2 *. 3.4')).toBe('4.08'))
   })
 
   describe('+', () => {
     test('integers: addition', () => expect(parseTypeCheckAndEvaluateExp('1 + 2')).toBe('3'))
     test('real numbers: addition', () =>
-      expect(parseTypeCheckAndEvaluateExp('1.2 + 3.4')).toBe('4.6'))
+      expect(parseTypeCheckAndEvaluateExp('1.2 +. 3.4')).toBe('4.6'))
   })
 
   describe('-', () => {
     test('integers: subtraction', () => expect(parseTypeCheckAndEvaluateExp('4 - 5')).toBe('~1'))
     test('real numbers: subtraction', () =>
-      expect(parseTypeCheckAndEvaluateExp('1.2 - 3.4')).toBe('~2.2'))
+      expect(parseTypeCheckAndEvaluateExp('1.2 -. 3.4')).toBe('~2.2'))
   })
 
   describe('^', () => {
@@ -395,7 +395,7 @@ in
    b
 end
 `)
-    ).toThrow(/b not found in env/))
+    ).toThrow(/Unbound value identifier \"b\"./))
 
   test('multiple declarations with shadowing', () =>
     expect(

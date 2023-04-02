@@ -53,8 +53,11 @@ UNDERSCORE: '_';
 SLASH: '/';
 DIV: 'div';
 MOD: 'mod';
+STARDOT: '*.';
 STAR: '*';
+PLUSDOT: '+.';
 PLUS: '+';
+MINUSDOT: '-.';
 MINUS: '-';
 CARET: '^';
 CONS: '::';
@@ -92,25 +95,25 @@ con
     ;
 
 exp
-    : con                                                             # Constant
-    | id=ID                                                           # ExpVariable
-    | fn=exp arg=exp                                                  # Application
+    : con                                                                # Constant
+    | id=ID                                                              # ExpVariable
+    | fn=exp arg=exp                                                     # Application
     // Precedence levels can be found on Page 98 of https://smlfamily.github.io/sml90-defn.pdf
-    | op1=exp id=(SLASH | DIV | MOD | STAR) op2=exp                   # InfixApplication
-    | op1=exp id=(PLUS | MINUS | CARET) op2=exp                       # InfixApplication
-    | <assoc=right> op1=exp id=(CONS | AT) op2=exp                    # InfixApplication
-    | op1=exp id=(EQ | NEQ | LT | GT | LTE | GTE) op2=exp             # InfixApplication
-    | op1=exp id=ID op2=exp                                           # InfixApplication
-    | LPAREN exp RPAREN                                               # Parentheses
-    | LSQUARE (exp (COMMA exp)*)? RSQUARE                             # List
-    | LPAREN exp (SEMICOLON exp)+ RPAREN                              # ExpSequence
-    | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'               # LetExpression
-    | exp COLON typ 	                                              # ExpTypeAnnotation
-    | op1=exp ANDALSO op2=exp                                         # Conjunction
-    | op1=exp ORELSE op2=exp                                          # Disjunction
-    | 'if' pred=exp 'then' cons=exp 'else' alt=exp                    # Conditional
-    | 'case' exp 'of' matches                                         # CaseAnalysis
-    | 'fn' matches                                                    # Function
+    | op1=exp id=(SLASH | DIV | MOD | STAR | STARDOT) op2=exp            # InfixApplication
+    | op1=exp id=(PLUS | PLUSDOT | MINUS | MINUSDOT | CARET) op2=exp     # InfixApplication
+    | <assoc=right> op1=exp id=(CONS | AT) op2=exp                       # InfixApplication
+    | op1=exp id=(EQ | NEQ | LT | GT | LTE | GTE) op2=exp                # InfixApplication
+    | op1=exp id=ID op2=exp                                              # InfixApplication
+    | LPAREN exp RPAREN                                                  # Parentheses
+    | LSQUARE (exp (COMMA exp)*)? RSQUARE                                # List
+    | LPAREN exp (SEMICOLON exp)+ RPAREN                                 # ExpSequence
+    | 'let' decSequence 'in' exp (SEMICOLON exp)* 'end'                  # LetExpression
+    | exp COLON typ 	                                                 # ExpTypeAnnotation
+    | op1=exp ANDALSO op2=exp                                            # Conjunction
+    | op1=exp ORELSE op2=exp                                             # Disjunction
+    | 'if' pred=exp 'then' cons=exp 'else' alt=exp                       # Conditional
+    | 'case' exp 'of' matches                                            # CaseAnalysis
+    | 'fn' matches                                                       # Function
     ;
 
 // Note: this is named patmatch instead of match because

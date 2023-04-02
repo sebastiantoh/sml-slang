@@ -10,7 +10,7 @@ in
   f 3
 end
 `)
-    ).toThrow(/f not found in env/))
+    ).toThrow(/Unbound value identifier \"f\"./))
 
   test('rec function with rec keyword', () =>
     expect(

@@ -36,8 +36,11 @@ const primitiveFuncs: [string, TypeScheme][] = [
   ['mod', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['div', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
   ['+', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
+  ['+.', { type: makeFunctionType(REAL_TY, REAL_TY, REAL_TY), typeVariables: [] }],
   ['*', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
+  ['*.', { type: makeFunctionType(REAL_TY, REAL_TY, REAL_TY), typeVariables: [] }],
   ['-', { type: makeFunctionType(INT_TY, INT_TY, INT_TY), typeVariables: [] }],
+  ['-.', { type: makeFunctionType(REAL_TY, REAL_TY, REAL_TY), typeVariables: [] }],
   ['^', { type: makeFunctionType(STR_TY, STR_TY, STR_TY), typeVariables: [] }],
   [
     '::',
@@ -197,6 +200,7 @@ export function extendTypeEnvFromPattern(
     case 'StringConstant':
     case 'CharConstant':
     case 'BoolConstant':
+    case 'UnitConstant':
     case 'Wildcard': {
       return originalEnv
     }
@@ -229,6 +233,9 @@ export function extendTypeEnvFromPattern(
       return env
     }
     default: {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore: The following line will throw a compile error if all the
+      // case statements are implemented (i.e. this branch is never taken).
       throw new CustomSourceError(pat, `${pat.tag} not implemented`)
     }
   }
