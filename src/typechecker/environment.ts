@@ -275,7 +275,7 @@ export function instantiate(typeScheme: TypeScheme): Type {
       }
     }
     for (const [typeVar, freshTypeVar] of typeMappings) {
-      if (typeVar == type) {
+      if (typeVar.id === type.id) {
         return freshTypeVar
       }
     }
