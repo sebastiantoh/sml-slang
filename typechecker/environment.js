@@ -275,7 +275,6 @@ function generalize(C, env, id, type) {
         type: t,
         typeVariables: (0, lodash_1.uniqBy)((0, lodash_1.difference)(unsolved(t), unsolvedEnv(env)), t => t.id)
     };
-    console.log(JSON.stringify(newEnv[id]));
     return newEnv;
 }
 function substituteTypeVarIntoType(type, typeVar, subsType) {
