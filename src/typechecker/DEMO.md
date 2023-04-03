@@ -194,24 +194,40 @@ end
 ```
 
 #### Speed comparison with OCaml
+
+##### SML
 ```
 let
     val b = true
-    fun f0 x = x + 1
-    fun f x = (if b then f0 else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
-    fun f x = (if b then f else fn y => x y)
+    val f0 = fn x => x + 1
+    val f = fn x => (if b then f0 else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
+    val f = fn x => (if b then f else fn y => x y)
 in
     f
 end;
+```
+
+##### OCaml
+```
+let b = true;;
+let f0 x = x + 1;;
+let f x = (if b then f0 else fun y -> x y);;
+let f x = (if b then f else fun y -> x y);;
+let f x = (if b then f else fun y -> x y);;
+let f x = (if b then f else fun y -> x y);;
+...
 ```
 
 ### Lets and Locals
