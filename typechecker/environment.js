@@ -273,8 +273,7 @@ function generalize(C, env, id, type) {
     const newEnv = (0, lodash_1.cloneDeep)(env);
     newEnv[id] = {
         type: t,
-        // TODO: check that this list difference works for type vars
-        typeVariables: (0, lodash_1.difference)(unsolved(t), unsolvedEnv(env))
+        typeVariables: (0, lodash_1.uniqBy)((0, lodash_1.difference)(unsolved(t), unsolvedEnv(env)), t => t.id)
     };
     console.log(JSON.stringify(newEnv[id]));
     return newEnv;
