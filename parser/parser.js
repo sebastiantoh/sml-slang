@@ -464,7 +464,7 @@ function parse(source, f) {
                         column: charPositionInLine
                     }
                 }, msg);
-            },
+            }
         });
         parser.buildParseTree = true;
         const tree = f(parser);
