@@ -105,7 +105,6 @@ function extendTypeEnv(env, decs) {
                             break;
                         }
                         case 'PatVariable': {
-                            // Create new type variable for the pattern type and assign it to env
                             const patTy = freshTypeVariable();
                             if (valbind.isRec) {
                                 const newEnv = (0, lodash_1.cloneDeep)(env);
@@ -277,6 +276,7 @@ function generalize(C, env, id, type) {
         // TODO: check that this list difference works for type vars
         typeVariables: (0, lodash_1.difference)(unsolved(t), unsolvedEnv(env))
     };
+    console.log(JSON.stringify(newEnv[id]));
     return newEnv;
 }
 function substituteTypeVarIntoType(type, typeVar, subsType) {
