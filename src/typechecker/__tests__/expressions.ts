@@ -112,6 +112,28 @@ in
 end;
   `)
     ).toBe(`int list`))
+
+  test('type inference with valid constant valbind - should not throw', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val 1 = 1 + 3
+in
+  "ABC"
+end
+`)
+    ).toBe(`string`))
+
+  test('type inference with invalid constant valbind - should throw', () =>
+    expect(() =>
+      parseAndTypeCheckExp(`
+let
+  val 1 = "abc"
+in
+  "ABC"
+end
+`)
+    ).toThrow(/Invalid constant binding. Expected type int, got string./))
 })
 
 describe('Function', () => {
@@ -200,26 +222,4 @@ in
 end
 `)
     ).toBe(`bool`))
-
-  test('type inference with valid constant valbind - should not throw', () =>
-    expect(
-      parseAndTypeCheckExp(`
-let
-  val 1 = 1 + 3
-in
-  "ABC"
-end
-`)
-    ).toBe(`string`))
-
-  test('type inference with invalid constant valbind - should throw', () =>
-    expect(() =>
-      parseAndTypeCheckExp(`
-let
-  val 1 = "abc"
-in
-  "ABC"
-end
-`)
-    ).toThrow(/Invalid constant binding. Expected type int, got string./))
 })
