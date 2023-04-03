@@ -321,7 +321,6 @@ function generalize(
     type: t,
     typeVariables: uniqBy(difference(unsolved(t), unsolvedEnv(env)), t => t.id)
   }
-  console.log(JSON.stringify(newEnv[id]))
   return newEnv
 }
 
