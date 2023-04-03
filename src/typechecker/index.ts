@@ -1,5 +1,6 @@
 import { Node } from '../parser/ast'
 import {
+  createInitialTypeEnvironment,
   extendTypeEnv,
   extendTypeEnvFromPattern,
   freshTypeVariable,
@@ -12,6 +13,8 @@ import {
 import { CustomSourceError } from './errors'
 import { Type, TypeConstraint } from './types'
 import { BOOL_TY, UNIT_TY } from './utils'
+
+export const INIT_ENV = createInitialTypeEnvironment()
 
 export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeConstraint[]] {
   switch (node.tag) {
@@ -178,4 +181,9 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
       throw new CustomSourceError(node, `${node.tag} not implemented`)
     }
   }
+}
+
+export function typeCheck(node: Node) {
+  const [type, typeConstraints] = hindleyMilner(INIT_ENV, node)
+  return unifyAndSubstitute(type, typeConstraints)
 }

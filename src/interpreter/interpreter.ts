@@ -1,11 +1,8 @@
 import * as assert from 'assert'
 import { head, isEqual, tail, take, takeRight } from 'lodash'
 
-import { INIT_ENV } from '..'
 import { Expression, Node, Pattern, Program } from '../parser/ast'
 import * as Sml from '../sml'
-import { hindleyMilner } from '../typechecker'
-import { unifyAndSubstitute } from '../typechecker/environment'
 import { RuntimeError } from '../typechecker/errors'
 import { Environment, Result, Value } from '../types'
 import { Instruction } from './instructions'
@@ -502,13 +499,7 @@ export function evaluate(node: Node) {
   }
 }
 
-export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
-  let type = undefined
-  if (outputWithType) {
-    const [unsolvedType, typeConstraints] = hindleyMilner(INIT_ENV, exp)
-    type = unifyAndSubstitute(unsolvedType, typeConstraints)
-  }
-
+export function evaluateExp(exp: Expression): Result {
   evaluate(exp)
 
   assert(S.length === 1, `internal error: stash must be singleton but is: ${S}`)
@@ -516,8 +507,7 @@ export function evaluateExp(exp: Expression, outputWithType: boolean): Result {
   return {
     status: 'finished',
     stdout: stdout,
-    value: S[0],
-    type: type
+    value: S[0]
   }
 }
 
