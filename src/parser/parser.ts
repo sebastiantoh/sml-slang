@@ -563,6 +563,22 @@ function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Nod
     const lexer = new SmlLexer(inputStream)
     const tokenStream = new CommonTokenStream(lexer)
     const parser = new SmlParser(tokenStream)
+    parser.addErrorListener({
+      syntaxError: (_recognizer: any, _offendingSymbol: any, line: number, charPositionInLine: number, msg: string, _e: any): void => {
+        throw new ParseError(
+          {
+            start: {
+              line: line,
+              column: charPositionInLine
+            },
+            end: {
+              line: line,
+              column: charPositionInLine
+            }
+          }, msg
+        )
+      },
+    })
     parser.buildParseTree = true
 
     const tree = f(parser)
