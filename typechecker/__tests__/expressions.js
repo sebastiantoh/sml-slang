@@ -87,6 +87,20 @@ in
   a
 end;
   `)).toBe(`int list`));
+    test('type inference with valid constant valbind - should not throw', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+let
+  val 1 = 1 + 3
+in
+  "ABC"
+end
+`)).toBe(`string`));
+    test('type inference with invalid constant valbind - should throw', () => expect(() => (0, utils_1.parseAndTypeCheckExp)(`
+let
+  val 1 = "abc"
+in
+  "ABC"
+end
+`)).toThrow(/Invalid constant binding. Expected type int, got string./));
 });
 describe('Function', () => {
     test('function with type variables in parameter and return type', () => expect((0, utils_1.parseAndTypeCheckExp)('fn x => x')).toBe(`'a -> 'a`));
@@ -133,19 +147,12 @@ in
   a
 end
 `)).toBe(`bool`));
-    test('type inference with valid constant valbind - should not throw', () => expect((0, utils_1.parseAndTypeCheckExp)(`
+    test('type inference with elements from multiple lists from multiple functions', () => expect((0, utils_1.parseAndTypeCheckExp)(`
 let
-  val 1 = 1 + 3
+  val take_heads = fn hd1::tl2 => fn hd2::tl2 => [hd1, hd2]
 in
-  "ABC"
+  take_heads
 end
-`)).toBe(`string`));
-    test('type inference with invalid constant valbind - should throw', () => expect(() => (0, utils_1.parseAndTypeCheckExp)(`
-let
-  val 1 = "abc"
-in
-  "ABC"
-end
-`)).toThrow(/Invalid constant binding. Expected type int, got string./));
+`)).toBe(`'a list -> 'a list -> 'a list`));
 });
 //# sourceMappingURL=expressions.js.map

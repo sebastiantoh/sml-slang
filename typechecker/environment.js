@@ -237,7 +237,7 @@ function instantiate(typeScheme) {
             };
         }
         for (const [typeVar, freshTypeVar] of typeMappings) {
-            if (typeVar == type) {
+            if (typeVar.id === type.id) {
                 return freshTypeVar;
             }
         }
