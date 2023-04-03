@@ -129,7 +129,6 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
               break
             }
             case 'PatVariable': {
-              // Create new type variable for the pattern type and assign it to env
               const patTy = freshTypeVariable()
 
               if (valbind.isRec) {
@@ -322,6 +321,7 @@ function generalize(
     type: t,
     typeVariables: uniqBy(difference(unsolved(t), unsolvedEnv(env)), t => t.id)
   }
+  console.log(JSON.stringify(newEnv[id]))
   return newEnv
 }
 
