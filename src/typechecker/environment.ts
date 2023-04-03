@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { cloneDeep, difference } from 'lodash'
+import { cloneDeep, difference, uniqBy } from 'lodash'
 
 import { Declaration, ExpVariable, InfixApplication, Pattern } from '../parser/ast'
 import { hindleyMilner } from '.'
@@ -320,8 +320,7 @@ function generalize(
   const newEnv = cloneDeep(env)
   newEnv[id] = {
     type: t,
-    // TODO: check that this list difference works for type vars
-    typeVariables: difference(unsolved(t), unsolvedEnv(env))
+    typeVariables: uniqBy(difference(unsolved(t), unsolvedEnv(env)), t => t.id)
   }
   return newEnv
 }
