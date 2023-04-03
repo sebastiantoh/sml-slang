@@ -452,6 +452,20 @@ function parse(source, f) {
         const lexer = new SmlLexer_1.SmlLexer(inputStream);
         const tokenStream = new antlr4ts_1.CommonTokenStream(lexer);
         const parser = new SmlParser_1.SmlParser(tokenStream);
+        parser.addErrorListener({
+            syntaxError: (_recognizer, _offendingSymbol, line, charPositionInLine, msg, _e) => {
+                throw new errors_1.ParseError({
+                    start: {
+                        line: line,
+                        column: charPositionInLine
+                    },
+                    end: {
+                        line: line,
+                        column: charPositionInLine
+                    }
+                }, msg);
+            },
+        });
         parser.buildParseTree = true;
         const tree = f(parser);
         const generator = new NodeGenerator();
