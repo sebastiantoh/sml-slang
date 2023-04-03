@@ -222,4 +222,15 @@ in
 end
 `)
     ).toBe(`bool`))
+
+  test('type inference with elements from multiple lists from multiple functions', () =>
+    expect(
+      parseAndTypeCheckExp(`
+let
+  val take_heads = fn hd1::tl2 => fn hd2::tl2 => [hd1, hd2]
+in
+  take_heads
+end
+`)
+    ).toBe(`'a list -> 'a list -> 'a list`))
 })
