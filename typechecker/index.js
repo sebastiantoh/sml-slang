@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hindleyMilner = void 0;
+exports.typeCheck = exports.hindleyMilner = exports.INIT_ENV = void 0;
 const environment_1 = require("./environment");
 const errors_1 = require("./errors");
 const utils_1 = require("./utils");
+exports.INIT_ENV = (0, environment_1.createInitialTypeEnvironment)();
 function hindleyMilner(env, node) {
     switch (node.tag) {
         /* Expressions */
@@ -162,4 +163,9 @@ function hindleyMilner(env, node) {
     }
 }
 exports.hindleyMilner = hindleyMilner;
+function typeCheck(node) {
+    const [type, typeConstraints] = hindleyMilner(exports.INIT_ENV, node);
+    return (0, environment_1.unifyAndSubstitute)(type, typeConstraints);
+}
+exports.typeCheck = typeCheck;
 //# sourceMappingURL=index.js.map

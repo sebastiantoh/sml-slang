@@ -3,10 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.evaluateProg = exports.evaluateExp = exports.evaluate = exports.stdout = void 0;
 const assert = require("assert");
 const lodash_1 = require("lodash");
-const __1 = require("..");
 const Sml = require("../sml");
-const typechecker_1 = require("../typechecker");
-const environment_1 = require("../typechecker/environment");
 const errors_1 = require("../typechecker/errors");
 exports.stdout = [];
 let A = [];
@@ -471,19 +468,13 @@ function evaluate(node) {
     }
 }
 exports.evaluate = evaluate;
-function evaluateExp(exp, outputWithType) {
-    let type = undefined;
-    if (outputWithType) {
-        const [unsolvedType, typeConstraints] = (0, typechecker_1.hindleyMilner)(__1.INIT_ENV, exp);
-        type = (0, environment_1.unifyAndSubstitute)(unsolvedType, typeConstraints);
-    }
+function evaluateExp(exp) {
     evaluate(exp);
     assert(S.length === 1, `internal error: stash must be singleton but is: ${S}`);
     return {
         status: 'finished',
         stdout: exports.stdout,
-        value: S[0],
-        type: type
+        value: S[0]
     };
 }
 exports.evaluateExp = evaluateExp;
