@@ -578,9 +578,35 @@ class NodeGenerator implements SmlVisitor<Node> {
 }
 
 function getStdlibSourceCode(): string {
-  const fs = require('fs')
-  const file = 'src/stdlib.sml'
-  return fs.readFileSync(file, { encoding: 'utf8', flag: 'r' })
+  return `
+fun hd lst = case lst of x::xs => x
+
+fun tl lst = case lst of x::xs => xs
+
+fun length lst =
+  let
+    fun loop acc lst =
+      case lst of [] => acc | x::xs => loop (acc + 1) (xs)
+  in
+    loop 0 lst
+end
+
+fun rev lst =
+  let
+    fun loop acc lst =
+      case lst of [] => acc | x::xs => loop (x::acc) (xs)
+  in
+    loop [] lst
+end
+
+fun map f lst =
+  let
+    fun loop acc lst =
+      case lst of [] => rev acc | x::xs => loop (f x::acc) (xs)
+  in
+    loop [] lst
+end
+  `
 }
 
 function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Node {
