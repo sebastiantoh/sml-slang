@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn
+      - run: rm src/run.ts
       - run: yarn build
 
       - name: Deploy
