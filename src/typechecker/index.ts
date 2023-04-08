@@ -1,4 +1,4 @@
-import { Node } from '../parser/ast'
+import { Node, TypeVariable } from '../parser/ast'
 import {
   createInitialTypeEnvironment,
   extendTypeEnv,
@@ -17,6 +17,10 @@ import { BOOL_TY, UNIT_TY } from './utils'
 export const INIT_ENV = createInitialTypeEnvironment()
 
 export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeConstraint[]] {
+  let nodeAnnotatedType = 'annotated_type' in node
+    ? node.annotated_type
+    : null
+
   switch (node.tag) {
     /* Expressions */
     // Constant
@@ -26,12 +30,20 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
     case 'CharConstant':
     case 'BoolConstant':
     case 'UnitConstant': {
-      return [node.type, []]
+      if (nodeAnnotatedType == null) return [node.type, []]
+      
+      const C: TypeConstraint[] = [{ type1: (nodeAnnotatedType as TypeVariable).id as Type, type2: node.type, node}]
+      return [node.type, C]
     }
     // Variable
     case 'ExpVariable': {
       const ts = getTypeSchemeFromEnv(env, node)
-      return [instantiate(ts), []]
+      const varType = instantiate(ts)
+      if (nodeAnnotatedType == null) return [varType, []]
+
+      const C: TypeConstraint[] = [{ type1: (nodeAnnotatedType as TypeVariable).id as Type, type2: varType, node}]
+      console.log('Variable Type Constraint', C)
+      return [varType, C]
     }
     // Application
     case 'Application': {
