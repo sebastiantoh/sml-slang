@@ -4,6 +4,7 @@ exports.parseExp = exports.parseProg = void 0;
 /* tslint:disable:max-classes-per-file */
 const antlr4ts_1 = require("antlr4ts");
 const assert = require("assert");
+const lodash_1 = require("lodash");
 const SmlLexer_1 = require("../lang/SmlLexer");
 const SmlParser_1 = require("../lang/SmlParser");
 const errors_1 = require("../typechecker/errors");
@@ -19,6 +20,29 @@ function contextToLocation(ctx) {
             column: ctx.stop ? ctx.stop.charPositionInLine : ctx.start.charPositionInLine
         }
     };
+}
+function throwParseErrorIfDuplicateVariableInPattern(pattern, loc) {
+    function collectVariables(element) {
+        const variableNames = [];
+        switch (element.tag) {
+            case 'PatVariable':
+                variableNames.push(element.id);
+                break;
+            case 'InfixConstruction':
+                variableNames.push(...collectVariables(element.pat1));
+                variableNames.push(...collectVariables(element.pat2));
+                break;
+            case 'ListPattern':
+                element.elements.forEach(e => variableNames.push(...collectVariables(e)));
+                break;
+        }
+        return variableNames;
+    }
+    const variableNames = collectVariables(pattern);
+    const duplicateVariableNames = Object.keys((0, lodash_1.pickBy)((0, lodash_1.groupBy)(variableNames), x => x.length > 1));
+    if (duplicateVariableNames.length > 0) {
+        throw new errors_1.ParseError(loc, `found duplicate variables in pattern: ${duplicateVariableNames}`);
+    }
 }
 class NodeGenerator {
     /**
@@ -246,25 +270,29 @@ class NodeGenerator {
         };
     }
     visitPatInfixConstruction(ctx) {
-        return {
+        const pattern = {
             tag: 'InfixConstruction',
             pat1: this.visit(ctx._pat1),
             pat2: this.visit(ctx._pat2),
             id: ctx.CONS().text,
             loc: contextToLocation(ctx)
         };
+        throwParseErrorIfDuplicateVariableInPattern(pattern, contextToLocation(ctx));
+        return pattern;
     }
     visitPatParentheses(ctx) {
         return this.visit(ctx.pat());
     }
     visitPatList(ctx) {
-        const elements = ctx.pat();
-        return {
+        const elements = ctx.pat().map(e => this.visit(e));
+        const pattern = {
             tag: 'ListPattern',
-            elements: elements.map(e => this.visit(e)),
+            elements: elements,
             arity: elements.length,
             loc: contextToLocation(ctx)
         };
+        throwParseErrorIfDuplicateVariableInPattern(pattern, contextToLocation(ctx));
+        return pattern;
     }
     visitPatTypeAnnotation(ctx) {
         const pat = this.visit(ctx.pat());
@@ -310,8 +338,6 @@ class NodeGenerator {
     visitFunDecl(ctx) {
         // function declarations are syntatic sugar for value declarations:
         // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
-        // TODO: this desugaring doesn't work for mutually recursive function :'(
-        // For more info: https://stackoverflow.com/questions/63428214/declaring-interdependent-values-and-functions-in-standard-ml
         return {
             tag: 'ValueDeclaration',
             valbinds: ctx.funbind().map((fb) => this.visit(fb)),
@@ -360,7 +386,6 @@ class NodeGenerator {
         const fnName = funMatches[0].ID().text;
         const nParams = funMatches[0].pat().length;
         const matches = [];
-        // TODO: delete this specific case once multiple cases have been supported
         if (funMatches.length === 1) {
             const funMatch = funMatches[0];
             const params = funMatch.pat().map(p => this.visit(p));
@@ -385,7 +410,7 @@ class NodeGenerator {
             matches.push(match);
         }
         else {
-            throw new errors_1.ParseError(contextToLocation(ctx), "TODO: multiple cases for functions not yet implemented. Consider using 'case (...) of ...' instead");
+            throw new errors_1.ParseError(contextToLocation(ctx), "multiple cases for functions not yet implemented. Consider using 'case (...) of ...' instead");
             // Each funmatch correspond to a separate case. Each case can contain >= 1 parameter (or patterns)
             for (const funMatch of funMatches) {
                 const id = funMatch.ID().text;
