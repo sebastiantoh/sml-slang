@@ -577,38 +577,6 @@ class NodeGenerator implements SmlVisitor<Node> {
   }
 }
 
-function getStdlibSourceCode(): string {
-  return `
-fun hd lst = case lst of x::xs => x
-
-fun tl lst = case lst of x::xs => xs
-
-fun length lst =
-  let
-    fun loop acc lst =
-      case lst of [] => acc | x::xs => loop (acc + 1) (xs)
-  in
-    loop 0 lst
-end
-
-fun rev lst =
-  let
-    fun loop acc lst =
-      case lst of [] => acc | x::xs => loop (x::acc) (xs)
-  in
-    loop [] lst
-end
-
-fun map f lst =
-  let
-    fun loop acc lst =
-      case lst of [] => rev acc | x::xs => loop (f x::acc) (xs)
-  in
-    loop [] lst
-end
-  `
-}
-
 function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Node {
   try {
     const inputStream = CharStreams.fromString(source)
@@ -652,11 +620,10 @@ function parse(source: string, f: (parser: SmlParser) => ParserRuleContext): Nod
   }
 }
 
-export function parseProg(source: string): Node {
-  const stdlibSourceCode = getStdlibSourceCode()
-  return parse(stdlibSourceCode + source, (parser: SmlParser) => parser.prog())
+export function parseProg(source: string): Program {
+  return parse(source, (parser: SmlParser) => parser.prog()) as Program
 }
 
-export function parseExp(source: string): Node {
-  return parse(source, (parser: SmlParser) => parser.exp())
+export function parseExp(source: string): Expression {
+  return parse(source, (parser: SmlParser) => parser.exp()) as Expression
 }

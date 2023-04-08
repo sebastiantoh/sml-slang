@@ -15,11 +15,20 @@ let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
 
 const initEnv = (): Environment => {
-  const env = { frame: {}, parent: undefined }
+  E = { frame: {}, parent: undefined }
   for (const fn of Sml.builtinFns) {
-    assignInEnv(env, fn.id, fn)
+    assignInEnv(E, fn.id, fn)
   }
-  return env
+  loadStdlib()
+  return E
+}
+
+const loadStdlib = () => {
+  const prevA = A
+  const prevS = S
+  evaluate(Sml.STDLIB, false)
+  A = prevA
+  S = prevS
 }
 
 const extendEnv = (env: Environment): Environment => {
@@ -464,10 +473,12 @@ const execMicrocode = (cmd: Microcode) => {
   }
 }
 
-export function evaluate(node: Node) {
+export function evaluate(node: Node, reinitialise_env = true) {
+  if (reinitialise_env) {
+    E = initEnv()
+  }
   A = [node]
   S = []
-  E = initEnv()
   stdout = []
 
   const stepLimit = 1000000
