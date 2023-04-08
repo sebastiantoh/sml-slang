@@ -51,3 +51,19 @@ end
   `)
     ).toThrow(CustomSourceError))
 })
+
+describe('Infix Application', () => {
+  test('simple infix', () =>
+    expect(
+      parseAndTypeCheckExp(`
+1 + 1
+  `)
+    ).toBe(`int`))
+
+  test('simple infix', () =>
+    expect(
+      parseAndTypeCheckExp(`
+(1.0 +. 1.0):string
+  `)
+    ).toBe(`int`))
+})

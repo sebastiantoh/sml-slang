@@ -67,8 +67,11 @@ export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeCons
         { type1: t1, type2: t4, node: node.operand1 },
         { type1: t2, type2: t5, node: node.operand2 }
       ]
+      if (nodeAnnotatedType != null)
+        constraints.push({ type1: (nodeAnnotatedType as TypeVariable).id as Type, type2: t3, node})
       const solvedType = unifyAndSubstitute(t3, constraints)
       return [solvedType, constraints]
+      
     }
     // List
     case 'ListLiteral': {
