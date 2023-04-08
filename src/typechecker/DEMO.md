@@ -9,27 +9,29 @@ a type `t` and a set of type constraints `C`, each of the form `t0 = t1`.
 env |- e : t -| C
 ```
 
+The idea is that we find type constraints from the given expression and try to solve (unify) it in the hopes of finding a valid value for the type of the expression.
+
 For example,
 ```
-{} |- 1 : int -| []
-```
-or,
-```
-{} |- if true then 1 else 2 : 't -| ['t = t2, 't = t3, t1 = bool, t2 = int, t3 = int]
-    {} |- true : t1 -| [t1 = bool]
-    {} |- 1 : t2 -| [t2 = int]
-    {} |- 2 : t3 -| [t3 = int]
+env |- if e1 then e2 else e3 : 't -| C1, C2, C3, t1 = bool, 't = t2, 't = t3
+    if env |- e1 : t1 -| C1
+    and env |- e2 : t2 -| C2
+    and env |- e3 : t3 -| C3
 ```
 
-Once we get a type and set of type constraints, we first try to solve the set of type constraints (also known as unifying the set of constraints) to generate a list of substitutions. There is no valid type for a particular expression if and only if there is no valid solution to unification of type constraints.
+A comprehensive list of rules used in our algorithm can be found [here](README.md).
 
 ## Unifying Set of Type Constraints
 
-For example, consider the output of hindley milner for the following:
+For example, consider inferring the type of
 ```
-{ '+': int -> int -> int } |- fn f => fn x => f (x + 1) : 'a -> 'b -> 'e -| ['a = 'd -> 'e, 'c = int -> 'd, int -> int -> int = 'b -> 'c]
+fn f => fn x => f (x + 1)
 ```
-In particular, the type of `fn f => fn x => f (x + 1)` is `'a -> 'b -> 'e` and the list of type constraints obtained is `['a = 'd -> 'e, 'c = int -> 'd, int -> int -> int = 'b -> 'c]`.
+
+Hindley Milner gives us the type `'a -> 'b -> 'e` along with the set of type constraints:
+```
+['a = 'd -> 'e, 'c = int -> 'd, int -> int -> int = 'b -> 'c]
+```
 
 Let us try to unify it! The algorithm to solve a set of constraints is fairly simple, we try and eliminate complex terms as much as possible by breaking up complex constraints and using substitutions whenever we can.
 
@@ -85,9 +87,12 @@ More substitutions:
 {('d -> 'e) / 'a}; {(int -> 'd) / 'c}; {int / 'b}; {int / 'd}
 ```
 
-Thus we have successfully unified the set of type constraints to get the list of type substitutions `{('d -> 'e) / 'a}; {(int -> 'd) / 'c}; {int / 'b}; {int / 'd}`. Notice that if we had gotten a type constraint that is inconsistent (e.g. `int = bool` or `t1 -> t2 = t1 list` then we would throw a type error!)
 
-All thats left is to apply the set of substitutions to the generated type to successfully infer the type of `fn f => fn x => f (x + 1)`.
+Success! If we had gotten an inconsistent constraint, we would simply return type error instead. Some examples of inconsistent constraints:
+```
+int = bool
+'a -> 'b = 'c list
+```
 
 ## Applying Substitutions to Generated Type
 
@@ -105,7 +110,7 @@ Recall that `fn f => fn x => f (x + 1)` returned a type `'a -> 'b -> 'e`. Let us
 (int -> 'e) -> int -> 'e
 ```
 
-We have thus successfully inferred the type (correctly) to be `(int -> 'e) -> int -> 'e`. To aid readability, we have further downcasted type variables obtained to the lowest type variables to finally give us `(int -> 'a) -> int -> 'a`.
+To aid readability, we have further downcasted type variables obtained to the lowest type variables to finally give us `(int -> 'a) -> int -> 'a`.
 
 Feel free to [try it yourself](https://rohit0718.github.io/sml-slang-frontend/)!
 
@@ -120,25 +125,29 @@ in
     id true
 end
 ```
-Then, following the original algorithm, if we consider id to be of type `'a -> 'a` and run into `id 3`, then we will add the constraint that `'a = int`. However, when evaluating `id true`, we will also add the constraint that `'a = bool`, which causes as inconsistency in our unification algorithm as `int != bool`.
+Notice that if we run the algorithm from above we infer the following types and generate the following constraints:
+```
+let
+    val id = fn x => x      (* 'a -> 'a *)
+in
+    id 3;                   (* 'a = int *)
+    id true                 (* 'a = bool *)
+end
+```
+
+This ins inconsistent - unify produces `int = bool`!
 
 The solution is simple, instead of considering types of variables that have been declared in our program, we consider their type schemes. For example, the type scheme of `id` would be `'a . 'a -> 'a` which reads, for all `'a`, id has a type `'a -> 'a`.
 
-This solves the original problem as whenever we apply (or instantiate) the variable `id`, we create a new version of its type scheme. This when evaluating `id 3`, we instantiate a new copy of the type scheme `'a . 'a -> 'a`, giving us `'b -> 'b`, and adding the constraint that `'b = int`. Similarly, when evaluation `id true`, we instantiate a type `'c -> 'c` and add the constraint `'c = bool` in our set of type constraints. Notice we thus have no inconsistencies! Furthermore, the type scheme of `id` remains as `'a . 'a -> 'a` as intended.
-
-## Overview of Rules
-
-Let us look at an example of type inference for conditional expressions in greater detail.
+The above example now becomes:
 ```
-env |- if e1 then e2 else e3 : 't -| C1, C2, C3, t1 = bool, 't = t2, 't = t3
-    if fresh 't
-    and env |- e1 : t1 -| C1
-    and env |- e2 : t2 -| C2
-    and env |- e3 : t3 -| C3
+let
+    val id = fn x => x      (* 'a . 'a -> 'a *)
+in
+    id 3;                   (* 'b = int, where id is instantiated as 'b -> 'b *)
+    id true                 (* 'c = bool, where id is instantiated as 'c -> 'c *)
+end
 ```
-Here, we create a fresh 't, which denotes a new type variable that has not been used thus far in the algorithm, and return it as the type of the conditional. Additionally, we evaluate the types of e1, e2, e3 to get t1, t2, t3 respectively. Then, the set of type constriants returned is simply a concatenation of constraints returned from the evaluations of the subexpressions, along with the constraint that t1 must be a bool and that t2 and t3 must be equal!
-
-A comprehensive list of rules used in our algorithm can be found [here](README.md).
 
 ## Interesting Examples
 

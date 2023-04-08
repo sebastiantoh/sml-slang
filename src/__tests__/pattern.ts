@@ -152,7 +152,7 @@ in
   one_x_x [1,2,3]
 end
 `)
-    ).toThrow('Cannot have two of the same variable in one list pattern'))
+    ).toThrow('found duplicate variables in pattern: x'))
 
   test('list pattern matching with infix construction', () =>
     expect(

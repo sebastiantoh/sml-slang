@@ -14,8 +14,6 @@ import { CustomSourceError } from './errors'
 import { Type, TypeConstraint } from './types'
 import { BOOL_TY, UNIT_TY } from './utils'
 
-export const INIT_ENV = createInitialTypeEnvironment()
-
 export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeConstraint[]] {
   let nodeAnnotatedType = 'annotated_type' in node
     ? node.annotated_type
@@ -199,3 +197,5 @@ export function typeCheck(node: Node) {
   const [type, typeConstraints] = hindleyMilner(INIT_ENV, node)
   return unifyAndSubstitute(type, typeConstraints)
 }
+
+export const INIT_ENV = createInitialTypeEnvironment()
