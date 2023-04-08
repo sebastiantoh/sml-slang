@@ -148,22 +148,6 @@ const tryMatch = (originalEnv: Environment, value: Value, pat: Pattern): [boolea
       return [false, originalEnv]
     }
 
-    // Cannot have two of the same variable in one list pattern
-    const patVarSet = new Set()
-    let numVars = 0
-    pat.elements.forEach(e => {
-      if (e.tag === 'PatVariable') {
-        numVars++
-        patVarSet.add(e.id)
-      }
-    })
-
-    // Throw error if there is a duplicate variable
-    // TODO: we might want to change this into a parsing error
-    if (patVarSet.size !== numVars) {
-      throw new RuntimeError(`'Cannot have two of the same variable in one list pattern'`)
-    }
-
     let updatedEnv = { ...E }
     for (let i = 0; i < pat.arity; i++) {
       const [matched, env] = tryMatch(updatedEnv, vals[i], pats[i])

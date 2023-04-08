@@ -5,6 +5,7 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as assert from 'assert'
+import { groupBy, pickBy } from 'lodash'
 
 import { SmlLexer } from '../lang/SmlLexer'
 import {
@@ -103,6 +104,30 @@ function contextToLocation(ctx: ParserRuleContext): SourceLocation {
       line: ctx.stop ? ctx.stop.line : ctx.start.line,
       column: ctx.stop ? ctx.stop.charPositionInLine : ctx.start.charPositionInLine
     }
+  }
+}
+
+function throwParseErrorIfDuplicateVariableInPattern(pattern: Pattern, loc: SourceLocation) {
+  function collectVariables(element: Pattern) {
+    const variableNames: string[] = []
+    switch (element.tag) {
+      case 'PatVariable':
+        variableNames.push(element.id)
+        break
+      case 'InfixConstruction':
+        variableNames.push(...collectVariables(element.pat1))
+        variableNames.push(...collectVariables(element.pat2))
+        break
+      case 'ListPattern':
+        element.elements.forEach(e => variableNames.push(...collectVariables(e)))
+        break
+    }
+    return variableNames
+  }
+  const variableNames = collectVariables(pattern)
+  const duplicateVariableNames = Object.keys(pickBy(groupBy(variableNames), x => x.length > 1))
+  if (duplicateVariableNames.length > 0) {
+    throw new ParseError(loc, `found duplicate variables in pattern: ${duplicateVariableNames}`)
   }
 }
 
@@ -335,25 +360,29 @@ class NodeGenerator implements SmlVisitor<Node> {
     }
   }
   visitPatInfixConstruction(ctx: PatInfixConstructionContext): InfixConstruction {
-    return {
+    const pattern = {
       tag: 'InfixConstruction',
       pat1: this.visit(ctx._pat1) as Pattern,
       pat2: this.visit(ctx._pat2) as Pattern,
       id: ctx.CONS().text,
       loc: contextToLocation(ctx)
-    }
+    } as InfixConstruction
+    throwParseErrorIfDuplicateVariableInPattern(pattern, contextToLocation(ctx))
+    return pattern
   }
   visitPatParentheses(ctx: PatParenthesesContext): Pattern {
     return this.visit(ctx.pat()) as Pattern
   }
   visitPatList(ctx: PatListContext): ListPattern {
-    const elements = ctx.pat()
-    return {
+    const elements = ctx.pat().map(e => this.visit(e)) as Pattern[]
+    const pattern = {
       tag: 'ListPattern',
-      elements: elements.map(e => this.visit(e)) as Pattern[],
+      elements: elements,
       arity: elements.length,
       loc: contextToLocation(ctx)
-    }
+    } as ListPattern
+    throwParseErrorIfDuplicateVariableInPattern(pattern, contextToLocation(ctx))
+    return pattern
   }
   visitPatTypeAnnotation(ctx: PatTypeAnnotationContext): Pattern {
     const pat = this.visit(ctx.pat()) as Pattern
@@ -401,8 +430,6 @@ class NodeGenerator implements SmlVisitor<Node> {
   visitFunDecl(ctx: FunDeclContext): ValueDeclaration {
     // function declarations are syntatic sugar for value declarations:
     // (see Page 90 of https://smlfamily.github.io/sml90-defn.pdf, Figure 17)
-    // TODO: this desugaring doesn't work for mutually recursive function :'(
-    // For more info: https://stackoverflow.com/questions/63428214/declaring-interdependent-values-and-functions-in-standard-ml
     return {
       tag: 'ValueDeclaration',
       valbinds: ctx.funbind().map((fb: FunbindContext) => this.visit(fb) as Valbind),
@@ -455,7 +482,6 @@ class NodeGenerator implements SmlVisitor<Node> {
     const nParams = funMatches[0].pat().length
     const matches: Array<Match> = []
 
-    // TODO: delete this specific case once multiple cases have been supported
     if (funMatches.length === 1) {
       const funMatch = funMatches[0]
       const params = funMatch.pat().map(p => this.visit(p) as Pattern)
@@ -483,7 +509,7 @@ class NodeGenerator implements SmlVisitor<Node> {
     } else {
       throw new ParseError(
         contextToLocation(ctx),
-        "TODO: multiple cases for functions not yet implemented. Consider using 'case (...) of ...' instead"
+        "multiple cases for functions not yet implemented. Consider using 'case (...) of ...' instead"
       )
 
       // Each funmatch correspond to a separate case. Each case can contain >= 1 parameter (or patterns)
