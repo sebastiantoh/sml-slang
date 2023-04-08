@@ -2,6 +2,11 @@
 
 SML sub-language implementation
 
+## Requirements
+
+- Node (known working version: v16.19.0)
+- Yarn (known working version: v1.22.19)
+
 ## Set Up
 
 ### Building
