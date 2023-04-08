@@ -1,3 +1,3 @@
-import { Node } from './ast';
-export declare function parseProg(source: string): Node;
-export declare function parseExp(source: string): Node;
+import { Expression, Program } from './ast';
+export declare function parseProg(source: string): Program;
+export declare function parseExp(source: string): Expression;

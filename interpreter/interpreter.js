@@ -10,11 +10,19 @@ let A = [];
 let S = [];
 let E = { frame: {}, parent: undefined };
 const initEnv = () => {
-    const env = { frame: {}, parent: undefined };
+    E = { frame: {}, parent: undefined };
     for (const fn of Sml.builtinFns) {
-        assignInEnv(env, fn.id, fn);
+        assignInEnv(E, fn.id, fn);
     }
-    return env;
+    loadStdlib();
+    return E;
+};
+const loadStdlib = () => {
+    const prevA = A;
+    const prevS = S;
+    evaluate(Sml.STDLIB, false);
+    A = prevA;
+    S = prevS;
 };
 const extendEnv = (env) => {
     return { frame: {}, parent: env };
@@ -435,10 +443,12 @@ const execMicrocode = (cmd) => {
         }
     }
 };
-function evaluate(node) {
+function evaluate(node, reinitialise_env = true) {
+    if (reinitialise_env) {
+        E = initEnv();
+    }
     A = [node];
     S = [];
-    E = initEnv();
     exports.stdout = [];
     const stepLimit = 1000000;
     let i = 0;

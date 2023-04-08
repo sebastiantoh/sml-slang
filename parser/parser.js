@@ -466,37 +466,6 @@ class NodeGenerator {
         assert(false);
     }
 }
-function getStdlibSourceCode() {
-    return `
-fun hd lst = case lst of x::xs => x
-
-fun tl lst = case lst of x::xs => xs
-
-fun length lst =
-  let
-    fun loop acc lst =
-      case lst of [] => acc | x::xs => loop (acc + 1) (xs)
-  in
-    loop 0 lst
-end
-
-fun rev lst =
-  let
-    fun loop acc lst =
-      case lst of [] => acc | x::xs => loop (x::acc) (xs)
-  in
-    loop [] lst
-end
-
-fun map f lst =
-  let
-    fun loop acc lst =
-      case lst of [] => rev acc | x::xs => loop (f x::acc) (xs)
-  in
-    loop [] lst
-end
-  `;
-}
 function parse(source, f) {
     try {
         const inputStream = antlr4ts_1.CharStreams.fromString(source);
@@ -530,8 +499,7 @@ function parse(source, f) {
     }
 }
 function parseProg(source) {
-    const stdlibSourceCode = getStdlibSourceCode();
-    return parse(stdlibSourceCode + source, (parser) => parser.prog());
+    return parse(source, (parser) => parser.prog());
 }
 exports.parseProg = parseProg;
 function parseExp(source) {

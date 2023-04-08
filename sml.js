@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.builtinFns = exports.builtinBinOperators = exports.valueToString = void 0;
+exports.STDLIB = exports.builtinFns = exports.builtinBinOperators = exports.valueToString = void 0;
 const assert = require("assert");
 const lodash_1 = require("lodash");
 const interpreter_1 = require("./interpreter/interpreter");
+const parser_1 = require("./parser/parser");
 const errors_1 = require("./typechecker/errors");
 const valueToString = (val) => {
     switch (val.tag) {
@@ -268,4 +269,33 @@ exports.builtinFns = [
         }
     }
 ];
+exports.STDLIB = (0, parser_1.parseProg)(`
+fun hd lst = case lst of x::xs => x
+
+fun tl lst = case lst of x::xs => xs
+
+fun length lst =
+  let
+    fun loop acc lst =
+      case lst of [] => acc | x::xs => loop (acc + 1) (xs)
+  in
+    loop 0 lst
+end
+
+fun rev lst =
+  let
+    fun loop acc lst =
+      case lst of [] => acc | x::xs => loop (x::acc) (xs)
+  in
+    loop [] lst
+end
+
+fun map f lst =
+  let
+    fun loop acc lst =
+      case lst of [] => rev acc | x::xs => loop (f x::acc) (xs)
+  in
+    loop [] lst
+end
+`);
 //# sourceMappingURL=sml.js.map

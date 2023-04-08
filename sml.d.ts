@@ -75,3 +75,4 @@ export declare const builtinBinOperators: {
     };
 };
 export declare const builtinFns: Array<BuiltinFn>;
+export declare const STDLIB: import("./parser/ast").Program;

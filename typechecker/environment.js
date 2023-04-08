@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.unifyAndSubstitute = exports.substituteIntoType = exports.unify = exports.instantiate = exports.getPrimitiveFuncTypes = exports.extendTypeEnvFromPattern = exports.extendTypeEnv = exports.getTypeSchemeFromEnv = exports.createInitialTypeEnvironment = exports.freshTypeVariable = void 0;
 const assert = require("assert");
 const lodash_1 = require("lodash");
+const Sml = require("../sml");
 const _1 = require(".");
 const errors_1 = require("./errors");
 const utils_1 = require("./utils");
@@ -61,8 +62,9 @@ const primitiveFuncs = [
     ['not', { type: (0, utils_1.makeFunctionType)(utils_1.BOOL_TY, utils_1.BOOL_TY), typeVariables: [] }]
 ];
 function createInitialTypeEnvironment() {
-    // initial type env only contains inbuilt funcs
-    return Object.fromEntries(primitiveFuncs);
+    // initial type env only contains inbuilt funcs + stdlib declarations
+    const envWithBuiltins = Object.fromEntries(primitiveFuncs);
+    return extendTypeEnv(envWithBuiltins, Sml.STDLIB.body);
 }
 exports.createInitialTypeEnvironment = createInitialTypeEnvironment;
 function getTypeSchemeFromEnv(env, expVar) {
