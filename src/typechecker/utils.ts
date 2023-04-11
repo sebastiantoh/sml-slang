@@ -39,6 +39,15 @@ export function isPrimitiveType(type: Type): type is PrimitiveType {
   return isInt(type) || isReal(type) || isStr(type) || isChar(type) || isBool(type) || isUnit(type)
 }
 
+export function isPrimitiveTypeString(str: string): boolean {
+  return str === INT_TY 
+      || str === REAL_TY 
+      || str === STR_TY 
+      || str === CHAR_TY 
+      || str === BOOL_TY 
+      || str === UNIT_TY
+}
+
 export function isFunctionType(type: Type): type is FunctionType {
   return (
     (type as FunctionType)?.parameterType !== undefined &&

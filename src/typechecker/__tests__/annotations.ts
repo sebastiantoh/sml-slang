@@ -6,6 +6,8 @@ describe('Constant', () => {
     test('Valid Annotation', () => expect(parseAndTypeCheckExp('1:int')).toBe('int'))
     test('Invalid Annotation', () =>
       expect(() => parseAndTypeCheckExp('1:real')).toThrow(CustomSourceError))
+    test('Invalid Annotation', () =>
+      expect(() => parseAndTypeCheckExp(`1:'a`)).toThrow(CustomSourceError))
   })
   describe('RealConstant', () => {
     test('Valid Annotation', () => expect(parseAndTypeCheckExp('1.0:real')).toBe('real'))
@@ -62,7 +64,7 @@ describe('Infix Application', () => {
   test('Valid annotation', () =>
     expect(
       parseAndTypeCheckExp(`
-1 + 1
+(1 + 1):int
   `)
     ).toBe(`int`))
 

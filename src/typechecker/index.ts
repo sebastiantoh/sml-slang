@@ -1,3 +1,4 @@
+import { assert } from 'console'
 import { Node, TypeAstNode } from '../parser/ast'
 import {
   createInitialTypeEnvironment,
@@ -12,7 +13,7 @@ import {
 } from './environment'
 import { CustomSourceError } from './errors'
 import { PrimitiveType, Type, TypeConstraint } from './types'
-import { BOOL_TY, UNIT_TY } from './utils'
+import { BOOL_TY, UNIT_TY, isPrimitiveType, isPrimitiveTypeString } from './utils'
 
 function genAnnotations(node: Node, t: Type): TypeConstraint[] {
   if (!('annotated_type' in node) || node.annotated_type == undefined) return []
@@ -29,10 +30,13 @@ function genAnnotations(node: Node, t: Type): TypeConstraint[] {
         }
       case 'TypeConstructor':
         switch (annotation.id) {
-          // TODO: check if this is exhaustive
           case 'list':
+            if (annotation.typeParameters.length !== 1) {
+              throw new CustomSourceError(node, `list type expects exactly 1 type parameter`)
+            }
             return { elementType: getAnnotationType(annotation.typeParameters[0]) }
           default:
+            assert(isPrimitiveTypeString(annotation.id))
             return annotation.id as PrimitiveType
         }
       default:
