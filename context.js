@@ -17,7 +17,6 @@ const createEmptyContext = (externalSymbols, externalContext) => {
         typeEnvironments: typechecker_1.INIT_ENV
     };
 };
-// TODO: cleanup this function.
 // currently used by the frontend, can update the way its called
 const createContext = (externalSymbols = [], externalContext) => {
     return createEmptyContext(externalSymbols, externalContext);
