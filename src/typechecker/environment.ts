@@ -60,7 +60,6 @@ const primitiveFuncs: [string, TypeScheme][] = [
   ],
   ...['=', '<>', '<', '>', '<=', '>='].map(comp => {
     const t = freshTypeVariable()
-    // TODO: might need to update these to equality type variables (''a, ''b, etc.)
     return [
       comp,
       {
@@ -170,17 +169,7 @@ export function extendTypeEnv(env: TypeEnvironment, decs: Declaration[]): TypeEn
       }
       case 'LocalDeclaration': {
         const envWithLocalDecs = extendTypeEnv(env, dec.localDecs)
-        const envWithDecs = extendTypeEnv(envWithLocalDecs, dec.decs)
-
-        /*
-          now we remove all declarations from local declarations
-          make sure things like `local val x = 5 in val x = 3 end;` work as expected
-
-          TODO: figure out if theres a nice way of doing this without needing a seperate function extendTypeEnvWithLocalDecs(env, decs, envWithLocalDecs)
-            perhaps we cld have an optional third param for this function envWithLocalDecs, which is used as the env if defined?
-            right now this doesnt work properly!
-        */
-        return envWithDecs
+        return extendTypeEnv(envWithLocalDecs, dec.decs)
       }
     }
   }
@@ -306,7 +295,6 @@ function unsolvedEnv(env: TypeEnvironment): TypeVariable[] {
   return tvs
 }
 
-// inefficient way of generalizing. TODO: make this more efficient?
 function generalize(
   C: TypeConstraint[],
   env: TypeEnvironment,
