@@ -19,7 +19,6 @@ const createEmptyContext = <T>(externalSymbols: string[], externalContext?: T): 
   }
 }
 
-// TODO: cleanup this function.
 // currently used by the frontend, can update the way its called
 const createContext = <T>(externalSymbols: string[] = [], externalContext?: T): Context => {
   return createEmptyContext(externalSymbols, externalContext)

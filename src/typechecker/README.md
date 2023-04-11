@@ -54,8 +54,11 @@ Since we dont allow user defined infix applications, it suffices to ensure that 
 div : int -> int -> int
 mod : int -> int -> int
 * : int -> int -> int
+*. : real -> real -> real
 + : int -> int -> int
++. : real -> real -> real
 - : int -> int -> int
+-. : real -> real -> real
 ^ : string -> string -> string
 = : 'a . 'a -> 'a -> 'a
 <> : 'a . 'a -> 'a -> 'a
@@ -85,9 +88,8 @@ env |- [e1, e2, ... en] : 't list -| C1, C2, .. Cn, 't = t1, 't = t2, ... 't = t
 ```
 
 ### Let Expression
-extend_env(env, dec) takes in an env and a set of declarations and extends it with the generalizations of the types defined (see Declarations below for more info)
+`extend_env(env, dec)` takes in an env and a set of declarations and extends it with the generalizations of the types defined (see Declarations below for more info)
 
-TODO: are any of the constraints C1 .. Cn-1 needed?
 ```
 env |- let dec in e1; e2; ...; en end: tn -| Cn
     if extend_env(env, dec) |- e1 : t1 -| C1
@@ -162,7 +164,6 @@ env |- u : unit -| {}
 ```
 
 ### Wildcard
-TODO: check if its sufficient to consider the wildcard to be a type variable
 ```
 env |- _ : 't -| {}
     if fresh 't
@@ -179,33 +180,23 @@ env |- v : 't -| {}
 
 ### Infix Construction
 ```
-env |- hd::tl : 't list -| C1, C2, t1 = 't, t2 = 't list
+env |- p1::p2 : 't list -| C1, C2, t1 = 't, t2 = 't list
     if fresh 't
-    and env |- hd : t1 -| C1
-    and env |- tl : t2 -| C2
+    and env |- p1 : t1 -| C1
+    and env |- p2 : t2 -| C2
 ```
 
 e.g.
 - `fun f (hd::tl) = [1,2,3]` has a pattern of type `'a . 'a list`
 
 ### List
-Go through patterns and check we can unify it to a specific type.
-
-The logic for (specific) unifying types of patterns (type of 't) can be simply:
 ```
-    get types t1, t2,..., tn of patterns p1, p2,..., pn
-    any primitive (p) defined?
-        are there 2 different primitive types or list types defined? type error!
-        type is p list
-    any type variable ('a) defined?
-        are there any list types defined? type error!
-        type is 'a list
-    any conflicting list types (t)? type error!
-    type is t list
-```
-```
-env |- [p1, p2,..., pn] : 't list -| {}
-    if fresh 't, where 't = is the most specific unification of all types of p1, p2, ... pn (if exists)
+env |- [p1, p2,..., pn] : 't list -| C1, C2, ..., Cn, 't = t1, 't = t2, ..., 't = tn
+    if fresh 't
+    and env |- p1 : t1 -| C1
+    and env |- p2 : t2 -| C2
+    ...
+    and env |- pn : tn -| Cn
 ```
 e.g.
 - `fun f [x,y] = [2,3] | f [1] = [3]` has a pattern of type `int list`
@@ -218,27 +209,46 @@ e.g.
 For declarations, it suffices to extend the type environment (there is no type to return). We define a function `extend_env(env, dec)` that returns an environment extended with the declarations in `dec`.
 
 ### Value
-If patterns are of type 'a (type variable):
+If pattern is of type 'a (type variable) and not wildcard (if wildcard, we do not have to extend the environment):
 ```
-extend_env(env, val p1 = e1 and p2 = e2 .... and pn = en) -> generalize(Cn, generalize(...., generalize(C2, generalize(C1, env, p1 : t1), p2 : t2), ...), pn : tn)
+extend_env(env, val p1 = e1) -> generalize(C1, env, p1 : t1)
     if env |- e1 : t1 -| C1
-    and env |- e2 : t2 -| C2
-    ...
-    and env |- en : tn -| Cn
 ```
 
-If patterns are of type p (primitive), it suffices to test that expression is of the same type (no extension of env needed):
+If pattern is of type primitive, it suffices to test that expression is of the same type (no extension of env needed):
 ```
-extend_env(env, val p1 = e1 and p2 = e2 .... and pn = en) -> env
+extend_env(env, val p1 = e1) -> env
     if env |- e1 : t1 -| C1
-    and env |- e2 : t2 -| C2
-    ...
-    and env |- en : tn -| Cn
 
-    assert(p1 = t1, p2 = t2,..., pn = tn)
+    assert(p1 = t1)
 ```
 
-TODO: handle infix construction and list (just a matter of evaluating e1s type and assigning the types to the vars in the pattern)
+If pattern is of type list, it suffices to recursively extend type env with the elements of the pattern. `extend_env_from_pat` is defined below.
+```
+extend_env(env, val [p1, p2, ..., pn] = e1) -> extend_env_from_pat(env, [p1, p2, ..., pn], t1)
+    if env |- e1 : t1 -| C1
+```
+
+If pattern is of infix construction type, we similarly recursively extend type env with elements of pattern.
+```
+extend_env(env, val p1::p2 = e1) -> extend_env_from_pat(env, p1::p2, t1)
+    if env |- e1 : t1 -| C1
+```
+
+> #### `extend_env_from_pat(env, p1, t1)`
+> If pattern is of primitive type or wildcard, we do nothing.
+> If pattern is of type 'a (type variable), we extend environment with  the specified type.
+> ```
+> extend_env_from_pat(env, p1, t1) -> { ...env, p1: t1 }
+> ```
+> If pattern is of type list pattern, we recursively extend types of the elements. Specified type must be a list type.
+> ```
+> extend_env_from_pat(env, [p1, p2,..., pn], t1 list) -> extend_env_from_pat(.....extend_env_from_pat(extend_env_from_pat(env, p1, t1), p2, t1), pn, t1)
+> ```
+> If pattern is of infix construction type, we similarly recursively extend types of the elements. Specified type must be a list type.
+> ```
+> extend_env_from_pat(env, p1::p2, t1 list) -> { p1: t1, ...extend_env_from_pat(env, p2, t1 list) }
+> ```
 
 ### Sequence
 ```
@@ -246,7 +256,6 @@ extend_env(env, dec1 ; dec2 ; ... ; decn) -> extend_env(extend_env(......extend_
 ```
 
 ### Local
-TODO: update this. this is incorrect! we dont want decs in dec1 to show up in our final env.
 ```
 extend_env(env, local dec1 in dec2 end) -> extend_env(extend_env(env, dec1), dec2)
 ```
@@ -261,7 +270,6 @@ extend_env(env, prog) -> extend_env(env, dec1 ; dec2 ; ... ; decn) -> extend_env
 ```
 
 ### Sequence
-TODO: do the programs affect each others env?
 ```
 extend_env(env, prog1 ; prog2 ; ... ; progn) -> extend_env(env, prog1) ; extend_env(env, prog1) ; .... ; extend_env(env, progn)
 ```
