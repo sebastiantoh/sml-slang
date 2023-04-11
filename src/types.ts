@@ -83,7 +83,6 @@ export interface Context<T = any> {
   runtime: {
     isRunning: boolean
     environments: Environment[]
-    // TODO: udpate to sml value?
     value: any
     nodes: Node[]
   }

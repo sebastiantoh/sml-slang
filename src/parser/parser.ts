@@ -93,7 +93,6 @@ import {
   Wildcard
 } from './ast'
 
-// TODO: move to parser/utils.ts?
 function contextToLocation(ctx: ParserRuleContext): SourceLocation {
   return {
     start: {
