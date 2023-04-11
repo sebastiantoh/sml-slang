@@ -15,11 +15,20 @@ let S: Array<Value> = []
 let E: Environment = { frame: {}, parent: undefined }
 
 const initEnv = (): Environment => {
-  const env = { frame: {}, parent: undefined }
+  E = { frame: {}, parent: undefined }
   for (const fn of Sml.builtinFns) {
-    assignInEnv(env, fn.id, fn)
+    assignInEnv(E, fn.id, fn)
   }
-  return env
+  loadStdlib()
+  return E
+}
+
+const loadStdlib = () => {
+  const prevA = A
+  const prevS = S
+  evaluate(Sml.STDLIB, false)
+  A = prevA
+  S = prevS
 }
 
 const extendEnv = (env: Environment): Environment => {
@@ -146,22 +155,6 @@ const tryMatch = (originalEnv: Environment, value: Value, pat: Pattern): [boolea
     // Lists of different length does not match
     if (vals.length !== pats.length) {
       return [false, originalEnv]
-    }
-
-    // Cannot have two of the same variable in one list pattern
-    const patVarSet = new Set()
-    let numVars = 0
-    pat.elements.forEach(e => {
-      if (e.tag === 'PatVariable') {
-        numVars++
-        patVarSet.add(e.id)
-      }
-    })
-
-    // Throw error if there is a duplicate variable
-    // TODO: we might want to change this into a parsing error
-    if (patVarSet.size !== numVars) {
-      throw new RuntimeError(`'Cannot have two of the same variable in one list pattern'`)
     }
 
     let updatedEnv = { ...E }
@@ -480,10 +473,12 @@ const execMicrocode = (cmd: Microcode) => {
   }
 }
 
-export function evaluate(node: Node) {
+export function evaluate(node: Node, reinitialise_env = true) {
+  if (reinitialise_env) {
+    E = initEnv()
+  }
   A = [node]
   S = []
-  E = initEnv()
   stdout = []
 
   const stepLimit = 1000000

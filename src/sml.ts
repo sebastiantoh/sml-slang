@@ -2,6 +2,7 @@ import * as assert from 'assert'
 import { isEqual } from 'lodash'
 
 import { stdout } from './interpreter/interpreter'
+import { parseProg } from './parser/parser'
 import { RuntimeError } from './typechecker/errors'
 import { BuiltinFn, Value } from './types'
 
@@ -278,3 +279,33 @@ export const builtinFns: Array<BuiltinFn> = [
     }
   }
 ]
+
+export const STDLIB = parseProg(`
+fun hd lst = case lst of x::xs => x
+
+fun tl lst = case lst of x::xs => xs
+
+fun length lst =
+  let
+    fun loop acc lst =
+      case lst of [] => acc | x::xs => loop (acc + 1) (xs)
+  in
+    loop 0 lst
+end
+
+fun rev lst =
+  let
+    fun loop acc lst =
+      case lst of [] => acc | x::xs => loop (x::acc) (xs)
+  in
+    loop [] lst
+end
+
+fun map f lst =
+  let
+    fun loop acc lst =
+      case lst of [] => rev acc | x::xs => loop (f x::acc) (xs)
+  in
+    loop [] lst
+end
+`)

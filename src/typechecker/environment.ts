@@ -2,6 +2,7 @@ import * as assert from 'assert'
 import { cloneDeep, difference, uniqBy } from 'lodash'
 
 import { Declaration, ExpVariable, InfixApplication, Pattern } from '../parser/ast'
+import * as Sml from '../sml'
 import { hindleyMilner } from '.'
 import { CustomSourceError, TypeMismatchError } from './errors'
 import { Type, TypeConstraint, TypeScheme, TypeSubstitution, TypeVariable } from './types'
@@ -80,8 +81,9 @@ const primitiveFuncs: [string, TypeScheme][] = [
 ]
 
 export function createInitialTypeEnvironment(): TypeEnvironment {
-  // initial type env only contains inbuilt funcs
-  return Object.fromEntries(primitiveFuncs)
+  // initial type env only contains inbuilt funcs + stdlib declarations
+  const envWithBuiltins = Object.fromEntries(primitiveFuncs)
+  return extendTypeEnv(envWithBuiltins, Sml.STDLIB.body)
 }
 
 export function getTypeSchemeFromEnv(env: TypeEnvironment, expVar: ExpVariable): TypeScheme {

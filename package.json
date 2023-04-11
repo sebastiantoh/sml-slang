@@ -9,6 +9,7 @@
     "ci": "yarn format:ci && yarn eslint && yarn test",
     "compile": "yarn tsc",
     "eslint": "eslint --ext \".ts,.tsx\" src",
+    "eval": "node dist/run.js {0}",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:ci": "prettier --list-different \"src/**/*.{ts,tsx}\"",
     "prepare": "husky install",
