@@ -1,4 +1,5 @@
 import { assert } from 'console'
+
 import { Node, TypeAstNode } from '../parser/ast'
 import {
   createInitialTypeEnvironment,
@@ -12,17 +13,25 @@ import {
   unifyAndSubstitute
 } from './environment'
 import { CustomSourceError } from './errors'
-import { PrimitiveType, Type, TypeConstraint } from './types'
-import { BOOL_TY, UNIT_TY, isPrimitiveType, isPrimitiveTypeString } from './utils'
+import { PrimitiveType, Type, TypeConstraint, TypeVariable } from './types'
+import { BOOL_TY, isPrimitiveTypeString, UNIT_TY } from './utils'
 
 function genAnnotations(node: Node, t: Type): TypeConstraint[] {
   if (!('annotated_type' in node) || node.annotated_type == undefined) return []
 
+  const knownTypeVars = new Map<string, TypeVariable>()
   function getAnnotationType(annotation: TypeAstNode): Type {
     switch (annotation.tag) {
       case 'TypeVariable':
-        // Currently all possible cases are primitive type?
-        return annotation.id as PrimitiveType
+        let tv: TypeVariable
+        if (knownTypeVars.has(annotation.id)) {
+          tv = knownTypeVars.get(annotation.id) as TypeVariable
+        } else {
+          tv = freshTypeVariable()
+          knownTypeVars.set(annotation.id, tv)
+        }
+
+        return tv
       case 'TypeFunction':
         return {
           parameterType: getAnnotationType(annotation.argTy),
