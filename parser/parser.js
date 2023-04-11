@@ -8,7 +8,6 @@ const lodash_1 = require("lodash");
 const SmlLexer_1 = require("../lang/SmlLexer");
 const SmlParser_1 = require("../lang/SmlParser");
 const errors_1 = require("../typechecker/errors");
-// TODO: move to parser/utils.ts?
 function contextToLocation(ctx) {
     return {
         start: {
