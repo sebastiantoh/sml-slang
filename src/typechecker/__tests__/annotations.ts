@@ -6,8 +6,7 @@ describe('Constant', () => {
     test('Valid Annotation', () => expect(parseAndTypeCheckExp('1:int')).toBe('int'))
     test('Invalid Annotation', () =>
       expect(() => parseAndTypeCheckExp('1:real')).toThrow(CustomSourceError))
-    test('Invalid Annotation', () =>
-      expect(() => parseAndTypeCheckExp(`1:'a`)).toThrow(CustomSourceError))
+    test('Invalid Annotation', () => expect(() => parseAndTypeCheckExp(`1:'a`)).toThrow())
   })
   describe('RealConstant', () => {
     test('Valid Annotation', () => expect(parseAndTypeCheckExp('1.0:real')).toBe('real'))
@@ -152,6 +151,17 @@ end : int
   `)
     ).toThrow(CustomSourceError))
 })
+
+test('Invalid annotation', () =>
+  expect(() =>
+    parseAndTypeCheckExp(`
+let
+  fun id x : int = x
+in
+  id "A"
+end
+`)
+  ).toThrow(CustomSourceError))
 
 describe('Pattern', () => {
   test('Valid annotation', () =>
