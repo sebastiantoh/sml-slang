@@ -14,7 +14,8 @@ import {
 } from './environment'
 import { CustomSourceError } from './errors'
 import { PrimitiveType, Type, TypeConstraint, TypeVariable } from './types'
-import { BOOL_TY, isPrimitiveTypeString, UNIT_TY } from './utils'
+import { BOOL_TY, isPrimitiveType, isPrimitiveTypeString, stringifyType, UNIT_TY } from './utils'
+import { isTypeVariableType } from './utils'
 
 function genAnnotations(node: Node, t: Type): TypeConstraint[] {
   if (!('annotated_type' in node) || node.annotated_type == undefined) return []
@@ -53,7 +54,15 @@ function genAnnotations(node: Node, t: Type): TypeConstraint[] {
     }
   }
 
-  return [{ type1: getAnnotationType(node.annotated_type), type2: t, node }]
+  const annotatedType = getAnnotationType(node.annotated_type)
+  if (isPrimitiveType(t) && isTypeVariableType(annotatedType)) {
+    throw new CustomSourceError(
+      node,
+      `Failed to unify type constraint ${stringifyType(annotatedType)} = ${stringifyType(t)}.`
+    )
+  }
+
+  return [{ type1: annotatedType, type2: t, node }]
 }
 
 export function hindleyMilner(env: TypeEnvironment, node: Node): [Type, TypeConstraint[]] {
