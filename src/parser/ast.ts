@@ -157,7 +157,7 @@ export interface ListPattern extends BaseTypeAnnotatableNode {
 }
 
 /**
- * Types
+ * Type
  */
 export type TypeAstNode = TypeVariable | TypeConstructor | TypeFunction
 
