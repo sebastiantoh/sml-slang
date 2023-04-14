@@ -1,4 +1,4 @@
-import { assert } from 'console'
+import * as assert from 'assert'
 
 import { Node, TypeAstNode } from '../parser/ast'
 import {
