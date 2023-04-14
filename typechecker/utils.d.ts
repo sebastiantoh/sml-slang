@@ -12,6 +12,7 @@ export declare function isChar(type: Type): boolean;
 export declare function isBool(type: Type): boolean;
 export declare function isUnit(type: Type): boolean;
 export declare function isPrimitiveType(type: Type): type is PrimitiveType;
+export declare function isPrimitiveTypeString(str: string): boolean;
 export declare function isFunctionType(type: Type): type is FunctionType;
 export declare function isListType(type: Type): type is ListType;
 export declare function isTypeVariableType(type: Type): type is TypeVariable;

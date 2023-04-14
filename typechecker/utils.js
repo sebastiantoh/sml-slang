@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.hasTypeVariable = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
+exports.stringifyType = exports.curryFunctionTypes = exports.makeFunctionType = exports.hasTypeVariable = exports.isSameType = exports.isTypeVariableType = exports.isListType = exports.isFunctionType = exports.isPrimitiveTypeString = exports.isPrimitiveType = exports.isUnit = exports.isBool = exports.isChar = exports.isStr = exports.isReal = exports.isInt = exports.UNIT_TY = exports.BOOL_TY = exports.CHAR_TY = exports.STR_TY = exports.REAL_TY = exports.INT_TY = void 0;
 const assert = require("assert");
 const lodash_1 = require("lodash");
 exports.INT_TY = 'int';
@@ -38,6 +38,15 @@ function isPrimitiveType(type) {
     return isInt(type) || isReal(type) || isStr(type) || isChar(type) || isBool(type) || isUnit(type);
 }
 exports.isPrimitiveType = isPrimitiveType;
+function isPrimitiveTypeString(str) {
+    return (str === exports.INT_TY ||
+        str === exports.REAL_TY ||
+        str === exports.STR_TY ||
+        str === exports.CHAR_TY ||
+        str === exports.BOOL_TY ||
+        str === exports.UNIT_TY);
+}
+exports.isPrimitiveTypeString = isPrimitiveTypeString;
 function isFunctionType(type) {
     return ((type === null || type === void 0 ? void 0 : type.parameterType) !== undefined &&
         (type === null || type === void 0 ? void 0 : type.returnType) !== undefined);

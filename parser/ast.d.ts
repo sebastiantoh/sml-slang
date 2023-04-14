@@ -115,7 +115,7 @@ export interface ListPattern extends BaseTypeAnnotatableNode {
     arity: number;
 }
 /**
- * Types
+ * Type
  */
 export type TypeAstNode = TypeVariable | TypeConstructor | TypeFunction;
 export interface TypeVariable extends BaseNode {

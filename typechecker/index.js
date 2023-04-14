@@ -1,9 +1,53 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.INIT_ENV = exports.typeCheck = exports.hindleyMilner = void 0;
+const assert = require("assert");
 const environment_1 = require("./environment");
 const errors_1 = require("./errors");
 const utils_1 = require("./utils");
+const utils_2 = require("./utils");
+function genAnnotations(node, t) {
+    if (!('annotated_type' in node) || node.annotated_type == undefined)
+        return [];
+    const knownTypeVars = new Map();
+    function getAnnotationType(annotation) {
+        switch (annotation.tag) {
+            case 'TypeVariable':
+                let tv;
+                if (knownTypeVars.has(annotation.id)) {
+                    tv = knownTypeVars.get(annotation.id);
+                }
+                else {
+                    tv = (0, environment_1.freshTypeVariable)();
+                    knownTypeVars.set(annotation.id, tv);
+                }
+                return tv;
+            case 'TypeFunction':
+                return {
+                    parameterType: getAnnotationType(annotation.argTy),
+                    returnType: getAnnotationType(annotation.retTy)
+                };
+            case 'TypeConstructor':
+                switch (annotation.id) {
+                    case 'list':
+                        if (annotation.typeParameters.length !== 1) {
+                            throw new errors_1.CustomSourceError(node, `list type expects exactly 1 type parameter`);
+                        }
+                        return { elementType: getAnnotationType(annotation.typeParameters[0]) };
+                    default:
+                        assert((0, utils_1.isPrimitiveTypeString)(annotation.id));
+                        return annotation.id;
+                }
+            default:
+                throw new Error('Not implemented');
+        }
+    }
+    const annotatedType = getAnnotationType(node.annotated_type);
+    if ((0, utils_1.isPrimitiveType)(t) && (0, utils_2.isTypeVariableType)(annotatedType)) {
+        throw new errors_1.CustomSourceError(node, `Failed to unify type constraint ${(0, utils_1.stringifyType)(annotatedType)} = ${(0, utils_1.stringifyType)(t)}.`);
+    }
+    return [{ type1: annotatedType, type2: t, node }];
+}
 function hindleyMilner(env, node) {
     switch (node.tag) {
         /* Expressions */
@@ -14,12 +58,13 @@ function hindleyMilner(env, node) {
         case 'CharConstant':
         case 'BoolConstant':
         case 'UnitConstant': {
-            return [node.type, []];
+            return [node.type, genAnnotations(node, node.type)];
         }
         // Variable
         case 'ExpVariable': {
             const ts = (0, environment_1.getTypeSchemeFromEnv)(env, node);
-            return [(0, environment_1.instantiate)(ts), []];
+            const t = (0, environment_1.instantiate)(ts);
+            return [t, genAnnotations(node, t)];
         }
         // Application
         case 'Application': {
@@ -32,7 +77,7 @@ function hindleyMilner(env, node) {
                 { type1: t1, type2: { parameterType: t2, returnType: t }, node }
             ];
             const solvedType = (0, environment_1.unifyAndSubstitute)(t, constraints);
-            return [solvedType, constraints];
+            return [solvedType, [...constraints, ...genAnnotations(node, solvedType)]];
         }
         // Infix Application
         case 'InfixApplication': {
@@ -46,7 +91,7 @@ function hindleyMilner(env, node) {
                 { type1: t2, type2: t5, node: node.operand2 }
             ];
             const solvedType = (0, environment_1.unifyAndSubstitute)(t3, constraints);
-            return [solvedType, constraints];
+            return [solvedType, [...constraints, ...genAnnotations(node, solvedType)]];
         }
         // List
         case 'ListLiteral': {
@@ -57,7 +102,7 @@ function hindleyMilner(env, node) {
                 C = [...C, ...tmp_C, { type1: t, type2: tmp_ty, node: el }];
             }
             const solvedType = (0, environment_1.unifyAndSubstitute)({ elementType: t }, C);
-            return [solvedType, C];
+            return [solvedType, [...C, ...genAnnotations(node, solvedType)]];
         }
         // Let Expression
         case 'LetExpression': {
@@ -69,7 +114,7 @@ function hindleyMilner(env, node) {
                 [t, C] = hindleyMilner(extendedEnv, exp);
             }
             const solvedType = (0, environment_1.unifyAndSubstitute)(t, C);
-            return [solvedType, C];
+            return [solvedType, [...C, ...genAnnotations(node, solvedType)]];
         }
         // Expression Sequence
         case 'ExpSequence': {
@@ -80,7 +125,7 @@ function hindleyMilner(env, node) {
                 [t, C] = hindleyMilner(env, exp);
             }
             const solvedType = (0, environment_1.unifyAndSubstitute)(t, C);
-            return [solvedType, C];
+            return [solvedType, [...C, ...genAnnotations(node, solvedType)]];
         }
         // Conditional
         case 'ConditionalExpression': {
@@ -97,7 +142,7 @@ function hindleyMilner(env, node) {
                 { type1: t, type2: t3, node: node.alternative }
             ];
             const solvedType = (0, environment_1.unifyAndSubstitute)(t, constraints);
-            return [solvedType, constraints];
+            return [solvedType, [...constraints, ...genAnnotations(node, solvedType)]];
         }
         // Function
         case 'Function': {
@@ -112,14 +157,14 @@ function hindleyMilner(env, node) {
                 constraints.push(...patConstraints, ...expConstraints, { type1: parameterType, type2: patTy, node: pat }, { type1: returnType, type2: expTy, node: exp });
             }
             const solvedType = (0, environment_1.unifyAndSubstitute)(funTy, constraints);
-            return [solvedType, constraints];
+            return [solvedType, [...constraints, ...genAnnotations(node, solvedType)]];
         }
         /* Patterns */
         // For wildcard and variables, we are not able to infer any more information
         case 'Wildcard':
         case 'PatVariable': {
             const t = (0, environment_1.freshTypeVariable)();
-            return [t, []];
+            return [t, genAnnotations(node, t)];
         }
         case 'InfixConstruction': {
             // we only support ::
@@ -137,7 +182,7 @@ function hindleyMilner(env, node) {
                 { type1: t2, type2: tList, node: node.pat2 }
             ];
             const solvedType = (0, environment_1.unifyAndSubstitute)(tList, constraints);
-            return [solvedType, constraints];
+            return [solvedType, [...constraints, ...genAnnotations(node, solvedType)]];
         }
         case 'ListPattern': {
             const t = (0, environment_1.freshTypeVariable)();
@@ -148,7 +193,7 @@ function hindleyMilner(env, node) {
                 constraints.push(...elementConstraints, { type1: elementTy, type2: t, node: pat });
             }
             const solvedType = (0, environment_1.unifyAndSubstitute)(tList, constraints);
-            return [solvedType, constraints];
+            return [solvedType, [...constraints, ...genAnnotations(node, solvedType)]];
         }
         /* Programs */
         case 'Program': {
